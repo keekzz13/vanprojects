@@ -1,96 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VanProjects ChatBot</title>
-  <link rel="stylesheet" href="../style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My GPT - Vern</title>
   <style>
     body {
-      background: #0f0f1a;
-      color: white;
       font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #58a6ff;
     }
     .chat-box {
-      width: 100%;
+      width: 90%;
       max-width: 600px;
-      background: #1a1a2e;
-      padding: 20px;
+      background: #161b22;
       border-radius: 12px;
-      height: 70vh;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    .messages {
+      max-height: 400px;
       overflow-y: auto;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     .msg {
-      margin: 8px 0;
+      margin: 10px 0;
       padding: 10px;
       border-radius: 8px;
     }
     .user {
-      background: #4f46e5;
+      background: #238636;
       text-align: right;
     }
     .bot {
-      background: #2d2d44;
-      text-align: left;
+      background: #30363d;
+      position: relative;
+    }
+    .bot small {
+      display: block;
+      color: #8b949e;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .copy-btn {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      background: #21262d;
+      border: none;
+      color: #8b949e;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: 0.2s;
+    }
+    .copy-btn:hover {
+      background: #30363d;
+      color: #fff;
     }
     .input-box {
       display: flex;
-      width: 100%;
-      max-width: 600px;
+      gap: 10px;
     }
-    .input-box input {
+    input {
       flex: 1;
-      padding: 12px;
+      padding: 10px;
       border: none;
-      border-radius: 8px 0 0 8px;
-      outline: none;
+      border-radius: 6px;
+      background: #21262d;
+      color: #e6edf3;
     }
-    .input-box button {
-      padding: 12px 20px;
+    button {
+      padding: 10px 16px;
       border: none;
-      background: #4f46e5;
-      color: white;
-      border-radius: 0 8px 8px 0;
+      border-radius: 6px;
+      background: #58a6ff;
+      color: #fff;
       cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #1f6feb;
     }
   </style>
 </head>
 <body>
-  <h1>🤖 VanProjects ChatBot</h1>
-  <div class="chat-box" id="chatBox"></div>
-
-  <div class="input-box">
-    <input type="text" id="userInput" placeholder="Type your message..." />
-    <button onclick="sendMessage()">Send</button>
+  <h1>🤖 My GPT</h1>
+  <div class="chat-box">
+    <div class="messages" id="messages"></div>
+    <div class="input-box">
+      <input type="text" id="userInput" placeholder="Type a message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
   </div>
 
   <script>
-    async function sendMessage() {
-      const input = document.getElementById('userInput');
-      const chatBox = document.getElementById('chatBox');
-      const message = input.value.trim();
-      if (!message) return;
+    const messagesDiv = document.getElementById("messages");
 
-      // Show user message
-      chatBox.innerHTML += `<div class="msg user">${message}</div>`;
-      chatBox.scrollTop = chatBox.scrollHeight;
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text) return;
+      
+      // show user message
+      addMessage(text, "user");
       input.value = "";
 
-      // Call your GPT API
       try {
-        const res = await fetch(`https://urangkapolka.vercel.app/api/chatgpt4?prompt=${encodeURIComponent(message)}`);
-        const data = await res.text();
+        // call your API
+        const res = await fetch(`https://urangkapolka.vercel.app/api/chatgpt4?prompt=${encodeURIComponent(text)}`);
+        const data = await res.json();
 
-        chatBox.innerHTML += `<div class="msg bot">${data}</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
+        // add bot message with response + copy button
+        addMessage(data.response, "bot", data.creator);
       } catch (err) {
-        chatBox.innerHTML += `<div class="msg bot">⚠️ Error connecting to API</div>`;
+        addMessage("⚠️ Error fetching response", "bot");
       }
+    }
+
+    function addMessage(text, type, creator="") {
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("msg", type);
+
+      if (type === "bot") {
+        msgDiv.innerHTML = `
+          ${text}
+          <button class="copy-btn" onclick="copyText('${text.replace(/'/g, "\\'")}')">Copy</button>
+          <small>Created by ${creator}</small>
+        `;
+      } else {
+        msgDiv.textContent = text;
+      }
+
+      messagesDiv.appendChild(msgDiv);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text);
+      alert("Copied: " + text);
     }
   </script>
 </body>
