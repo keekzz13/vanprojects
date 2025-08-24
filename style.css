@@ -119,18 +119,22 @@ body {
   box-shadow: 0 10px 25px rgba(124,156,255,0.6);
   background: linear-gradient(135deg, #5a75ff, var(--brand));
 }
-.github-corner:hover .octo-arm {
-  animation: octocat-wave 560ms ease-in-out;
+.github-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #5865f2, #7c9cff);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(124, 156, 255, 0.4);
 }
 
-@keyframes octocat-wave {
-  0%, 100% { transform: rotate(0); }
-  20%, 60% { transform: rotate(-25deg); }
-  40%, 80% { transform: rotate(10deg); }
+.github-btn:hover {
+  background: linear-gradient(135deg, #4752c4, #6478d3);
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(124, 156, 255, 0.6);
 }
-
-@media (max-width:500px) {
-  .github-corner svg { width: 60px; height: 60px; }
-  .github-corner:hover .octo-arm { animation: none; }
-}
-
