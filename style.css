@@ -36,12 +36,13 @@ body {
   border-radius: 50%;
   animation: rise 20s infinite ease-in;
 }
-.bubbles span:nth-child(1) { width:60px; height:60px; left:10%; animation-duration:18s; animation-delay:0s; }
+.bubbles span:nth-child(1) { width:60px; height:60px; left:12%; animation-duration:18s; animation-delay:0s; }
 .bubbles span:nth-child(2) { width:40px; height:40px; left:25%; animation-duration:25s; animation-delay:3s; }
 .bubbles span:nth-child(3) { width:100px; height:100px; left:40%; animation-duration:30s; animation-delay:6s; }
 .bubbles span:nth-child(4) { width:25px; height:25px; left:55%; animation-duration:22s; animation-delay:9s; }
 .bubbles span:nth-child(5) { width:80px; height:80px; left:70%; animation-duration:26s; animation-delay:12s; }
 .bubbles span:nth-child(6) { width:50px; height:50px; left:85%; animation-duration:24s; animation-delay:15s; }
+.bubbles span:nth-child(6) { width:50px; height:50px; left:85%; animation-duration:24s; animation-delay:18s; }
 
 @keyframes rise {
   0% { transform: translateY(0) scale(1); opacity:0; }
@@ -92,3 +93,44 @@ body {
 }
 .project-card.disabled { opacity:.6; pointer-events:none; }
 .emoji { font-size:28px; margin-bottom:6px }
+}
+.source-wrap {
+  text-align: center;
+  margin: 40px 0;
+  position: relative;
+  z-index: 2;
+}
+
+.source-btn {
+  display: inline-block;
+  padding: 14px 28px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  background: linear-gradient(135deg, var(--brand), #5a75ff);
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(124,156,255,0.3);
+}
+
+.source-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(124,156,255,0.6);
+  background: linear-gradient(135deg, #5a75ff, var(--brand));
+}
+.github-corner:hover .octo-arm {
+  animation: octocat-wave 560ms ease-in-out;
+}
+
+@keyframes octocat-wave {
+  0%, 100% { transform: rotate(0); }
+  20%, 60% { transform: rotate(-25deg); }
+  40%, 80% { transform: rotate(10deg); }
+}
+
+@media (max-width:500px) {
+  .github-corner svg { width: 60px; height: 60px; }
+  .github-corner:hover .octo-arm { animation: none; }
+}
+
