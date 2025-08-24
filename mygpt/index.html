@@ -1,24 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My GPT</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VanProjects ChatBot</title>
+  <link rel="stylesheet" href="../style.css" />
   <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-    #chatBox { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto; margin-bottom: 10px; }
-    .user { color: blue; margin: 5px 0; }
-    .bot { color: green; margin: 5px 0; }
-    input, button { padding: 10px; font-size: 16px; }
+    body {
+      background: #0f0f1a;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    .chat-box {
+      width: 100%;
+      max-width: 600px;
+      background: #1a1a2e;
+      padding: 20px;
+      border-radius: 12px;
+      height: 70vh;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+    .msg {
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .user {
+      background: #4f46e5;
+      text-align: right;
+    }
+    .bot {
+      background: #2d2d44;
+      text-align: left;
+    }
+    .input-box {
+      display: flex;
+      width: 100%;
+      max-width: 600px;
+    }
+    .input-box input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px 0 0 8px;
+      outline: none;
+    }
+    .input-box button {
+      padding: 12px 20px;
+      border: none;
+      background: #4f46e5;
+      color: white;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h2>My GPT 🤖</h2>
-  <div id="chatBox"></div>
+  <h1>🤖 VanProjects ChatBot</h1>
+  <div class="chat-box" id="chatBox"></div>
 
-  <input type="text" id="promptInput" placeholder="Type your message..." style="width:70%">
-  <button id="sendBtn">Send</button>
+  <div class="input-box">
+    <input type="text" id="userInput" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
 
-  <script src="script.js"></script>
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const chatBox = document.getElementById('chatBox');
+      const message = input.value.trim();
+      if (!message) return;
+
+      // Show user message
+      chatBox.innerHTML += `<div class="msg user">${message}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = "";
+
+      // Call your GPT API
+      try {
+        const res = await fetch(`https://urangkapolka.vercel.app/api/chatgpt4?prompt=${encodeURIComponent(message)}`);
+        const data = await res.text();
+
+        chatBox.innerHTML += `<div class="msg bot">${data}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (err) {
+        chatBox.innerHTML += `<div class="msg bot">⚠️ Error connecting to API</div>`;
+      }
+    }
+  </script>
 </body>
 </html>
