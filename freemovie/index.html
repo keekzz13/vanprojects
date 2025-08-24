@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Movie Player</title>
+  <meta name="color-scheme" content="dark light"/>
+  <style>
+    :root{
+      --bg:#0f1115;--panel:#171923;--panel-2:#1f2230;--text:#eef2ff;--muted:#aab2cf;--brand:#7c9cff;--accent:#51e1a7;--danger:#ff6b6b;--border:#2b3040;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
+      background:linear-gradient(120deg,var(--bg),#0b0d12 60%);
+      display:flex; min-height:100vh;
+    }
+    .sidebar{
+      position:fixed; inset:0 auto 0 0; width:120px; background:var(--panel);
+      border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:14px; padding:20px 10px;
+    }
+    .brand{font-weight:800; letter-spacing:.5px; font-size:14px; color:var(--brand); text-transform:uppercase}
+    .navlink{color:var(--muted); text-decoration:none; font-weight:600; font-size:13px; padding:8px 10px; border-radius:10px; transition:all .2s ease}
+    .navlink:hover{color:var(--text); background:var(--panel-2)}
+    .navbtn {
+      all: unset;
+      cursor: pointer;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      text-align: center;
+      transition: all .2s ease;
+    }
+    .navbtn:hover {
+      color: var(--text);
+      background: var(--panel-2);
+    }
+    .main{margin-left:140px; flex:1; display:flex; flex-direction:column;}
+    .header{padding:22px 20px; background:var(--panel); border-bottom:1px solid var(--border);}
+    .header h1{margin:0; font-size:24px}
+    .header p{margin:6px 0 0; color:var(--muted); font-size:13px}
+    .wrap{max-width:1000px; width:100%; margin:22px auto; padding:0 16px}
+    .toolbar{display:flex; flex-wrap:wrap; gap:10px; align-items:center; background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:12px}
+    .input{flex:1; min-width:260px; background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:10px 12px; outline:none}
+    .select,.btn{background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:10px 12px; cursor:pointer}
+    .btn{display:inline-flex; align-items:center; gap:8px; font-weight:700}
+    .btn:hover{filter:brightness(1.1)}
+    .btn.primary{background:var(--brand); border-color:transparent; color:#0a1024}
+    .btn.ghost{background:transparent}
+    .player{margin-top:16px; background:#000; border:1px solid var(--border); border-radius:18px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.45)}
+    .player .frame-wrap{position:relative; width:100%; aspect-ratio:16/9; background:#000}
+    iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+    .status{margin-top:10px; color:var(--muted); font-size:12px; display:flex; gap:10px; align-items:center}
+    .status .dot{width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent)}
+    .footer{margin:24px 0 40px; color:var(--muted); font-size:12px;}
+    .results {
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+      gap:14px;
+    }
+    .movie {
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:12px;
+      overflow:hidden;
+      cursor:pointer;
+      transition:transform .2s;
+    }
+    .movie:hover{transform:scale(1.05)}
+    .movie img{width:100%; display:block}
+    .movie-title{padding:8px; font-size:13px; font-weight:600; color:var(--text); text-align:center}
+    dialog{border:1px solid var(--border); background:var(--panel); color:var(--text); border-radius:16px; padding:0; width:min(720px,94vw)}
+    .modal-header{display:flex; justify-content:space-between; align-items:center; padding:14px 16px; border-bottom:1px solid var(--border)}
+    .modal-title{font-weight:800}
+    .modal-body{padding:16px}
+    .modal-body ol{margin:0; padding-left:18px}
+    .close-x{all:unset; cursor:pointer; padding:6px 8px; border-radius:10px}
+    .close-x:hover{background:var(--panel-2)}
+    @media (max-width: 860px){
+      .sidebar{position:static; width:auto; height:auto; flex-direction:row; justify-content:space-between}
+      .main{margin-left:0}
+      .brand{display:none}
+    }
+    .home-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+}
+
+.home-btn:hover {
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+    <div class="sidebar">
+   <button id="homeBtn" class="home-btn">
+  <strong>Movie<br>Player</strong>
+   </button>
+    <a class="navlink" href="https://www.facebook.com/aivan.abanto1/" target="_blank">Contact</a>
+    <button class="navbtn" id="openHelp">Ad-block</button>
+    <a class="navlink" href="https://www.imdb.com/" target="_blank">IMDb</a>
+    <button class="navbtn" id="openAbout">About</button>
+    <button class="navbtn" id="openHistory">History</button> <!-- NEW -->
+  </div>
+
+  <!-- Continue Watching Modal --> <!-- NEW -->
+  <dialog id="continueModal">
+    <div class="modal-header">
+      <div class="modal-title">Continue Watching</div>
+      <button class="close-x" id="continueClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="continueText"></p>
+      <button class="btn primary" id="resumeBtn">▶ Resume</button>
+    </div>
+  </dialog>
+
+  <!-- History Modal --> <!-- NEW -->
+  <dialog id="historyModal">
+    <div class="modal-header">
+      <div class="modal-title">Watch History</div>
+      <button class="close-x" id="historyClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <ul id="historyList"></ul>
+    </div>
+  </dialog>
+
+
+  <main class="main">
+    <header class="header">
+      <h1>Free Movies</h1>
+      <p>Search or paste an IMDb ID (e.g., <code>tt11083552</code>), pick a server, then hit Watch.</p>
+    </header>
+
+    <section class="wrap">
+      <div class="toolbar" role="group" aria-label="Controls">
+        <input id="imdbInput" class="input" placeholder="Enter IMDb link, ID, or movie name" autocomplete="off" />
+        <button id="searchBtn" class="btn" type="button">🔍 Search</button>
+        <select id="serverSelect" class="select" aria-label="Server">
+          <option value="vidsrc">Server 1 – Vidsrc.to</option>
+          <option value="vidsrcto">Server 2 – Vidsrc.me</option>
+          <option value="2embed">Server 3 – 2Embed</option>
+          <option value="noads">Server 4 – Test(tryi basin way ads haha)</option>
+        </select>
+        <button id="watchBtn" class="btn primary" type="button">▶ Watch</button>
+        <button id="copyBtn" class="btn" type="button" title="Copy share link">🔗 Copy Link</button>
+      </div>
+
+      <div id="results" class="results"></div>
+
+      <!-- Player hidden by default -->
+      <div class="player" id="playerContainer" style="display:none" aria-live="polite">
+        <div class="frame-wrap">
+          <iframe id="movieFrame" allow="fullscreen; picture-in-picture; clipboard-write" referrerpolicy="no-referrer" src=""></iframe>
+        </div>
+      </div>
+
+      <div class="status" id="status">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="statusText">Ready. Tip: Press <kbd>Enter</kbd> or click Search to find movies.</span>
+      </div>
+
+      <div class="footer">
+        <p><strong>Heads-up:</strong> Only embed content you have the rights to watch. Some third-party players show ads; see <em>Ad-block Help</em> for tips. If a server fails, try a different one.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Ad-block Help Modal -->
+  <dialog id="helpModal">
+  <div class="modal-header">
+    <div class="modal-title">Watch with fewer ads using 
+      <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/ddkjiahejlhfcafbddmgiahcphecmpfh?hl=en" 
+         target="_blank" rel="noopener noreferrer">
+        uBlock Origin Lite
+      </a>
+    </div>
+    <button class="close-x" id="helpClose" aria-label="Close">✕</button>
+  </div>
+  <div class="modal-body">
+    <p>These steps are for Chromium-based browsers (Chrome, Edge, Brave, etc.). For Firefox, install the classic <em>uBlock Origin</em> add-on.</p>
+    <ol>
+      <li>Install <strong>
+        <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/ddkjiahejlhfcafbddmgiahcphecmpfh?hl=en" 
+           target="_blank" rel="noopener noreferrer">
+           uBlock Origin Lite
+        </a>
+      </strong> from the Chrome Web Store.</li>
+      <li>Pin it and make sure blocking is <strong>On</strong> for this site.</li>
+      <li>Reload. Most popups/banners should be gone.</li>
+    </ol>
+  </div>
+</dialog>
+
+
+  <!-- About Modal -->
+  <dialog id="aboutModal">
+    <div class="modal-header">
+      <div class="modal-title">About this page</div>
+      <button class="close-x" id="aboutClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Search by movie title or paste IMDb ID. Click a movie card to load instantly in the player.</p>
+    </div>
+  </dialog>
+
+<script>
+const $ = sel => document.querySelector(sel);
+
+// Modal logic
+const helpModal = $('#helpModal');
+const aboutModal = $('#aboutModal');
+const openHelpBtn = $('#openHelp');
+const openAboutBtn = $('#openAbout');
+const helpClose = $('#helpClose');
+const aboutClose = $('#aboutClose');
+
+openHelpBtn.addEventListener('click', () => helpModal.showModal());
+openAboutBtn.addEventListener('click', () => aboutModal.showModal());
+helpClose.addEventListener('click', () => helpModal.close());
+aboutClose.addEventListener('click', () => aboutModal.close());
+
+const input = $('#imdbInput');
+const select = $('#serverSelect');
+const frame = $('#movieFrame');
+const statusText = $('#statusText');
+const resultsDiv = $('#results');
+
+const API_KEY = "6452370c23b5a8497b9a201cf46fba42";
+const TMDB_SEARCH = "https://api.themoviedb.org/3/search/movie?api_key="+API_KEY+"&query=";
+const TMDB_DETAILS = id => `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`;
+
+const extractIMDb = (str='') => {
+  const m = String(str).match(/tt\d{7,8}/i);
+  return m ? m[0] : '';
+};
+
+function buildURL(server, imdbID, season = null, episode = null) {
+  let raw = `https://vidsrc.in/embed/${imdbID}`;
+  if (season && episode) {
+    raw = `https://vidsrc.in/embed/${imdbID}/${season}-${episode}/`;
+  }
+  switch(server){
+    case 'vidsrcto':
+      return `https://vidsrc.to/embed/movie/${imdbID}`;
+    case 'vidsrc':
+      return `https://vidsrc.me/embed/movie?imdb=${imdbID}`;
+    case '2embed':
+      return `https://www.2embed.cc/embed/${imdbID}`;
+    case 'noads':
+      return `https://vid-src-embeds-no-ads-demo.vercel.app/embed?url=${encodeURIComponent(raw)}`;
+    default:
+      return '';
+  }
+}
+const setStatus = (msg) => statusText.textContent = msg;
+
+function loadFromFields(imdbIDOverride){
+  const imdbID = imdbIDOverride || extractIMDb(input.value.trim());
+  if(!imdbID){ alert('Please enter a valid IMDb ID.'); return; }
+  const embedURL = buildURL(select.value, imdbID);
+  if(!embedURL){ alert('Unknown server selected.'); return; }
+  frame.src = embedURL;
+  $('#playerContainer').style.display = "block"; // show player
+  setStatus(`Loaded ${imdbID} on ${select.options[select.selectedIndex].text}.`);
+}
+
+$('#watchBtn').addEventListener('click', () => loadFromFields());
+$('#searchBtn').addEventListener('click', () => {
+  const query = input.value.trim();
+  if (extractIMDb(query)) {
+    loadFromFields();
+  } else {
+    searchTMDB(query);
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if(e.key==='Enter' && document.activeElement===input){
+    e.preventDefault();
+    if(extractIMDb(input.value.trim())) loadFromFields();
+    else searchTMDB(input.value.trim());
+  }
+});
+
+async function searchTMDB(query){
+  if(!query) return;
+  setStatus("Searching…");
+  const res = await fetch(TMDB_SEARCH+encodeURIComponent(query));
+  const data = await res.json();
+  resultsDiv.innerHTML="";
+  if(!data.results || !data.results.length){
+    setStatus("No results.");
+    return;
+  }
+  data.results.forEach(m => {
+    if(!m.poster_path) return;
+    const div = document.createElement("div");
+    div.className = "movie";
+    div.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${m.poster_path}"><div class="movie-title">${m.title}</div>`;
+    div.onclick = async () => {
+      const detRes = await fetch(TMDB_DETAILS(m.id));
+      const det = await detRes.json();
+      if(det.imdb_id){
+        input.value = det.imdb_id;
+        loadFromFields(det.imdb_id);
+        resultsDiv.innerHTML = "";
+      } else {
+        setStatus("No IMDb ID found for this movie.");
+      }
+    };
+    resultsDiv.appendChild(div);
+  });
+  setStatus("Click a movie to watch.");
+}
+
+// Load trending movies on homepage
+async function loadTrending() {
+  setStatus("Loading trending movies…");
+  const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`);
+  const data = await res.json();
+  resultsDiv.innerHTML="";
+  if(!data.results || !data.results.length){
+    setStatus("No trending movies found.");
+    return;
+  }
+  data.results.forEach(m => {
+    if(!m.poster_path) return;
+    const div = document.createElement("div");
+    div.className = "movie";
+    div.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${m.poster_path}"><div class="movie-title">${m.title}</div>`;
+    div.onclick = async () => {
+      const detRes = await fetch(TMDB_DETAILS(m.id));
+      const det = await detRes.json();
+      if(det.imdb_id){
+        input.value = det.imdb_id;
+        loadFromFields(det.imdb_id);
+        resultsDiv.innerHTML = "";
+      } else {
+        setStatus("No IMDb ID found for this movie.");
+      }
+    };
+    resultsDiv.appendChild(div);
+  });
+  setStatus("Trending this week:");
+}
+window.addEventListener('DOMContentLoaded', loadTrending);
+// --- NEW: Continue Watching + History feature ---
+const historyModal = $('#historyModal');
+const historyClose = $('#historyClose');
+const openHistoryBtn = $('#openHistory');
+const historyList = $('#historyList');
+
+const continueModal = $('#continueModal');
+const continueClose = $('#continueClose');
+const continueText = $('#continueText');
+const resumeBtn = $('#resumeBtn');
+
+openHistoryBtn.addEventListener('click', () => {
+  renderHistory();
+  historyModal.showModal();
+});
+historyClose.addEventListener('click', () => historyModal.close());
+continueClose.addEventListener('click', () => continueModal.close());
+
+// 🔑 TMDB API key 
+const TMDB_KEY = "6452370c23b5a8497b9a201cf46fba42"; 
+
+async function fetchTitleFromTMDB(imdbID) {
+  try {
+    const res = await fetch(
+      `https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`
+    );
+    const data = await res.json();
+    if (data.movie_results?.length) {
+      return data.movie_results[0].title;
+    } else if (data.tv_results?.length) {
+      return data.tv_results[0].name;
+    }
+    return imdbID; // fallback
+  } catch (e) {
+    console.error("TMDB lookup failed:", e);
+    return imdbID;
+  }
+}
+
+function saveHistory(imdbID, title){
+  if(!imdbID || imdbID.toLowerCase().includes("free")) return; // 🚫 block bad entries
+
+  let history = JSON.parse(localStorage.getItem('watchHistory') || "[]");
+  history = history.filter(h => h.imdbID !== imdbID); // avoid duplicates
+  history.unshift({ imdbID, title, time: Date.now() });
+  if(history.length > 20) history.pop();
+  localStorage.setItem('watchHistory', JSON.stringify(history));
+  localStorage.setItem('lastWatch', JSON.stringify({ imdbID, title }));
+}
+
+function renderHistory(){
+  let history = JSON.parse(localStorage.getItem('watchHistory') || "[]");
+  historyList.innerHTML = "";
+  if(!history.length){
+    historyList.innerHTML = "<li>No history yet.</li>";
+    return;
+  }
+  history.forEach(h => {
+    const li = document.createElement("li");
+    const d = new Date(h.time).toLocaleString();
+    li.textContent = `${h.title || h.imdbID} — ${d}`;
+    li.style.cursor = "pointer";
+    li.onclick = () => {
+      input.value = h.imdbID;
+      loadFromFields(h.imdbID);
+      historyModal.close();
+    };
+    historyList.appendChild(li);
+  });
+}
+
+// ✅ Hook into loadFromFields but fetch title from TMDB
+const _oldLoad = loadFromFields;
+loadFromFields = async function(imdbIDOverride){
+  _oldLoad(imdbIDOverride);
+
+  const imdbID = imdbIDOverride || extractIMDb(input.value.trim());
+  if(!imdbID || imdbID.toLowerCase().includes("free")) return;
+
+  // fetch proper title from TMDB
+  const tmdbTitle = await fetchTitleFromTMDB(imdbID);
+
+  if(tmdbTitle && !tmdbTitle.toLowerCase().includes("free")){
+    saveHistory(imdbID, tmdbTitle);
+  }
+};
+
+// Show Continue Watching popup if exists
+window.addEventListener('DOMContentLoaded', () => {
+  const last = JSON.parse(localStorage.getItem('lastWatch') || "null");
+  if(last){
+    // set popup text
+    document.getElementById('continueText').textContent = `Resume "${last.title || last.imdbID}"?`;
+    
+    // show popup
+    document.getElementById('resumePopup').classList.remove('hidden');
+    
+    // resume button
+    document.getElementById('resumeBtn').onclick = () => {
+      input.value = last.imdbID;
+      loadFromFields(last.imdbID); // load movie
+      document.getElementById('resumePopup').classList.add('hidden');
+    };
+
+    // close button
+    document.getElementById('resumeClose').onclick = () => {
+      document.getElementById('resumePopup').classList.add('hidden');
+    };
+  }
+});
+// --- History + Continue Watching ---
+// (Nag unsa ka diri dawg)
+
+// --- Home button redirect ---
+const homeBtn = document.getElementById("homeBtn");
+homeBtn.addEventListener("click", () => {
+    const input = document.getElementById("imdbInput");
+    const imdbID = input.value.trim();
+    const homeURL = imdbID 
+        ? `https://freestreamingsite.netlify.app/?imdb=${encodeURIComponent(imdbID)}`
+        : `https://freestreamingsite.netlify.app/`;
+    window.location.href = homeURL;
+});
+window.addEventListener("load", () => {
+  console.log(`
+██   ██ ██    ██ ██    ██ ██ 
+██   ██ ██    ██  ██  ██  ██ 
+███████ ██    ██   ████   ██ 
+██   ██ ██    ██    ██       
+██   ██  ██████     ██    ██ 
+                                                        
+  `);
+
+  console.log("nag unsa ka diri dawg 🐶");
+});
+
+</script>
+<!-- Auto-load movie from URL -->
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const imdb = params.get('imdb');
+  if(imdb && window.loadFromFields){
+    document.getElementById('imdbInput').value = imdb;
+    window.loadFromFields(imdb);
+  }
+});
+</script>
+
+<!-- Mobile-specific fixes -->
+<script src="mobile-fix.js"></script>
+<script src="copy-link.js"></script>
+<!-- Auto-load movie from URL -->
+<script src="auto-load.js"></script>
+<!-- Home button redirect -->
+<script src="home-btn.js"></script>
+<!-- Mobile-specific fixes -->
+<script src="mobile-fix.js"></script>
+<!-- Copy link button -->
+<script>
+// --- Auto-load movie from URL ---
+window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const imdb = params.get('imdb');
+    if(imdb && window.loadFromFields){
+        document.getElementById('imdbInput').value = imdb;
+        window.loadFromFields(imdb);
+    }
+});
+
+// --- Home button redirect ---
+const homeBtn = document.getElementById("homeBtn");
+homeBtn.addEventListener("click", () => {
+    const params = new URLSearchParams(window.location.search);
+    const imdb = params.get('imdb');
+    const homeURL = imdb 
+        ? `https://freestreamingsite.netlify.app/?imdb=${encodeURIComponent(imdb)}`
+        : `https://freestreamingsite.netlify.app/`;
+    window.location.href = homeURL;
+});
+
+  // Server auto-switch
+  const select = document.getElementById('serverSelect');
+  const input = document.getElementById('imdbInput'); // make sure input exists
+  select.addEventListener('change', () => {
+      const imdbID = input.value.trim();
+      if(imdbID && extractIMDb(imdbID)){  // only reload if it's a valid IMDb ID
+          loadFromFields(); 
+    }
+});
+</script>
+</body>
+</html>
