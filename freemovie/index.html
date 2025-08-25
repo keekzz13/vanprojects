@@ -172,9 +172,10 @@
 
   <main class="main">
     <header class="header">
-      <h1>Free Movies</h1>
-      <p>Search or paste an IMDb ID (e.g., <code>tt11083552</code>), pick a server, then hit Watch.</p>
-    </header>
+     <h1>Free Movies</h1>
+     <p id="movieDescription">Search or paste an IMDb ID (e.g., <code>tt11083552</code>), pick a server, then hit Watch.</p>
+   </header>
+
 
     <section class="wrap">
       <div class="toolbar" role="group" aria-label="Controls">
@@ -398,12 +399,25 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
   frame.src = embedURL;
 
   fetchTitleFromTMDB(imdbID).then(title => {
-    if(season && episode){
-      setStatus(`Now Playing: ${title} — Season ${season}, Episode ${episode}`);
-      document.querySelector(".header h1").textContent = `Now Watching: ${title} — S${season}E${episode}`;
-    } else {
-      setStatus(`Now Playing: ${title}`);
-      document.querySelector(".header h1").textContent = `Now Watching: ${title}`;
+    const headerTitle = document.querySelector(".header h1");
+const headerDesc  = document.getElementById("movieDescription");
+
+if(season && episode){
+  setStatus(`Now Playing: ${title} — Season ${season}, Episode ${episode}`);
+  headerTitle.textContent = `Now Watching: ${title} — S${season}E${episode}`;
+  headerDesc.textContent = showData?.overview || "No description available.";
+} else {
+  setStatus(`Now Playing: ${title}`);
+  headerTitle.textContent = `Now Watching: ${title}`;
+  
+  // Fetch description from TMDB
+  fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${TMDB_KEY}&external_source=imdb_id`)
+    .then(res => res.json())
+    .then(data => {
+      const movieInfo = data.movie_results?.[0] || data.tv_results?.[0];
+      headerDesc.textContent = movieInfo?.overview || "No description available.";
+    });
+}
     }
     if(title && !title.toLowerCase().includes("free")){
       saveHistory(imdbID, title, season, episode);
