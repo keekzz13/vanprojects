@@ -346,9 +346,7 @@ window.addEventListener('DOMContentLoaded', () => {
   homeBtn.addEventListener("click", () => {
     const input = document.getElementById("imdbInput");
     const imdbID = input.value.trim();
-    const homeURL = imdbID 
-        ? `https://vanprojects.netlify.app/freemovie/?imdb=${encodeURIComponent(imdbID)}`
-        : `https://vanprojects.netlify.app/freemovie/`;
+    const homeURL = "https://vanprojects.netlify.app/freemovie/";
     window.location.href = homeURL;
   });
 
