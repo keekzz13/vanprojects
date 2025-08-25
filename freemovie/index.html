@@ -165,7 +165,12 @@
       <!-- Player hidden by default -->
       <div class="player" id="playerContainer" style="display:none" aria-live="polite">
         <div class="frame-wrap">
-          <iframe id="movieFrame" allow="fullscreen; picture-in-picture; clipboard-write" referrerpolicy="no-referrer" src=""></iframe>
+         <iframe id="movieFrame"
+  allow="fullscreen; picture-in-picture; clipboard-write"
+  referrerpolicy="no-referrer"
+  src=""
+  allowfullscreen>
+</iframe>
         </div>
       </div>
 
@@ -302,6 +307,39 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
       saveHistory(imdbID, title, season, episode);
     }
   });
+}
+
+async function loadSeasons(showData, imdbID) {
+  const seasonSelect = document.getElementById("seasonSelect");
+  const episodeSelect = document.getElementById("episodeSelect");
+  seasonSelect.style.display = "inline-block";
+  episodeSelect.style.display = "inline-block";
+
+  // fill seasons
+  seasonSelect.innerHTML = showData.seasons
+    .map(s => `<option value="${s.season_number}">Season ${s.season_number}</option>`)
+    .join("");
+
+  // load first season episodes
+  async function loadEpisodes(seasonNum) {
+    const res = await fetch(
+      `https://api.themoviedb.org/3/tv/${showData.id}/season/${seasonNum}?api_key=${API_KEY}`
+    );
+    const data = await res.json();
+    episodeSelect.innerHTML = data.episodes
+      .map(e => `<option value="${e.episode_number}">Ep ${e.episode_number} — ${e.name}</option>`)
+      .join("");
+  }
+
+  await loadEpisodes(seasonSelect.value);
+
+  seasonSelect.onchange = () => loadEpisodes(seasonSelect.value);
+
+  document.getElementById("watchBtn").onclick = () => {
+    const s = seasonSelect.value;
+    const e = episodeSelect.value;
+    loadFromFields(imdbID, s, e);
+  };
 }
 
 // --- Auto-load movie from URL & setup Home button ---
