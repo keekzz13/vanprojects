@@ -114,8 +114,6 @@
     <button class="navbtn" id="openHistory">History</button> <!-- NEW -->
   </div>
 
-  <!-- Continue Watching Modal --> <!-- NEW -->
-  <dialog id="continueModal">
     <div class="modal-header">
       <div class="modal-title">Continue Watching</div>
       <button class="close-x" id="continueClose" aria-label="Close">✕</button>
@@ -290,7 +288,8 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
   const embedURL = buildURL(select.value, imdbID, season, episode);
   if(!embedURL){ alert('Unknown server selected.'); return; }
 
-  frame.src = embedURL;
+frame.removeAttribute("src"); // reset so fullscreen re-initializes
+setTimeout(() => frame.src = embedURL, 50);
   $('#playerContainer').style.display = "block"; // show player
 
   // ✅ Fetch proper title + update UI + save history
@@ -497,11 +496,6 @@ const historyClose = $('#historyClose');
 const openHistoryBtn = $('#openHistory');
 const historyList = $('#historyList');
 
-const continueModal = $('#continueModal');
-const continueClose = $('#continueClose');
-const continueText = $('#continueText');
-const resumeBtn = $('#resumeBtn');
-
 openHistoryBtn.addEventListener('click', () => {
   renderHistory();
   historyModal.showModal();
@@ -540,7 +534,6 @@ function saveHistory(imdbID, title, season=null, episode=null){
   if(history.length > 20) history.pop();
 
   localStorage.setItem('watchHistory', JSON.stringify(history));
-  localStorage.setItem('lastWatch', JSON.stringify({ imdbID, title, season, episode }));
 }
 
 function renderHistory(){
@@ -566,21 +559,6 @@ function renderHistory(){
   });
 }
 
-// Show Continue Watching popup if exists
-window.addEventListener('DOMContentLoaded', () => {
-  const last = JSON.parse(localStorage.getItem('lastWatch') || "null");
-  if(last){
-    continueText.textContent = `Resume "${last.title || last.imdbID}"?`;
-    continueModal.showModal();
-    resumeBtn.onclick = () => {
-      input.value = last.imdbID;
-      loadFromFields(last.imdbID, last.season, last.episode);
-      continueModal.close();
-    };
-    continueClose.onclick = () => continueModal.close();
-  }
-});
-
 // (Nag unsa ka diri dawg)
 
 window.addEventListener("load", () => {
@@ -595,6 +573,13 @@ window.addEventListener("load", () => {
 
   console.log("nag unsa ka diri dawg 🐶");
 });
+// Run trending on homepage load
+window.addEventListener('DOMContentLoaded', () => {
+  if(!new URLSearchParams(window.location.search).get('imdb')){
+    loadTrending();
+  }
+});
+
 </script>  
 
 <script src="mobile-fix.js"></script>
