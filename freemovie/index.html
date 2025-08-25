@@ -51,6 +51,18 @@
     .btn.primary{background:var(--brand); border-color:transparent; color:#0a1024}
     .btn.ghost{background:transparent}
     .player{margin-top:16px; background:#000; border:1px solid var(--border); border-radius:18px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.45)}
+    /* --- Fullscreen Fix --- */
+#playerContainer {
+  visibility: hidden;
+  position: absolute;
+  left: -9999px;
+}
+
+#playerContainer.active {
+  visibility: visible;
+  position: static;
+}
+
     .player .frame-wrap{position:relative; width:100%; aspect-ratio:16/9; background:#000}
     iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
     .status{margin-top:10px; color:var(--muted); font-size:12px; display:flex; gap:10px; align-items:center}
@@ -151,16 +163,16 @@
       <div id="results" class="results"></div>
 
       <!-- Player hidden by default -->
-      <div class="player" id="playerContainer" style="display:none" aria-live="polite">
-        <div class="frame-wrap">
-<iframe id="movieFrame"
-  allow="fullscreen; picture-in-picture; clipboard-write; encrypted-media; autoplay"
-  referrerpolicy="no-referrer"
-  src=""
-  allowfullscreen="true"
-  webkitallowfullscreen="true"
-  mozallowfullscreen="true">
-</iframe>
+      <div class="player" id="playerContainer" aria-live="polite">
+  <div class="frame-wrap">
+    <iframe id="movieFrame"
+      allow="fullscreen; picture-in-picture; clipboard-write; encrypted-media; autoplay"
+      referrerpolicy="no-referrer"
+      src=""
+      allowfullscreen="true"
+      webkitallowfullscreen="true"
+      mozallowfullscreen="true">
+    </iframe>
         </div>
       </div>
 
@@ -283,7 +295,7 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
   if(!embedURL){ alert('Unknown server selected.'); return; }
 
   // ✅ show container BEFORE setting src
-  $('#playerContainer').style.display = "block";
+  $('#playerContainer').classList.add("active"); // show player properly
 
   // ✅ then set iframe src + fullscreen attributes
   frame.setAttribute("allowfullscreen", "true");
