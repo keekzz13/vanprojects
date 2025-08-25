@@ -153,11 +153,13 @@
       <!-- Player hidden by default -->
       <div class="player" id="playerContainer" style="display:none" aria-live="polite">
         <div class="frame-wrap">
-         <iframe id="movieFrame"
-  allow="fullscreen; picture-in-picture; clipboard-write"
+<iframe id="movieFrame"
+  allow="fullscreen; picture-in-picture; clipboard-write; encrypted-media; autoplay"
   referrerpolicy="no-referrer"
   src=""
-  allowfullscreen>
+  allowfullscreen="true"
+  webkitallowfullscreen="true"
+  mozallowfullscreen="true">
 </iframe>
         </div>
       </div>
