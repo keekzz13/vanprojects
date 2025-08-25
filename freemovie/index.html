@@ -288,7 +288,7 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
   frame.src = embedURL;
   $('#playerContainer').style.display = "block"; // show player
 
-    // ✅ New status logic with real title
+  // ✅ Fetch proper title + update UI + save history
   fetchTitleFromTMDB(imdbID).then(title => {
     if(season && episode){
       setStatus(`Now Playing: ${title} — Season ${season}, Episode ${episode}`);
@@ -297,7 +297,44 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
       setStatus(`Now Playing: ${title}`);
       document.querySelector(".header h1").textContent = `Now Watching: ${title}`;
     }
+
+    if(title && !title.toLowerCase().includes("free")){
+      saveHistory(imdbID, title, season, episode);
+    }
   });
+}
+
+// --- Auto-load movie from URL & setup Home button ---
+window.addEventListener('DOMContentLoaded', () => {
+  // Auto-load movie if ?imdb= is in URL
+  const params = new URLSearchParams(window.location.search);
+  const imdb = params.get('imdb');
+  if(imdb && window.loadFromFields){
+    document.getElementById('imdbInput').value = imdb;
+    window.loadFromFields(imdb);
+  }
+
+  // Home button
+  const homeBtn = document.getElementById("homeBtn");
+  homeBtn.addEventListener("click", () => {
+    const input = document.getElementById("imdbInput");
+    const imdbID = input.value.trim();
+    const homeURL = imdbID 
+        ? `https://vanprojects.netlify.app/freemovie/?imdb=${encodeURIComponent(imdbID)}`
+        : `https://vanprojects.netlify.app/freemovie/`;
+    window.location.href = homeURL;
+  });
+
+  // Server auto-switch
+  const select = document.getElementById('serverSelect');
+  const input = document.getElementById('imdbInput');
+  select.addEventListener('change', () => {
+    const imdbID = input.value.trim();
+    if(imdbID && extractIMDb(imdbID)){
+      loadFromFields(); 
+    }
+  });
+});
 
 $('#watchBtn').addEventListener('click', () => loadFromFields());
 $('#searchBtn').addEventListener('click', () => {
