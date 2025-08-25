@@ -154,7 +154,7 @@
           <option value="2embed">Server 3 – 2Embed</option>
           <option value="noads">Server 4 – Test(tryi basin way ads haha)</option>
         </select>
-        
+        <button id="watchBtn" class="btn primary" type="button">▶ Watch</button>
         <button id="copyBtn" class="btn" type="button" title="Copy share link">🔗 Copy Link</button>
       </div>
 
@@ -242,9 +242,6 @@ const API_KEY = "6452370c23b5a8497b9a201cf46fba42";
 const TMDB_SEARCH = "https://api.themoviedb.org/3/search/movie?api_key="+API_KEY+"&query=";
 const TMDB_DETAILS = id => `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`;
 
-let currentImdbId = null;
-let currentServer = null;
-
 const extractIMDb = (str='') => {
   const m = String(str).match(/tt\d{7,8}/i);
   return m ? m[0] : '';
@@ -271,8 +268,6 @@ function buildURL(server, imdbID, season = null, episode = null) {
 const setStatus = (msg) => statusText.textContent = msg;
 
 function loadFromFields(imdbIDOverride){
-  currentImdbId = imdbIDOverride || extractIMDb(input.value.trim());
-  currentServer = select.value;
   const imdbID = imdbIDOverride || extractIMDb(input.value.trim());
   if(!imdbID){ alert('Please enter a valid IMDb ID.'); return; }
   const embedURL = buildURL(select.value, imdbID);
@@ -544,18 +539,14 @@ homeBtn.addEventListener("click", () => {
 });
 
   // Server auto-switch
-  
-const select = document.getElementById('serverSelect');
-select.addEventListener('change', () => {
-    currentServer = select.value;
-    if (currentImdbId) {
-        const url = buildURL(currentServer, currentImdbId);
-        document.getElementById("movieFrame").src = url;
-    } else if (extractIMDb(input.value.trim())) {
-        loadFromFields();
+  const select = document.getElementById('serverSelect');
+  const input = document.getElementById('imdbInput'); // make sure input exists
+  select.addEventListener('change', () => {
+      const imdbID = input.value.trim();
+      if(imdbID && extractIMDb(imdbID)){  // only reload if it's a valid IMDb ID
+          loadFromFields(); 
     }
 });
-
 </script>
 </body>
 </html>
