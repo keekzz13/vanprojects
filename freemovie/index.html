@@ -277,14 +277,23 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
   const imdbID = imdbIDOverride || extractIMDb(input.value.trim());
   if(!imdbID){ alert('Please enter a valid IMDb ID.'); return; }
 
+  // ✅ make sure select has a value (default fallback)
+  if (!select.value) {
+    select.value = "2embed"; // or whichever works best as default
+  }
+
   const embedURL = buildURL(select.value, imdbID, season, episode);
   if(!embedURL){ alert('Unknown server selected.'); return; }
 
-frame.removeAttribute("src"); // reset so fullscreen re-initializes
-setTimeout(() => frame.src = embedURL, 50);
-  $('#playerContainer').style.display = "block"; // show player
+  // ✅ always set src + fullscreen attributes together
+  frame.src = embedURL;
+  frame.setAttribute("allowfullscreen", "true");
+  frame.setAttribute("webkitallowfullscreen", "true");
+  frame.setAttribute("mozallowfullscreen", "true");
 
-  // ✅ Fetch proper title + update UI + save history
+  $('#playerContainer').style.display = "block";
+
+  // your title + history code...
   fetchTitleFromTMDB(imdbID).then(title => {
     if(season && episode){
       setStatus(`Now Playing: ${title} — Season ${season}, Episode ${episode}`);
@@ -293,7 +302,6 @@ setTimeout(() => frame.src = embedURL, 50);
       setStatus(`Now Playing: ${title}`);
       document.querySelector(".header h1").textContent = `Now Watching: ${title}`;
     }
-
     if(title && !title.toLowerCase().includes("free")){
       saveHistory(imdbID, title, season, episode);
     }
