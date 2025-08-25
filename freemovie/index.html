@@ -264,20 +264,53 @@ aboutClose.addEventListener('click', () => aboutModal.close());
 const input = $('#imdbInput');
 const select = $('#serverSelect');
 const frame = $('#movieFrame');
-// Force fullscreen button
+// Force fullscreen button + Exit button
 const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+// Create exit button
+const exitBtn = document.createElement("button");
+exitBtn.textContent = "❌ Exit Fullscreen";
+exitBtn.style.position = "fixed";
+exitBtn.style.top = "10px";
+exitBtn.style.right = "10px";
+exitBtn.style.zIndex = "9999";
+exitBtn.style.padding = "10px 14px";
+exitBtn.style.fontSize = "14px";
+exitBtn.style.background = "#ff4d4d";
+exitBtn.style.color = "#fff";
+exitBtn.style.border = "none";
+exitBtn.style.borderRadius = "8px";
+exitBtn.style.cursor = "pointer";
+exitBtn.style.opacity = "0.6"; // 👈 semi-transparent but visible
+exitBtn.style.display = "none"; // hidden by default
+document.body.appendChild(exitBtn);
+
 fullscreenBtn.addEventListener("click", () => {
-  const iframe = document.getElementById("movieFrame");
-  if (iframe.requestFullscreen) {
-    iframe.requestFullscreen();
-  } else if (iframe.webkitRequestFullscreen) { // Safari
-    iframe.webkitRequestFullscreen();
-  } else if (iframe.mozRequestFullScreen) { // Firefox
-    iframe.mozRequestFullScreen();
-  } else if (iframe.msRequestFullscreen) { // IE/Edge
-    iframe.msRequestFullscreen();
-  } else {
-    alert("Fullscreen not supported in this browser.");
+  const container = document.getElementById("playerContainer");
+  if (container.requestFullscreen) {
+    container.requestFullscreen();
+  } else if (container.webkitRequestFullscreen) {
+    container.webkitRequestFullscreen();
+  } else if (container.mozRequestFullScreen) {
+    container.mozRequestFullScreen();
+  } else if (container.msRequestFullscreen) {
+    container.msRequestFullscreen();
+  }
+  exitBtn.style.display = "block"; // show button when fullscreen
+});
+
+// Exit fullscreen
+exitBtn.addEventListener("click", () => {
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  }
+  exitBtn.style.display = "none"; // hide button again
+});
+
+// Auto-hide button when user leaves fullscreen manually
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) {
+    exitBtn.style.display = "none";
   }
 });
 
