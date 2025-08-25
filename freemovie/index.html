@@ -281,14 +281,17 @@ const setStatus = (msg) => statusText.textContent = msg;
 function loadFromFields(imdbIDOverride, season=null, episode=null){
   const imdbID = imdbIDOverride || extractIMDb(input.value.trim());
   if(!imdbID){ alert('Please enter a valid IMDb ID.'); return; }
+
   const embedURL = buildURL(select.value, imdbID, season, episode);
   if(!embedURL){ alert('Unknown server selected.'); return; }
+
   frame.src = embedURL;
   $('#playerContainer').style.display = "block"; // show player
+
   if(season && episode){
-    setStatus(`Loaded ${imdbID} S${season}E${episode} on ${select.options[select.selectedIndex].text}.`);
+    setStatus(`Loaded ${imdbID} — Season ${season}, Episode ${episode}`);
   } else {
-    setStatus(`Loaded ${imdbID} on ${select.options[select.selectedIndex].text}.`);
+    setStatus(`Loaded ${imdbID}`);
   }
 }
 
@@ -431,15 +434,17 @@ async function fetchTitleFromTMDB(imdbID) {
   }
 }
 
-function saveHistory(imdbID, title){
-  if(!imdbID || imdbID.toLowerCase().includes("free")) return; // 🚫 block bad entries
+function saveHistory(imdbID, title, season=null, episode=null){
+  if(!imdbID || imdbID.toLowerCase().includes("free")) return;
 
   let history = JSON.parse(localStorage.getItem('watchHistory') || "[]");
-  history = history.filter(h => h.imdbID !== imdbID); // avoid duplicates
-  history.unshift({ imdbID, title, time: Date.now() });
+  history = history.filter(h => h.imdbID !== imdbID || h.season !== season || h.episode !== episode);
+
+  history.unshift({ imdbID, title, season, episode, time: Date.now() });
   if(history.length > 20) history.pop();
+
   localStorage.setItem('watchHistory', JSON.stringify(history));
-  localStorage.setItem('lastWatch', JSON.stringify({ imdbID, title }));
+  localStorage.setItem('lastWatch', JSON.stringify({ imdbID, title, season, episode }));
 }
 
 function renderHistory(){
@@ -452,7 +457,9 @@ function renderHistory(){
   history.forEach(h => {
     const li = document.createElement("li");
     const d = new Date(h.time).toLocaleString();
-    li.textContent = `${h.title || h.imdbID} — ${d}`;
+  li.textContent = h.season && h.episode
+  ? `${h.title} — S${h.season}E${h.episode} — ${d}`
+  : `${h.title} — ${d}`;
     li.style.cursor = "pointer";
     li.onclick = () => {
       input.value = h.imdbID;
@@ -469,7 +476,9 @@ loadFromFields = async function(imdbIDOverride){
   _oldLoad(imdbIDOverride);
 
   const imdbID = imdbIDOverride || extractIMDb(input.value.trim());
-  if(!imdbID || imdbID.toLowerCase().includes("free")) return;
+  if(tmdbTitle && !tmdbTitle.toLowerCase().includes("free")){
+  saveHistory(imdbID, tmdbTitle, season, episode);
+}
 
   // fetch proper title from TMDB
   const tmdbTitle = await fetchTitleFromTMDB(imdbID);
@@ -617,10 +626,10 @@ async function loadSeasons(showData, imdbID){
 
   // hook watch button
   document.getElementById("watchBtn").onclick = () => {
-    const s = seasonSelect.value;
-    const e = episodeSelect.value;
-    loadFromFields(imdbID, s, e);
-  };
+  const s = seasonSelect.value;
+  const e = episodeSelect.value;
+  loadFromFields(imdbID, s, e);   // ✅ now this works
+};
 }
 
 </script>
