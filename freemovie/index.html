@@ -277,23 +277,20 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
   const imdbID = imdbIDOverride || extractIMDb(input.value.trim());
   if(!imdbID){ alert('Please enter a valid IMDb ID.'); return; }
 
-  // ✅ make sure select has a value (default fallback)
-  if (!select.value) {
-    select.value = "2embed"; // or whichever works best as default
-  }
+  if (!select.value) select.value = "2embed"; // fallback
 
   const embedURL = buildURL(select.value, imdbID, season, episode);
   if(!embedURL){ alert('Unknown server selected.'); return; }
 
-  // ✅ always set src + fullscreen attributes together
-  frame.src = embedURL;
+  // ✅ show container BEFORE setting src
+  $('#playerContainer').style.display = "block";
+
+  // ✅ then set iframe src + fullscreen attributes
   frame.setAttribute("allowfullscreen", "true");
   frame.setAttribute("webkitallowfullscreen", "true");
   frame.setAttribute("mozallowfullscreen", "true");
+  frame.src = embedURL;
 
-  $('#playerContainer').style.display = "block";
-
-  // your title + history code...
   fetchTitleFromTMDB(imdbID).then(title => {
     if(season && episode){
       setStatus(`Now Playing: ${title} — Season ${season}, Episode ${episode}`);
