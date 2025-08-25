@@ -593,92 +593,9 @@ window.addEventListener('DOMContentLoaded', () => {
 <!-- Mobile-specific fixes -->
 <script src="mobile-fix.js"></script>
 <script src="copy-link.js"></script>
-<!-- Auto-load movie from URL -->
-<script src="auto-load.js"></script>
-<!-- Home button redirect -->
-<script src="home-btn.js"></script>
 <!-- Mobile-specific fixes -->
 <script src="mobile-fix.js"></script>
 <!-- Copy link button -->
-<script>
-// --- Auto-load movie from URL ---
-window.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const imdb = params.get('imdb');
-    if(imdb && window.loadFromFields){
-        document.getElementById('imdbInput').value = imdb;
-        window.loadFromFields(imdb);
-    }
-});
-
-// --- Home button redirect ---
-const homeBtn = document.getElementById("homeBtn");
-homeBtn.addEventListener("click", () => {
-    const params = new URLSearchParams(window.location.search);
-    const imdb = params.get('imdb');
-    const homeURL = imdb 
-        ? `https://freestreamingsite.netlify.app/?imdb=${encodeURIComponent(imdb)}`
-        : `https://freestreamingsite.netlify.app/`;
-    window.location.href = homeURL;
-});
-
-  // Server auto-switch
-  const select = document.getElementById('serverSelect');
-  const input = document.getElementById('imdbInput'); // make sure input exists
-  select.addEventListener('change', () => {
-      const imdbID = input.value.trim();
-      if(imdbID && extractIMDb(imdbID)){  // only reload if it's a valid IMDb ID
-          loadFromFields(); 
-    }
-});
-// para tv support dawg
-const seasonSelect = document.getElementById("seasonSelect");
-const episodeSelect = document.getElementById("episodeSelect");
-
-async function loadSeasons(showData, imdbID){
-  // populate seasons
-  seasonSelect.innerHTML = "";
-  showData.seasons.forEach(s => {
-    if(s.season_number === 0) return; // skip specials
-    const opt = document.createElement("option");
-    opt.value = s.season_number;
-    opt.textContent = `Season ${s.season_number}`;
-    seasonSelect.appendChild(opt);
-  });
-  seasonSelect.style.display = "inline-block";
-  episodeSelect.style.display = "inline-block";
-
-  seasonSelect.onchange = async () => {
-    const sNum = seasonSelect.value;
-    const res = await fetch(`https://api.themoviedb.org/3/tv/${showData.id}/season/${sNum}?api_key=${API_KEY}`);
-    const data = await res.json();
-    episodeSelect.innerHTML = "";
-    data.episodes.forEach(e => {
-      const opt = document.createElement("option");
-      opt.value = e.episode_number;
-      opt.textContent = `Ep ${e.episode_number}: ${e.name}`;
-      episodeSelect.appendChild(opt);
-    });
-  };
-
-  // auto-load first season
-  await seasonSelect.onchange();
-
-  // auto-select first episode
-  episodeSelect.selectedIndex = 0;
-
-  // immediately load first episode into iframe
-  const firstSeason = seasonSelect.value;
-  const firstEpisode = episodeSelect.value;
-  loadFromFields(imdbID, firstSeason, firstEpisode);
-
-  // still allow "Watch" button to reload another episode
-  document.getElementById("watchBtn").onclick = () => {
-    const s = seasonSelect.value;
-    const e = episodeSelect.value;
-    loadFromFields(imdbID, s, e);
-  };
-}
 
 </script>
 </body>
