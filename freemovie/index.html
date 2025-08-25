@@ -443,37 +443,54 @@ async function searchTMDB(query){
   setStatus("Click a title to watch.");
 }
 
-// Load trending movies on homepage
+// Load trending movies + TV shows on homepage
 async function loadTrending() {
-  setStatus("Loading trending movies…");
-  const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`);
-  const data = await res.json();
+  setStatus("Loading trending…");
   resultsDiv.innerHTML="";
-  if(!data.results || !data.results.length){
-    setStatus("No trending movies found.");
+
+  const [resMovies, resShows] = await Promise.all([
+    fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`),
+    fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}`)
+  ]);
+
+  const movies = (await resMovies.json()).results || [];
+  const shows  = (await resShows.json()).results || [];
+  const items  = [...movies, ...shows];
+
+  if(!items.length){
+    setStatus("No trending results.");
     return;
   }
-  data.results.forEach(m => {
+
+  items.forEach(m => {
     if(!m.poster_path) return;
+    const title = m.title || m.name;
     const div = document.createElement("div");
     div.className = "movie";
-    div.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${m.poster_path}"><div class="movie-title">${m.title}</div>`;
+    div.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${m.poster_path}"><div class="movie-title">${title}</div>`;
     div.onclick = async () => {
-      const detRes = await fetch(TMDB_DETAILS(m.id));
+      const type = m.title ? "movie" : "tv";
+      const detRes = await fetch(`https://api.themoviedb.org/3/${type}/${m.id}?api_key=${API_KEY}&append_to_response=external_ids`);
       const det = await detRes.json();
-      if(det.imdb_id){
-        input.value = det.imdb_id;
-        loadFromFields(det.imdb_id);
+      const imdbID = det.external_ids?.imdb_id;
+      if(imdbID){
+        input.value = imdbID;
+        if(type === "tv"){
+          await loadSeasons(det, imdbID); // show season/episode selector
+        } else {
+          loadFromFields(imdbID);
+        }
         resultsDiv.innerHTML = "";
       } else {
-        setStatus("No IMDb ID found for this movie.");
+        setStatus("No IMDb ID found.");
       }
     };
     resultsDiv.appendChild(div);
   });
+
   setStatus("Trending this week:");
 }
-window.addEventListener('DOMContentLoaded', loadTrending);
+
 // --- NEW: Continue Watching + History feature ---
 const historyModal = $('#historyModal');
 const historyClose = $('#historyClose');
