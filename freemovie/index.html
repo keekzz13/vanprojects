@@ -5,17 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Movie Player</title>
   <meta name="color-scheme" content="dark light"/>
-  <style>
-    :root{
-      --bg:#0f1115;--panel:#171923;--panel-2:#1f2230;--text:#eef2ff;--muted:#aab2cf;--brand:#7c9cff;--accent:#51e1a7;--danger:#ff6b6b;--border:#2b3040;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
-      background:linear-gradient(120deg,var(--bg),#0b0d12 60%);
-      display:flex; min-height:100vh;
-    }
+ <style>
+  :root {
+    --bg:#0f1115;--panel:#171923;--panel-2:#1f2230;--text:#eef2ff;
+    --muted:#aab2cf;--brand:#7c9cff;--accent:#51e1a7;--danger:#ff6b6b;--border:#2b3040;
+  }
+
+  /* Fullscreen polish — match 123movies behavior */
+  :not(:root):fullscreen {
+    object-fit: contain;
+    user-select: text;
+    position: fixed !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    background: #000 !important;
+  }
+
+  :fullscreen::backdrop {
+    background: #000;
+  }
+
+  * { box-sizing: border-box }
+  html, body { height: 100% }
+  body {
+    margin: 0;
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    color: var(--text);
+    background: linear-gradient(120deg,var(--bg),#0b0d12 60%);
+    display: flex;
+    min-height: 100vh;
+  }
     .sidebar{
       position:fixed; inset:0 auto 0 0; width:120px; background:var(--panel);
       border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:14px; padding:20px 10px;
