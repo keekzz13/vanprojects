@@ -278,14 +278,18 @@ function buildURL(server, imdbID, season=null, episode=null){
 }
 const setStatus = (msg) => statusText.textContent = msg;
 
-function loadFromFields(imdbIDOverride){
+function loadFromFields(imdbIDOverride, season=null, episode=null){
   const imdbID = imdbIDOverride || extractIMDb(input.value.trim());
   if(!imdbID){ alert('Please enter a valid IMDb ID.'); return; }
-  const embedURL = buildURL(select.value, imdbID);
+  const embedURL = buildURL(select.value, imdbID, season, episode);
   if(!embedURL){ alert('Unknown server selected.'); return; }
   frame.src = embedURL;
   $('#playerContainer').style.display = "block"; // show player
-  setStatus(`Loaded ${imdbID} on ${select.options[select.selectedIndex].text}.`);
+  if(season && episode){
+    setStatus(`Loaded ${imdbID} S${season}E${episode} on ${select.options[select.selectedIndex].text}.`);
+  } else {
+    setStatus(`Loaded ${imdbID} on ${select.options[select.selectedIndex].text}.`);
+  }
 }
 
 $('#watchBtn').addEventListener('click', () => loadFromFields());
@@ -355,27 +359,6 @@ async function searchTMDB(query){
     resultsDiv.appendChild(div);
   });
   setStatus("Click a title to watch.");
-}
-
-  data.results.forEach(m => {
-    if(!m.poster_path) return;
-    const div = document.createElement("div");
-    div.className = "movie";
-    div.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${m.poster_path}"><div class="movie-title">${m.title}</div>`;
-    div.onclick = async () => {
-      const detRes = await fetch(TMDB_DETAILS(m.id));
-      const det = await detRes.json();
-      if(det.imdb_id){
-        input.value = det.imdb_id;
-        loadFromFields(det.imdb_id);
-        resultsDiv.innerHTML = "";
-      } else {
-        setStatus("No IMDb ID found for this movie.");
-      }
-    };
-    resultsDiv.appendChild(div);
-  });
-  setStatus("Click a movie to watch.");
 }
 
 // Load trending movies on homepage
