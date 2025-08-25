@@ -146,6 +146,8 @@
 
     <section class="wrap">
       <div class="toolbar" role="group" aria-label="Controls">
+      <select id="seasonSelect" class="select" style="display:none"></select>
+      <select id="episodeSelect" class="select" style="display:none"></select>
         <input id="imdbInput" class="input" placeholder="Enter IMDb link, ID, or movie name" autocomplete="off" />
         <button id="searchBtn" class="btn" type="button">🔍 Search</button>
         <select id="serverSelect" class="select" aria-label="Server">
@@ -247,22 +249,31 @@ const extractIMDb = (str='') => {
   return m ? m[0] : '';
 };
 
-function buildURL(server, imdbID, season = null, episode = null) {
-  let raw = `https://vidsrc.in/embed/${imdbID}`;
-  if (season && episode) {
-    raw = `https://vidsrc.in/embed/${imdbID}/${season}-${episode}/`;
-  }
-  switch(server){
-    case 'vidsrcto':
-      return `https://vidsrc.to/embed/movie/${imdbID}`;
-    case 'vidsrc':
-      return `https://vidsrc.me/embed/movie?imdb=${imdbID}`;
-    case '2embed':
-      return `https://www.2embed.cc/embed/${imdbID}`;
-    case 'noads':
-      return `https://vid-src-embeds-no-ads-demo.vercel.app/embed?url=${encodeURIComponent(raw)}`;
-    default:
-      return '';
+function buildURL(server, imdbID, season=null, episode=null){
+  if(season && episode){
+    // TV embed
+    switch(server){
+      case 'vidsrcto':
+        return `https://vidsrc.to/embed/tv/${imdbID}/${season}/${episode}`;
+      case 'vidsrc':
+        return `https://vidsrc.me/embed/tv?imdb=${imdbID}&s=${season}&e=${episode}`;
+      case '2embed':
+        return `https://www.2embed.cc/embedtv/${imdbID}&s=${season}&e=${episode}`;
+      case 'noads':
+        return `https://vid-src-embeds-no-ads-demo.vercel.app/embed?url=${encodeURIComponent(`https://vidsrc.in/embed/${imdbID}/${season}-${episode}`)}`;
+    }
+  } else {
+    // Movie embed (your old code)
+    switch(server){
+      case 'vidsrcto':
+        return `https://vidsrc.to/embed/movie/${imdbID}`;
+      case 'vidsrc':
+        return `https://vidsrc.me/embed/movie?imdb=${imdbID}`;
+      case '2embed':
+        return `https://www.2embed.cc/embed/${imdbID}`;
+      case 'noads':
+        return `https://vid-src-embeds-no-ads-demo.vercel.app/embed?url=${encodeURIComponent(`https://vidsrc.in/embed/${imdbID}`)}`;
+    }
   }
 }
 const setStatus = (msg) => statusText.textContent = msg;
@@ -295,16 +306,57 @@ document.addEventListener('keydown', e => {
   }
 });
 
+const TMDB_SEARCH_MOVIE = "https://api.themoviedb.org/3/search/movie?api_key="+API_KEY+"&query=";
+const TMDB_SEARCH_TV = "https://api.themoviedb.org/3/search/tv?api_key="+API_KEY+"&query=";
+
 async function searchTMDB(query){
   if(!query) return;
   setStatus("Searching…");
-  const res = await fetch(TMDB_SEARCH+encodeURIComponent(query));
-  const data = await res.json();
   resultsDiv.innerHTML="";
-  if(!data.results || !data.results.length){
+
+  // search both
+  const [resMovie, resTV] = await Promise.all([
+    fetch(TMDB_SEARCH_MOVIE+encodeURIComponent(query)),
+    fetch(TMDB_SEARCH_TV+encodeURIComponent(query))
+  ]);
+
+  const movies = (await resMovie.json()).results || [];
+  const shows  = (await resTV.json()).results || [];
+
+  if(!movies.length && !shows.length){
     setStatus("No results.");
     return;
   }
+
+  [...movies, ...shows].forEach(m => {
+    if(!m.poster_path) return;
+    const title = m.title || m.name;
+    const div = document.createElement("div");
+    div.className = "movie";
+    div.innerHTML = `<img src="https://image.tmdb.org/t/p/w342${m.poster_path}"><div class="movie-title">${title}</div>`;
+    div.onclick = async () => {
+      // movies use /movie/, tv uses /tv/
+      const type = m.title ? "movie" : "tv";
+      const detRes = await fetch(`https://api.themoviedb.org/3/${type}/${m.id}?api_key=${API_KEY}&append_to_response=external_ids`);
+      const det = await detRes.json();
+      const imdbID = det.external_ids?.imdb_id;
+      if(imdbID){
+        input.value = imdbID;
+        if(type === "tv"){
+          await loadSeasons(det, imdbID); // 👈 show season/episode selector
+        } else {
+          loadFromFields(imdbID);
+        }
+        resultsDiv.innerHTML = "";
+      } else {
+        setStatus("No IMDb ID found.");
+      }
+    };
+    resultsDiv.appendChild(div);
+  });
+  setStatus("Click a title to watch.");
+}
+
   data.results.forEach(m => {
     if(!m.poster_path) return;
     const div = document.createElement("div");
@@ -547,6 +599,47 @@ homeBtn.addEventListener("click", () => {
           loadFromFields(); 
     }
 });
+// para tv support dawg
+const seasonSelect = document.getElementById("seasonSelect");
+const episodeSelect = document.getElementById("episodeSelect");
+
+async function loadSeasons(showData, imdbID){
+  // populate seasons
+  seasonSelect.innerHTML = "";
+  showData.seasons.forEach(s => {
+    if(s.season_number === 0) return; // skip specials
+    const opt = document.createElement("option");
+    opt.value = s.season_number;
+    opt.textContent = `Season ${s.season_number}`;
+    seasonSelect.appendChild(opt);
+  });
+  seasonSelect.style.display = "inline-block";
+  episodeSelect.style.display = "inline-block";
+
+  seasonSelect.onchange = async () => {
+    const sNum = seasonSelect.value;
+    const res = await fetch(`https://api.themoviedb.org/3/tv/${showData.id}/season/${sNum}?api_key=${API_KEY}`);
+    const data = await res.json();
+    episodeSelect.innerHTML = "";
+    data.episodes.forEach(e => {
+      const opt = document.createElement("option");
+      opt.value = e.episode_number;
+      opt.textContent = `Ep ${e.episode_number}: ${e.name}`;
+      episodeSelect.appendChild(opt);
+    });
+  };
+
+  // auto-load first season
+  seasonSelect.onchange();
+
+  // hook watch button
+  document.getElementById("watchBtn").onclick = () => {
+    const s = seasonSelect.value;
+    const e = episodeSelect.value;
+    loadFromFields(imdbID, s, e);
+  };
+}
+
 </script>
 </body>
 </html>
