@@ -79,11 +79,16 @@
 
 #playerContainer.active {
   visibility: visible;
-  position: static;
+  position: relative; /* <-- important so our button positions correctly */
 }
 
     .player .frame-wrap{position:relative; width:100%; aspect-ratio:16/9; background:#000}
     iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+    /* Keep iframe under the exit button */
+    #movieFrame {
+    z-index: 1;
+    }
+
     .status{margin-top:10px; color:var(--muted); font-size:12px; display:flex; gap:10px; align-items:center}
     .status .dot{width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent)}
     .footer{margin:24px 0 40px; color:var(--muted); font-size:12px;}
@@ -129,6 +134,14 @@
 
 .home-btn:hover {
   text-decoration: underline;
+}
+/* Optional polish for exit fullscreen button */
+#playerContainer button {
+  transition: opacity .2s ease;
+}
+
+#playerContainer button:hover {
+  opacity: 0.9;
 }
 
   </style>
@@ -264,55 +277,66 @@ aboutClose.addEventListener('click', () => aboutModal.close());
 const input = $('#imdbInput');
 const select = $('#serverSelect');
 const frame = $('#movieFrame');
-// Force fullscreen button + Exit button
+// ----- Fullscreen + Exit button -----
 const fullscreenBtn = document.getElementById("fullscreenBtn");
 
-// Create exit button
+// Create exit button and append INSIDE the player container
 const exitBtn = document.createElement("button");
 exitBtn.textContent = "❌ Exit Fullscreen";
-exitBtn.style.position = "fixed";
-exitBtn.style.top = "10px";
-exitBtn.style.right = "10px";
-exitBtn.style.zIndex = "9999";
-exitBtn.style.padding = "10px 14px";
-exitBtn.style.fontSize = "14px";
-exitBtn.style.background = "#ff4d4d";
-exitBtn.style.color = "#fff";
-exitBtn.style.border = "none";
-exitBtn.style.borderRadius = "8px";
-exitBtn.style.cursor = "pointer";
-exitBtn.style.opacity = "0.6"; // 👈 semi-transparent but visible
-exitBtn.style.display = "none"; // hidden by default
-document.body.appendChild(exitBtn);
+Object.assign(exitBtn.style, {
+  position: "absolute",
+  top: "10px",
+  right: "10px",
+  zIndex: "9999",          // above iframe
+  padding: "10px 14px",
+  fontSize: "14px",
+  background: "#ff4d4d",
+  color: "#fff",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer",
+  opacity: "0.6",          // semi-transparent
+  display: "none",         // hidden until fullscreen
+  pointerEvents: "auto"    // make 100% sure it's clickable
+});
 
+// append inside the fullscreen target so it shows in fullscreen
+document.getElementById("playerContainer").appendChild(exitBtn);
+
+// Enter fullscreen on the CONTAINER, not the iframe
 fullscreenBtn.addEventListener("click", () => {
   const container = document.getElementById("playerContainer");
-  if (container.requestFullscreen) {
-    container.requestFullscreen();
-  } else if (container.webkitRequestFullscreen) {
-    container.webkitRequestFullscreen();
-  } else if (container.mozRequestFullScreen) {
-    container.mozRequestFullScreen();
-  } else if (container.msRequestFullscreen) {
-    container.msRequestFullscreen();
-  }
-  exitBtn.style.display = "block"; // show button when fullscreen
+  if (container.requestFullscreen) container.requestFullscreen();
+  else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+  else if (container.mozRequestFullScreen) container.mozRequestFullScreen();
+  else if (container.msRequestFullscreen) container.msRequestFullscreen();
+
+  exitBtn.style.display = "block";
 });
 
-// Exit fullscreen
+// Exit fullscreen when the button is clicked
 exitBtn.addEventListener("click", () => {
-  if (document.exitFullscreen) {
-    document.exitFullscreen();
-  }
-  exitBtn.style.display = "none"; // hide button again
+  if (document.exitFullscreen) document.exitFullscreen();
+  else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+  else if (document.msExitFullscreen) document.msExitFullscreen();
 });
 
-// Auto-hide button when user leaves fullscreen manually
-document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement) {
-    exitBtn.style.display = "none";
-  }
-});
+// Hide the exit button when fullscreen ends (any method)
+function onFsChange() {
+  const inFs =
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement;
+
+  exitBtn.style.display = inFs ? "block" : "none";
+}
+
+document.addEventListener("fullscreenchange", onFsChange);
+document.addEventListener("webkitfullscreenchange", onFsChange);
+document.addEventListener("mozfullscreenchange", onFsChange);
+document.addEventListener("MSFullscreenChange", onFsChange);
 
 const statusText = $('#statusText');
 const resultsDiv = $('#results');
