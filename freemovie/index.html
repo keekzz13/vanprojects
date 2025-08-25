@@ -511,59 +511,23 @@ function renderHistory(){
   });
 }
 
-if(season && episode){
-  setStatus(`Now Playing: ${imdbID} — Season ${season}, Episode ${episode}`);
-  document.querySelector(".header h1").textContent = `Now Watching: Season ${season} Episode ${episode}`;
-} else {
-  setStatus(`Now Playing: ${imdbID}`);
-  document.querySelector(".header h1").textContent = "Now Watching: Movie";
-}
-
-
-  // fetch proper title from TMDB
-  const tmdbTitle = await fetchTitleFromTMDB(imdbID);
-
-  if(tmdbTitle && !tmdbTitle.toLowerCase().includes("free")){
-    saveHistory(imdbID, tmdbTitle);
-  }
-};
-
 // Show Continue Watching popup if exists
 window.addEventListener('DOMContentLoaded', () => {
   const last = JSON.parse(localStorage.getItem('lastWatch') || "null");
   if(last){
-    // set popup text
-    document.getElementById('continueText').textContent = `Resume "${last.title || last.imdbID}"?`;
-    
-    // show popup
-    document.getElementById('resumePopup').classList.remove('hidden');
-    
-    // resume button
-    document.getElementById('resumeBtn').onclick = () => {
+    continueText.textContent = `Resume "${last.title || last.imdbID}"?`;
+    continueModal.showModal();
+    resumeBtn.onclick = () => {
       input.value = last.imdbID;
-      loadFromFields(last.imdbID); // load movie
-      document.getElementById('resumePopup').classList.add('hidden');
+      loadFromFields(last.imdbID, last.season, last.episode);
+      continueModal.close();
     };
-
-    // close button
-    document.getElementById('resumeClose').onclick = () => {
-      document.getElementById('resumePopup').classList.add('hidden');
-    };
+    continueClose.onclick = () => continueModal.close();
   }
 });
-// --- History + Continue Watching ---
+
 // (Nag unsa ka diri dawg)
 
-// --- Home button redirect ---
-const homeBtn = document.getElementById("homeBtn");
-homeBtn.addEventListener("click", () => {
-    const input = document.getElementById("imdbInput");
-    const imdbID = input.value.trim();
-    const homeURL = imdbID 
-        ? `https://freestreamingsite.netlify.app/?imdb=${encodeURIComponent(imdbID)}`
-        : `https://freestreamingsite.netlify.app/`;
-    window.location.href = homeURL;
-});
 window.addEventListener("load", () => {
   console.log(`
 ██   ██ ██    ██ ██    ██ ██ 
@@ -576,27 +540,7 @@ window.addEventListener("load", () => {
 
   console.log("nag unsa ka diri dawg 🐶");
 });
-
-</script>
-<!-- Auto-load movie from URL -->
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(window.location.search);
-  const imdb = params.get('imdb');
-  if(imdb && window.loadFromFields){
-    document.getElementById('imdbInput').value = imdb;
-    window.loadFromFields(imdb);
-  }
-});
-</script>
-
-<!-- Mobile-specific fixes -->
 <script src="mobile-fix.js"></script>
 <script src="copy-link.js"></script>
-<!-- Mobile-specific fixes -->
-<script src="mobile-fix.js"></script>
-<!-- Copy link button -->
-
-</script>
 </body>
 </html>
