@@ -13,21 +13,13 @@
 
   /* Fullscreen polish — match 123movies behavior */
   :not(:root):fullscreen {
-    object-fit: contain;
-    user-select: text;
-    position: fixed !important;
-    box-sizing: border-box !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    width: 100% !important;
-    height: 100% !important;
-    transform: none !important;
-    inset: 0 !important;
-    margin: 0 !important;
-    background: #000 !important;
-  }
+  object-fit: contain;
+  background: #000 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  inset: 0 !important;
+}
 
   :fullscreen::backdrop {
     background: #000;
@@ -185,6 +177,7 @@
         </select>
         <button id="watchBtn" class="btn primary" type="button">▶ Watch</button>
         <button id="copyBtn" class="btn" type="button" title="Copy share link">🔗 Copy Link</button>
+        <button id="fullscreenBtn" class="btn" type="button" title="Fullscreen">⛶ Fullscreen</button>
       </div>
 
       <div id="results" class="results"></div>
@@ -271,6 +264,23 @@ aboutClose.addEventListener('click', () => aboutModal.close());
 const input = $('#imdbInput');
 const select = $('#serverSelect');
 const frame = $('#movieFrame');
+// Force fullscreen button
+const fullscreenBtn = document.getElementById("fullscreenBtn");
+fullscreenBtn.addEventListener("click", () => {
+  const iframe = document.getElementById("movieFrame");
+  if (iframe.requestFullscreen) {
+    iframe.requestFullscreen();
+  } else if (iframe.webkitRequestFullscreen) { // Safari
+    iframe.webkitRequestFullscreen();
+  } else if (iframe.mozRequestFullScreen) { // Firefox
+    iframe.mozRequestFullScreen();
+  } else if (iframe.msRequestFullscreen) { // IE/Edge
+    iframe.msRequestFullscreen();
+  } else {
+    alert("Fullscreen not supported in this browser.");
+  }
+});
+
 const statusText = $('#statusText');
 const resultsDiv = $('#results');
 
