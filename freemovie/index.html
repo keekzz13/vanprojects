@@ -114,16 +114,6 @@
     <button class="navbtn" id="openHistory">History</button> <!-- NEW -->
   </div>
 
-    <div class="modal-header">
-      <div class="modal-title">Continue Watching</div>
-      <button class="close-x" id="continueClose" aria-label="Close">✕</button>
-    </div>
-    <div class="modal-body">
-      <p id="continueText"></p>
-      <button class="btn primary" id="resumeBtn">▶ Resume</button>
-    </div>
-  </dialog>
-
   <!-- History Modal --> <!-- NEW -->
   <dialog id="historyModal">
     <div class="modal-header">
@@ -501,7 +491,6 @@ openHistoryBtn.addEventListener('click', () => {
   historyModal.showModal();
 });
 historyClose.addEventListener('click', () => historyModal.close());
-continueClose.addEventListener('click', () => continueModal.close());
 
 // 🔑 TMDB API key 
 const TMDB_KEY = "6452370c23b5a8497b9a201cf46fba42"; 
