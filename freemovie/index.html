@@ -151,9 +151,9 @@
         <input id="imdbInput" class="input" placeholder="Enter IMDb link, ID, or movie name" autocomplete="off" />
         <button id="searchBtn" class="btn" type="button">🔍 Search</button>
         <select id="serverSelect" class="select" aria-label="Server">
-          <option value="vidsrc">Server 1 – Vidsrc.to</option>
+          <option value="vidsrc">Server 1 – 2Embed</option>
           <option value="vidsrcto">Server 2 – Vidsrc.me</option>
-          <option value="2embed">Server 3 – 2Embed</option>
+          <option value="2embed">Server 3 – Vidsrc.to</option>
           <option value="noads">Server 4 – Test(tryi basin way ads haha)</option>
         </select>
         <button id="watchBtn" class="btn primary" type="button">▶ Watch</button>
@@ -254,11 +254,11 @@ function buildURL(server, imdbID, season=null, episode=null){
     // TV embed
     switch(server){
       case 'vidsrcto':
-        return `https://vidsrc.to/embed/tv/${imdbID}/${season}/${episode}`;
+        return `https://www.2embed.cc/embedtv/${imdbID}&s=${season}&e=${episode}`;
       case 'vidsrc':
         return `https://vidsrc.me/embed/tv?imdb=${imdbID}&s=${season}&e=${episode}`;
       case '2embed':
-        return `https://www.2embed.cc/embedtv/${imdbID}&s=${season}&e=${episode}`;
+        return `https://vidsrc.to/embed/tv/${imdbID}/${season}/${episode}`;
       case 'noads':
         return `https://vid-src-embeds-no-ads-demo.vercel.app/embed?url=${encodeURIComponent(`https://vidsrc.in/embed/${imdbID}/${season}-${episode}`)}`;
     }
@@ -266,11 +266,11 @@ function buildURL(server, imdbID, season=null, episode=null){
     // Movie embed (your old code)
     switch(server){
       case 'vidsrcto':
-        return `https://vidsrc.to/embed/movie/${imdbID}`;
+        return `https://www.2embed.cc/embed/${imdbID}`;
       case 'vidsrc':
         return `https://vidsrc.me/embed/movie?imdb=${imdbID}`;
       case '2embed':
-        return `https://www.2embed.cc/embed/${imdbID}`;
+        return `https://vidsrc.to/embed/movie/${imdbID}`;
       case 'noads':
         return `https://vid-src-embeds-no-ads-demo.vercel.app/embed?url=${encodeURIComponent(`https://vidsrc.in/embed/${imdbID}`)}`;
     }
@@ -288,12 +288,16 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
   frame.src = embedURL;
   $('#playerContainer').style.display = "block"; // show player
 
-  if(season && episode){
-    setStatus(`Loaded ${imdbID} — Season ${season}, Episode ${episode}`);
-  } else {
-    setStatus(`Loaded ${imdbID}`);
-  }
-}
+    // ✅ New status logic with real title
+  fetchTitleFromTMDB(imdbID).then(title => {
+    if(season && episode){
+      setStatus(`Now Playing: ${title} — Season ${season}, Episode ${episode}`);
+      document.querySelector(".header h1").textContent = `Now Watching: ${title} — S${season}E${episode}`;
+    } else {
+      setStatus(`Now Playing: ${title}`);
+      document.querySelector(".header h1").textContent = `Now Watching: ${title}`;
+    }
+  });
 
 $('#watchBtn').addEventListener('click', () => loadFromFields());
 $('#searchBtn').addEventListener('click', () => {
@@ -470,15 +474,14 @@ function renderHistory(){
   });
 }
 
-// ✅ Hook into loadFromFields but fetch title from TMDB
-const _oldLoad = loadFromFields;
-loadFromFields = async function(imdbIDOverride){
-  _oldLoad(imdbIDOverride);
-
-  const imdbID = imdbIDOverride || extractIMDb(input.value.trim());
-  if(tmdbTitle && !tmdbTitle.toLowerCase().includes("free")){
-  saveHistory(imdbID, tmdbTitle, season, episode);
+if(season && episode){
+  setStatus(`Now Playing: ${imdbID} — Season ${season}, Episode ${episode}`);
+  document.querySelector(".header h1").textContent = `Now Watching: Season ${season} Episode ${episode}`;
+} else {
+  setStatus(`Now Playing: ${imdbID}`);
+  document.querySelector(".header h1").textContent = "Now Watching: Movie";
 }
+
 
   // fetch proper title from TMDB
   const tmdbTitle = await fetchTitleFromTMDB(imdbID);
@@ -622,14 +625,22 @@ async function loadSeasons(showData, imdbID){
   };
 
   // auto-load first season
-  seasonSelect.onchange();
+  await seasonSelect.onchange();
 
-  // hook watch button
+  // auto-select first episode
+  episodeSelect.selectedIndex = 0;
+
+  // immediately load first episode into iframe
+  const firstSeason = seasonSelect.value;
+  const firstEpisode = episodeSelect.value;
+  loadFromFields(imdbID, firstSeason, firstEpisode);
+
+  // still allow "Watch" button to reload another episode
   document.getElementById("watchBtn").onclick = () => {
-  const s = seasonSelect.value;
-  const e = episodeSelect.value;
-  loadFromFields(imdbID, s, e);   // ✅ now this works
-};
+    const s = seasonSelect.value;
+    const e = episodeSelect.value;
+    loadFromFields(imdbID, s, e);
+  };
 }
 
 </script>
