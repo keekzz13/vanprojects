@@ -69,7 +69,12 @@
     .btn:hover{filter:brightness(1.1)}
     .btn.primary{background:var(--brand); border-color:transparent; color:#0a1024}
     .btn.ghost{background:transparent}
-    .player{margin-top:16px; background:#000; border:1px solid var(--border); border-radius:18px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.45)}
+    .player{
+  margin-top:16px; background:#000; border:1px solid var(--border);
+  border-radius:18px;
+  overflow:visible; /* let info show */
+  box-shadow:0 8px 30px rgba(0,0,0,.45)
+}
     /* --- Fullscreen Fix --- */
 #playerContainer {
   visibility: visible;
@@ -82,7 +87,11 @@
   position: relative; /* <-- important so our button positions correctly */
 }
 
-    .player .frame-wrap{position:relative; width:100%; aspect-ratio:16/9; background:#000}
+    .player .frame-wrap{
+  position:relative; width:100%; aspect-ratio:16/9; background:#000;
+  border-radius:18px; /* keep rounded video */
+  overflow:hidden;   /* only clip the video */
+}
     iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
     /* Keep iframe under the exit button */
     #movieFrame {
@@ -422,7 +431,8 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
   frame.setAttribute("webkitallowfullscreen", "true");
   frame.setAttribute("mozallowfullscreen", "true");
   frame.src = embedURL;
-
+  showInfoByIMDb(imdbID); 
+  
   fetchTitleFromTMDB(imdbID).then(title => {
     if(season && episode){
       setStatus(`Now Playing: ${title} — Season ${season}, Episode ${episode}`);
@@ -478,6 +488,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if(imdb && window.loadFromFields){
     document.getElementById('imdbInput').value = imdb;
     window.loadFromFields(imdb);
+    showInfoByIMDb(imdb);
   }
 
   // Home button
@@ -560,7 +571,6 @@ async function searchTMDB(query){
           loadFromFields(imdbID);
         }
         resultsDiv.innerHTML = "";
-        showMovieInfo(m.id, type);
       } else {
         setStatus("No IMDb ID found.");
       }
@@ -601,16 +611,17 @@ async function loadTrending() {
       const det = await detRes.json();
       const imdbID = det.external_ids?.imdb_id;
       if(imdbID){
-        input.value = imdbID;
-        if(type === "tv"){
-          await loadSeasons(det, imdbID); // show season/episode selector
-        } else {
-          loadFromFields(imdbID);
-        }
-        resultsDiv.innerHTML = "";
-      } else {
-        setStatus("No IMDb ID found.");
-      }
+  input.value = imdbID;
+  if(type === "tv"){
+    await loadSeasons(det, imdbID); // show season/episode selector
+  } else {
+    loadFromFields(imdbID);
+  }
+  resultsDiv.innerHTML = "";
+  showMovieInfo(m.id, type); // ✅ moved inside IF, so always shows info
+} else {
+  setStatus("No IMDb ID found.");
+}
     };
     resultsDiv.appendChild(div);
   });
@@ -680,6 +691,7 @@ function renderHistory(){
     li.onclick = () => {
       input.value = h.imdbID;
       loadFromFields(h.imdbID);
+      showInfoByIMDb(h.imdbID);
       historyModal.close();
     };
     historyList.appendChild(li);
@@ -728,6 +740,26 @@ async function showMovieInfo(tmdbID, type="movie") {
 
   } catch (e) {
     console.error("Movie info fetch failed:", e);
+  }
+}
+
+async function showInfoByIMDb(imdbID){
+  try{
+    const res = await fetch(
+      `https://api.themoviedb.org/3/find/${imdbID}?api_key=${API_KEY}&external_source=imdb_id`
+    );
+    const data = await res.json();
+
+    if (data.movie_results?.length){
+      return showMovieInfo(data.movie_results[0].id, "movie");
+    }
+    if (data.tv_results?.length){
+      return showMovieInfo(data.tv_results[0].id, "tv");
+    }
+
+    document.getElementById("movieInfo").style.display = "none";
+  }catch(e){
+    console.error("IMDb->TMDB lookup failed:", e);
   }
 }
 
