@@ -861,20 +861,54 @@ async function showMovieInfo(tmdbID, type="movie") {
     );
     const data = await res.json();
 
-    // Title + description
-    document.getElementById("movieTitle").textContent = data.title || data.name || "Unknown Title";
-    document.getElementById("movieOverview").textContent = data.overview || "No description available.";
-    document.getElementById("movieRating").textContent = data.vote_average ? data.vote_average.toFixed(1) : "N/A";
+    // Title + main overview + rating + cast (existing fields)
+    const title = data.title || data.name || "Unknown Title";
+    const mainOverview = data.overview || "No description available.";
+    const mainRating = data.vote_average ? data.vote_average.toFixed(1) : null;
 
-    // Show 5 cast members
-    const cast = (data.credits?.cast || []).slice(0,5).map(c => c.name).join(", ");
-    document.getElementById("movieCast").textContent = cast || "Unknown";
+    document.getElementById("movieTitle").textContent = title;
+    // keep the original movieOverview element too
+    const movieOverviewEl = document.getElementById("movieOverview");
+    if (movieOverviewEl) movieOverviewEl.textContent = mainOverview;
+    const movieRatingEl = document.getElementById("movieRating");
+    if (movieRatingEl) movieRatingEl.textContent = mainRating ? mainRating : "N/A";
 
-    // Show info box
-    document.getElementById("movieInfo").style.display = "block";
+    // Top 5 cast members
+    const castList = (data.credits?.cast || []).slice(0,5).map(c => c.name).join(", ");
+    const movieCastEl = document.getElementById("movieCast");
+    if (movieCastEl) movieCastEl.textContent = castList || "Unknown";
+
+    // --- NEW: fill the extra panel fields you added ---
+    // releaseDate span, overview span (in extraInfo), rating span (in extraInfo)
+    const releaseText = data.release_date || data.first_air_date || "N/A";
+    const extraOverviewEl = document.getElementById("overview");
+    const releaseEl = document.getElementById("releaseDate");
+    const ratingEl = document.getElementById("rating");
+
+    if (releaseEl) releaseEl.textContent = releaseText;
+    if (extraOverviewEl) extraOverviewEl.textContent = mainOverview;
+    if (ratingEl) ratingEl.textContent = mainRating ? (mainRating + "/10") : "N/A";
+
+    // Show the movieInfo container (keeps previous behavior)
+    const movieInfoContainer = document.getElementById("movieInfo");
+    if (movieInfoContainer) movieInfoContainer.style.display = "block";
+
+    // Reset the More info toggle to collapsed:
+    const toggleBtn = document.getElementById("toggleInfo");
+    const extraInfo = document.getElementById("extraInfo");
+    if (extraInfo) {
+      // make it hidden by default (we used 'hidden' class previously)
+      extraInfo.classList.remove("show");
+      extraInfo.classList.add("hidden");
+    }
+    if (toggleBtn) toggleBtn.textContent = "More info ▼";
 
   } catch (e) {
     console.error("Movie info fetch failed:", e);
+
+    // hide box on error
+    const movieInfoContainer = document.getElementById("movieInfo");
+    if (movieInfoContainer) movieInfoContainer.style.display = "none";
   }
 }
 
