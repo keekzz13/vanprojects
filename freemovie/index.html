@@ -935,17 +935,21 @@ async function showInfoByIMDb(imdbID){
 const toggleBtn = document.getElementById("toggleInfo");
 const extraInfo = document.getElementById("extraInfo");
 
-toggleBtn.addEventListener("click", () => {
-  const isHidden = extraInfo.classList.contains("show");
-  
-  if (isHidden) {
-    extraInfo.classList.remove("show");
-    toggleBtn.textContent = "Less info ▲";
-  } else {
-    extraInfo.classList.add("show");
-    toggleBtn.textContent = "More info ▼";
-  }
-});
+if (toggleBtn && extraInfo) {
+  toggleBtn.addEventListener("click", () => {
+    // If sliding animation CSS uses .show, toggle that; otherwise fallback to .hidden
+    if (extraInfo.classList.contains("show")) {
+      extraInfo.classList.remove("show");
+      // also add hidden class so older CSS using hidden works
+      extraInfo.classList.add("hidden");
+      toggleBtn.textContent = "More info ▼";
+    } else {
+      extraInfo.classList.add("show");
+      extraInfo.classList.remove("hidden");
+      toggleBtn.textContent = "Less info ▲";
+    }
+  });
+}
 
 </script>  
 
