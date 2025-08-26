@@ -203,6 +203,86 @@
 .info-content {
   margin-top: 10px;
 }
+/* 🔘 General Button Style with Animations */
+button {
+  transition: all 0.2s ease-in-out;
+  transform-origin: center;
+}
+
+button:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+/* 🎬 Movie Cards Animation */
+#results div, #trending div {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* 🎥 Smooth Expand / Collapse */
+.info-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+  opacity: 0;
+}
+
+.info-content.show {
+  max-height: 500px; /* big enough for content */
+  opacity: 1;
+}
+/* 📺 Smooth Video Player Fade-in */
+#playerContainer iframe {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+#playerContainer iframe.show {
+  opacity: 1;
+}
+/* ⏳ Loading Spinner */
+#spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255,255,255,0.3);
+  border-top: 5px solid #00bfff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Hide spinner when inactive */
+#spinner.hidden {
+  display: none;
+}
+#extraInfo.hidden {
+  display: none;
+}
+
   </style>
 </head>
 <body>
@@ -256,6 +336,7 @@
 
       <!-- Player hidden by default -->
       <div class="player" id="playerContainer" aria-live="polite">
+      <div id="spinner"></div>
   <div class="frame-wrap">
     <iframe id="movieFrame"
       allow="fullscreen; picture-in-picture; clipboard-write; encrypted-media; autoplay"
@@ -267,17 +348,12 @@
     </iframe>
         </div>
       <!-- Movie Info Section -->
-<div id="movieInfo" class="movie-info" style="display:none;">
-  <h2 id="movieTitle"></h2>
-
-  <!-- Toggle button -->
-  <button id="toggleInfo" class="toggle-btn">More info ▼</button>
-
-  <!-- Hidden details -->
-  <div id="infoContent" class="info-content" style="display:none;">
-    <p id="movieOverview"></p>
-    <p><strong>Rating:</strong> <span id="movieRating"></span>/10 ⭐</p>
-    <p><strong>Cast:</strong> <span id="movieCast"></span></p>
+<div id="movieInfo">
+  <button id="toggleInfo">More info ▼</button>
+  <div id="extraInfo" class="hidden">
+    <p><strong>Release Date:</strong> <span id="releaseDate"></span></p>
+    <p><strong>Overview:</strong> <span id="overview"></span></p>
+    <p><strong>Rating:</strong> <span id="rating"></span></p>
   </div>
 </div>
 
@@ -468,6 +544,19 @@ function loadFromFields(imdbIDOverride, season=null, episode=null){
   frame.setAttribute("allowfullscreen", "true");
   frame.setAttribute("webkitallowfullscreen", "true");
   frame.setAttribute("mozallowfullscreen", "true");
+  // Show spinner before loading
+const spinner = document.getElementById("spinner");
+spinner.classList.remove("hidden");
+
+// Clear old "show" class on iframe
+frame.classList.remove("show");
+
+// Wait until iframe loads, then fade it in + hide spinner
+frame.onload = () => {
+  frame.classList.add("show");
+  spinner.classList.add("hidden");
+};
+
   frame.src = embedURL;
   showInfoByIMDb(imdbID); 
   
@@ -801,19 +890,33 @@ async function showInfoByIMDb(imdbID){
   }
 }
 
-// Toggle More Info
+// Toggle More Info with animation
 document.addEventListener("click", (e) => {
   if(e.target && e.target.id === "toggleInfo"){
     const content = document.getElementById("infoContent");
     const btn = e.target;
 
-    if(content.style.display === "none"){
-      content.style.display = "block";
-      btn.textContent = "Less info ▲";
-    } else {
-      content.style.display = "none";
+    if(content.classList.contains("show")){
+      content.classList.remove("show");
       btn.textContent = "More info ▼";
+    } else {
+      content.classList.add("show");
+      btn.textContent = "Less info ▲";
     }
+  }
+});
+const toggleBtn = document.getElementById("toggleInfo");
+const extraInfo = document.getElementById("extraInfo");
+
+toggleBtn.addEventListener("click", () => {
+  const isHidden = extraInfo.classList.contains("hidden");
+  
+  if (isHidden) {
+    extraInfo.classList.remove("hidden");
+    toggleBtn.textContent = "Less info ▲";
+  } else {
+    extraInfo.classList.add("hidden");
+    toggleBtn.textContent = "More info ▼";
   }
 });
 
