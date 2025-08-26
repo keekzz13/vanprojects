@@ -356,12 +356,16 @@ button:active {
     </iframe>
         </div>
       <!-- Movie Info Section -->
-<div id="movieInfo">
+<div id="movieInfo" class="movie-info" style="display:none;">
+  <h2 id="movieTitle"></h2>
+
+  <!-- The button must exist inside here -->
   <button id="toggleInfo">More info ▼</button>
+
   <div id="extraInfo" class="hidden">
-    <p><strong>Release Date:</strong> <span id="releaseDate"></span></p>
-    <p><strong>Overview:</strong> <span id="overview"></span></p>
-    <p><strong>Rating:</strong> <span id="rating"></span></p>
+    <p><strong>Release Date:</strong> <span id="releaseDate">N/A</span></p>
+    <p><strong>Overview:</strong> <span id="overview">N/A</span></p>
+    <p><strong>Rating:</strong> <span id="rating">N/A</span></p>
   </div>
 </div>
 
@@ -937,10 +941,8 @@ const extraInfo = document.getElementById("extraInfo");
 
 if (toggleBtn && extraInfo) {
   toggleBtn.addEventListener("click", () => {
-    // If sliding animation CSS uses .show, toggle that; otherwise fallback to .hidden
     if (extraInfo.classList.contains("show")) {
       extraInfo.classList.remove("show");
-      // also add hidden class so older CSS using hidden works
       extraInfo.classList.add("hidden");
       toggleBtn.textContent = "More info ▼";
     } else {
