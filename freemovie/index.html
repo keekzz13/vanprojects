@@ -171,6 +171,38 @@
   margin: 6px 0;
   font-size: 14px;
 }
+.movie-info {
+  background: #1e1f28;
+  margin-top: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  color: #eef2f7;
+  line-height: 1.6;
+}
+
+.movie-info h2 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: #ffcc00;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.toggle-btn:hover {
+  text-decoration: underline;
+}
+
+.info-content {
+  margin-top: 10px;
+}
   </style>
 </head>
 <body>
@@ -235,12 +267,18 @@
     </iframe>
         </div>
       <!-- Movie Info Section -->
- <div id="movieInfo" class="movie-info" style="display:none;">
-   <h2 id="movieTitle"></h2>
-   <p id="movieOverview"></p>
-   <p><strong>Rating:</strong> <span id="movieRating"></span>/10 ⭐</p>
-   <p><strong>Cast:</strong> <span id="movieCast"></span></p>
- </div>
+<div id="movieInfo" class="movie-info" style="display:none;">
+  <h2 id="movieTitle"></h2>
+
+  <!-- Toggle button -->
+  <button id="toggleInfo" class="toggle-btn">More info ▼</button>
+
+  <!-- Hidden details -->
+  <div id="infoContent" class="info-content" style="display:none;">
+    <p id="movieOverview"></p>
+    <p><strong>Rating:</strong> <span id="movieRating"></span>/10 ⭐</p>
+    <p><strong>Cast:</strong> <span id="movieCast"></span></p>
+  </div>
 </div>
 
       <div class="status" id="status">
@@ -762,6 +800,22 @@ async function showInfoByIMDb(imdbID){
     console.error("IMDb->TMDB lookup failed:", e);
   }
 }
+
+// Toggle More Info
+document.addEventListener("click", (e) => {
+  if(e.target && e.target.id === "toggleInfo"){
+    const content = document.getElementById("infoContent");
+    const btn = e.target;
+
+    if(content.style.display === "none"){
+      content.style.display = "block";
+      btn.textContent = "Less info ▲";
+    } else {
+      content.style.display = "none";
+      btn.textContent = "More info ▼";
+    }
+  }
+});
 
 </script>  
 
