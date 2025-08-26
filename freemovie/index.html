@@ -279,8 +279,16 @@ button:active {
 #spinner.hidden {
   display: none;
 }
-#extraInfo.hidden {
-  display: none;
+#extraInfo {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.4s ease;
+}
+
+#extraInfo.show {
+  max-height: 500px; /* big enough */
+  opacity: 1;
 }
 
   </style>
@@ -890,32 +898,17 @@ async function showInfoByIMDb(imdbID){
   }
 }
 
-// Toggle More Info with animation
-document.addEventListener("click", (e) => {
-  if(e.target && e.target.id === "toggleInfo"){
-    const content = document.getElementById("infoContent");
-    const btn = e.target;
-
-    if(content.classList.contains("show")){
-      content.classList.remove("show");
-      btn.textContent = "More info ▼";
-    } else {
-      content.classList.add("show");
-      btn.textContent = "Less info ▲";
-    }
-  }
-});
 const toggleBtn = document.getElementById("toggleInfo");
 const extraInfo = document.getElementById("extraInfo");
 
 toggleBtn.addEventListener("click", () => {
-  const isHidden = extraInfo.classList.contains("hidden");
+  const isHidden = extraInfo.classList.contains("show");
   
   if (isHidden) {
-    extraInfo.classList.remove("hidden");
+    extraInfo.classList.remove("show");
     toggleBtn.textContent = "Less info ▲";
   } else {
-    extraInfo.classList.add("hidden");
+    extraInfo.classList.add("show");
     toggleBtn.textContent = "More info ▼";
   }
 });
