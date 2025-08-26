@@ -143,7 +143,25 @@
 #playerContainer button:hover {
   opacity: 0.9;
 }
-
+.movie-info {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  line-height: 1.6;
+}
+.movie-info h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--brand);
+}
+.movie-info p {
+  margin: 6px 0;
+  font-size: 14px;
+}
   </style>
 </head>
 <body>
@@ -207,7 +225,14 @@
       mozallowfullscreen="true">
     </iframe>
         </div>
-      </div>
+      <!-- Movie Info Section -->
+ <div id="movieInfo" class="movie-info" style="display:none;">
+   <h2 id="movieTitle"></h2>
+   <p id="movieOverview"></p>
+   <p><strong>Rating:</strong> <span id="movieRating"></span>/10 ⭐</p>
+   <p><strong>Cast:</strong> <span id="movieCast"></span></p>
+ </div>
+</div>
 
       <div class="status" id="status">
         <span class="dot" aria-hidden="true"></span>
@@ -535,6 +560,7 @@ async function searchTMDB(query){
           loadFromFields(imdbID);
         }
         resultsDiv.innerHTML = "";
+        showMovieInfo(m.id, type);
       } else {
         setStatus("No IMDb ID found.");
       }
@@ -680,6 +706,30 @@ window.addEventListener('DOMContentLoaded', () => {
     loadTrending();
   }
 });
+
+async function showMovieInfo(tmdbID, type="movie") {
+  try {
+    const res = await fetch(
+      `https://api.themoviedb.org/3/${type}/${tmdbID}?api_key=${API_KEY}&append_to_response=credits`
+    );
+    const data = await res.json();
+
+    // Title + description
+    document.getElementById("movieTitle").textContent = data.title || data.name || "Unknown Title";
+    document.getElementById("movieOverview").textContent = data.overview || "No description available.";
+    document.getElementById("movieRating").textContent = data.vote_average ? data.vote_average.toFixed(1) : "N/A";
+
+    // Show 5 cast members
+    const cast = (data.credits?.cast || []).slice(0,5).map(c => c.name).join(", ");
+    document.getElementById("movieCast").textContent = cast || "Unknown";
+
+    // Show info box
+    document.getElementById("movieInfo").style.display = "block";
+
+  } catch (e) {
+    console.error("Movie info fetch failed:", e);
+  }
+}
 
 </script>  
 
