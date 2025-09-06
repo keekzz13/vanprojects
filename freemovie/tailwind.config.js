@@ -3,12 +3,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'bg': '#f9fafb',
-        'sidebar': '#1f2937',
-        'text': '#111827',
-        'accent': '#3b82f6',
-        'card': '#ffffff',
-        'border': '#e5e7eb',
+        'bg': '#1a1a1a',
+        'sidebar': '#2a2a2a',
+        'text': '#ffffff',
+        'accent': '#ff4e50',
+        'card': '#333333',
+        'border': '#444444',
       },
       boxShadow: {
         'card': '0 4px 6px rgba(0, 0, 0, 0.1)',
