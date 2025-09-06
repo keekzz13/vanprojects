@@ -51,87 +51,30 @@
   </aside>
 
   <!-- Main Content -->
-  <main class="ml-64 flex-1 p-6">
-    <!-- Watch History Section -->
-    <section id="history" class="animate-fadeIn">
-      <h2 class="text-2xl font-bold mb-4">Watch History</h2>
-      <button onclick="document.getElementById('historyModal').style.display='block'" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200">View History</button>
-      <div id="historyModal" class="modal">
-        <div class="modal-content">
-          <span class="close" onclick="document.getElementById('historyModal').style.display='none'">&times;</span>
-          <h3 class="text-lg font-bold mb-2">Watch History</h3>
-          <p class="text-gray-600">History content goes here...</p>
-        </div>
-      </div>
-    </section>
+  <main class="ml-0 flex-1 p-6 bg-bg">
+  <!-- Hero Section -->
+  <section class="relative bg-cover bg-center h-64" style="background-image: url('https://via.placeholder.com/1200x300?text=Movie+Background');">
+    <div class="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black"></div>
+    <div class="relative z-10 flex items-center h-full pl-6">
+      <h1 class="text-4xl font-cinzel text-white">Movie Spotlight</h1>
+    </div>
+  </section>
 
-    <!-- Free Movies Section -->
-    <section id="movies" class="mt-8 animate-fadeIn">
-      <h2 class="text-2xl font-bold mb-4">Free Movies</h2>
-      <p class="mb-4 text-gray-600">Search or paste an IMDb ID (e.g., tt11083552), pick a server, then hit Watch.</p>
-      <div class="flex flex-col md:flex-row gap-4 mb-6">
-        <input type="text" id="searchInput" placeholder="Search or paste IMDb ID..." class="border border-border p-3 rounded-lg w-full md:w-1/2 focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200">
-        <button id="searchButton" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200">🔍 Search</button>
+  <!-- Movie Cards (Staggered) -->
+  <section id="movies" class="mt-8 p-6">
+    <h2 class="text-2xl font-cinzel text-white mb-4">Featured Movies</h2>
+    <div class="space-y-6">
+      <div class="bg-card border border-border rounded-lg p-4 hover:bg-opacity-80 transition-all duration-300 cursor-pointer" style="transform: translateY(0px);">
+        <img src="https://via.placeholder.com/300x450?text=Movie+1" alt="Movie 1" class="w-full rounded-t-lg">
+        <h3 class="text-lg font-semibold text-white mt-2">Movie 1</h3>
       </div>
-      <div id="movieCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Floating Movie Cards will be dynamically added here via JS -->
+      <div class="bg-card border border-border rounded-lg p-4 hover:bg-opacity-80 transition-all duration-300 cursor-pointer" style="transform: translateY(-20px);">
+        <img src="https://via.placeholder.com/300x450?text=Movie+2" alt="Movie 2" class="w-full rounded-t-lg">
+        <h3 class="text-lg font-semibold text-white mt-2">Movie 2</h3>
       </div>
-      <div id="playerSection" class="mt-6 hidden">
-        <select id="serverSelect" class="border border-border p-3 rounded-lg w-full mb-2 focus:outline-none focus:ring-2 focus:ring-accent transition-all duration-200">
-          <option value="2embed">Server 1 – 2Embed</option>
-          <option value="vidsrcme">Server 2 – Vidsrc.me</option>
-          <option value="vidsrcto">Server 3 – Vidsrc.to</option>
-          <option value="test">Server 4 – Test (fewer ads)</option>
-        </select>
-        <div class="flex space-x-3">
-          <button id="watchButton" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200">▶ Watch</button>
-          <button id="copyLinkButton" class="bg-gray-300 text-black px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200">🔗 Copy Link</button>
-          <button id="fullscreenButton" class="bg-gray-300 text-black px-4 py-2 rounded-lg hover:bg-gray-400 transition-all duration-200">⛶ Fullscreen</button>
-        </div>
-        <div id="movieInfo" class="mt-4 p-4 bg-card border border-border rounded-lg shadow-card transition-all duration-200">
-          <button id="infoToggle" class="text-accent hover:underline">More info ▼</button>
-          <div id="infoDetails" class="hidden mt-2 text-gray-600">
-            <p>Release Date: N/A</p>
-            <p>Overview: N/A</p>
-            <p>Rating: N/A</p>
-          </div>
-        </div>
-        <p id="readyTip" class="mt-2 text-sm text-gray-600">Ready. Tip: Press Enter or click Search to find movies.</p>
-        <p id="headsUp" class="mt-2 text-sm text-gray-600">Heads-up: Only embed content you have the rights to watch. Some third-party players show ads; see Ad-block Help for tips. If a server fails, try a different one.</p>
-      </div>
-    </section>
-
-    <!-- Ad-block Section -->
-    <section id="ad-block" class="mt-8 animate-fadeIn">
-      <h2 class="text-2xl font-bold mb-4">Watch with fewer ads using <a href="https://ublockorigin.com/" class="text-accent hover:underline">uBlock Origin Lite</a></h2>
-      <button onclick="document.getElementById('adBlockModal').style.display='block'" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200">View Help</button>
-      <div id="adBlockModal" class="modal">
-        <div class="modal-content">
-          <span class="close" onclick="document.getElementById('adBlockModal').style.display='none'">&times;</span>
-          <h3 class="text-lg font-bold mb-2">Ad-block Help</h3>
-          <p class="text-gray-600">These steps are for Chromium-based browsers (Chrome, Edge, Brave, etc.). For Firefox, install the classic uBlock Origin add-on.</p>
-          <ol class="list-decimal ml-5 mt-2 text-gray-600">
-            <li>Install <a href="https://chrome.com/webstore/detail/ublock-origin-lite/egnjhciaieccjhnbpfjgbkpfmglbcjdn" class="text-accent hover:underline">uBlock Origin Lite</a> from the Chrome Web Store.</li>
-            <li>Pin it and make sure blocking is On for this site.</li>
-            <li>Reload. Most popups/banners should be gone.</li>
-          </ol>
-        </div>
-      </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="mt-8 animate-fadeIn">
-      <h2 class="text-2xl font-bold mb-4">About this page</h2>
-      <button onclick="document.getElementById('aboutModal').style.display='block'" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200">View Details</button>
-      <div id="aboutModal" class="modal">
-        <div class="modal-content">
-          <span class="close" onclick="document.getElementById('aboutModal').style.display='none'">&times;</span>
-          <h3 class="text-lg font-bold mb-2">About this page</h3>
-          <p class="text-gray-600">Search by movie title or paste IMDb ID. Click a movie card to load instantly in the player.</p>
-        </div>
-      </div>
-    </section>
-  </main>
+    </div>
+  </section>
+</main>
 
   <script>
     // Dynamic movie card generation
