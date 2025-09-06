@@ -49,7 +49,7 @@ It allows searching for movies/TV shows by title or IMDb ID, fetching details fr
 ---
 
 ## 👏 Credits
-- Original concept & code: [@vanprojects]([https://github.com/aivanleigh25/vanprojects])
+- Original concept & code: [@vanprojects](https://github.com/aivanleigh25/vanprojects/)
 - Helper: daddygpt & grok and me (Aivan)
 - Movie data provided by [The Movie Database (TMDb)](https://www.themoviedb.org/)
 
