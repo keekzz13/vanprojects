@@ -87,6 +87,7 @@ body::before {
   padding: 20px 10px;
   transition: transform 0.3s ease;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+  overflow-y: hidden; /* Prevent vertical scrolling */
 }
 
 .sidebar.hidden {
@@ -405,39 +406,61 @@ dialog {
     width: 100%;
     height: auto;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: center; /* Center buttons to avoid overflow */
     align-items: center;
-    gap: 10px;
-    padding: 10px;
+    gap: 8px; /* Reduced gap for mobile */
+    padding: 8px 10px; /* Reduced padding */
     transform: translateY(0);
     border-right: none;
     border-top: 1px solid var(--border);
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
     z-index: 10;
+    flex-wrap: nowrap; /* Prevent wrapping to keep buttons in a single row */
+    overflow-x: auto; /* Allow horizontal scrolling if needed, but aim to avoid */
+    white-space: nowrap; /* Prevent text wrapping */
   }
+
+  .sidebar::-webkit-scrollbar {
+    display: none; /* Hide scrollbar on mobile for cleaner look */
+  }
+
   .sidebar.hidden {
     transform: translateY(100%);
   }
+
+  .navlink, .navbtn {
+    padding: 6px 8px;
+    font-size: 11px; /* Slightly smaller font to fit better */
+    min-width: 60px; /* Ensure buttons don’t shrink too much */
+    flex: 0 0 auto; /* Prevent buttons from stretching */
+  }
+
+  .brand {
+    display: none; /* Hide brand text on mobile to save space */
+  }
+
   .main {
     margin-left: 0;
-    margin-bottom: 60px; /* Adjust based on sidebar height */
+    margin-bottom: 50px; /* Reduced to match compact sidebar */
     transition: margin-bottom 0.3s ease;
   }
+
   .sidebar.hidden + .main {
     margin-bottom: 0;
   }
-  .brand {
-    display: inline;
-  }
+
   .toolbar {
     flex-direction: column;
   }
+
   .input {
     width: 100%;
   }
-  .navlink, .navbtn {
-    padding: 6px 8px;
-    font-size: 12px;
+
+  .home-btn {
+    font-size: 1.2rem; /* Smaller font for mobile */
+    min-width: 60px;
+    flex: 0 0 auto;
   }
 }
 
@@ -574,7 +597,6 @@ a:focus, button:focus, input:focus, select:focus {
   outline-offset: 2px;
 }
   </style>
-
 </head>
 <body>
   <div class="sidebar">
