@@ -90,18 +90,17 @@ body {
 
 body::before {
   content: '';
-  position: fixed;
+  position: absolute; /* Changed from fixed to match content height */
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
-  min-height: 100%;
-  background: linear-gradient(45deg, rgba(0, 255, 100, 0.4) 0%, rgba(0, 255, 100, 0.2) 25%, rgba(138, 43, 226, 0.2) 50%, rgba(0, 191, 255, 0.2) 75%, rgba(0, 191, 255, 0.4) 100%);
-  background-size: 150% 150%; /* Reduced size for less intensive animation */
-  animation: aurora 20s ease-in-out infinite; /* Slower animation for less frequent repaints */
+  height: 100%; /* Match body height, not fixed viewport */
+  background: linear-gradient(45deg, rgba(0, 255, 100, 0.3), rgba(0, 191, 255, 0.3)); /* Simplified gradient */
+  background-size: 150% 150%;
+  animation: aurora 20s ease-in-out infinite;
   z-index: -1;
-  opacity: 0.7; /* Slightly reduced opacity to lighten load */
-  filter: blur(5px); /* Reduced blur for better performance */
+  opacity: 0.5; /* Reduced opacity */
+  filter: blur(2px); /* Reduced blur */
   will-change: background-position;
 }
 
@@ -114,9 +113,9 @@ body::before {
 /* Fallback for reduced motion to minimize lag on low-end devices */
 @media (prefers-reduced-motion: reduce) {
   body::before {
-    animation: none; /* Disable animation */
-    background: linear-gradient(45deg, rgba(0, 255, 100, 0.4), rgba(138, 43, 226, 0.2), rgba(0, 191, 255, 0.4)); /* Static gradient */
-    filter: blur(3px); /* Even lighter blur */
+    animation: none;
+    background: linear-gradient(45deg, rgba(0, 255, 100, 0.3), rgba(138, 43, 226, 0.2), rgba(0, 191, 255, 0.3));
+    filter: blur(3px);
   }
 }
 
@@ -362,6 +361,7 @@ iframe {
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 14px;
   animation: fadeIn 0.4s ease forwards;
+  z-index: 1; /* Ensure it stays above background */
 }
 
 .movie {
@@ -371,6 +371,7 @@ iframe {
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 2; /* Ensure movie cards are above background */
 }
 
 .movie:hover {
@@ -381,6 +382,7 @@ iframe {
 .movie img {
   width: 100%;
   display: block;
+  image-rendering: pixelated; /* Added to improve image rendering */
 }
 
 .movie-title {
