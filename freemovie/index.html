@@ -85,7 +85,7 @@
         <button id="searchButton" class="bg-teal text-white px-4 py-2 rounded-lg hover:bg-teal-dark transition-all duration-200">🔍 Search</button>
       </div>
       <div id="movieCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Movie cards will be added dynamically -->
+        <!-- Movie cards will be added dynamically from TMDB -->
       </div>
       <div id="playerSection" class="mt-6 hidden">
         <select id="serverSelect" class="bg-gray-800 border border-gray-600 p-3 rounded-lg text-white w-full mb-2 focus:outline-none focus:ring-2 focus:ring-teal transition-all duration-200">
@@ -102,9 +102,9 @@
         <div id="movieInfo" class="mt-4 p-4 bg-gray-800 border border-gray-600 rounded-lg">
           <button id="infoToggle" class="text-teal hover:underline">More info ▼</button>
           <div id="infoDetails" class="hidden mt-2 text-gray-300">
-            <p>Release Date: N/A</p>
-            <p>Overview: N/A</p>
-            <p>Rating: N/A</p>
+            <p>Release Date: <span id="releaseDate">N/A</span></p>
+            <p>Overview: <span id="overview">N/A</span></p>
+            <p>Rating: <span id="rating">N/A</span></p>
           </div>
         </div>
         <p id="readyTip" class="mt-2 text-sm text-gray-400">Ready. Tip: Press Enter or click Search to find movies.</p>
@@ -145,58 +145,121 @@
   </main>
 
   <script>
-    // Dynamic movie card generation
+    // TMDB API Configuration
+    const API_KEY = "6452370c23b5a8497b9a201cf46fba42";
+    const TMDB_SEARCH = "https://api.themoviedb.org/3/search/movie?api_key=" + API_KEY + "&query=";
+    const TMDB_DETAILS = id => `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`;
+
+    // Placeholder for Previous Website API
+    const PREVIOUS_API_URL = 'https://yourpreviouswebsite.com/api'; // Update this URL
+    const PREVIOUS_API_KEY = 'YOUR_PREVIOUS_API_KEY'; // Update if required
+
     const movieCards = document.getElementById('movieCards');
-    const sampleMovies = [
-      { id: 'tt11083552', title: 'Sample Movie 1', poster: 'https://via.placeholder.com/300x450' },
-      { id: 'tt12094562', title: 'Sample Movie 2', poster: 'https://via.placeholder.com/300x450' },
-      { id: 'tt13085673', title: 'Sample Movie 3', poster: 'https://via.placeholder.com/300x450' },
-    ];
+    const playerSection = document.getElementById('playerSection');
     const imdbRegex = /^tt\d{7,8}$/;
 
+    // Fetch movies from TMDB
+    async function fetchMovies(query = '') {
+      try {
+        const url = query ? `${TMDB_SEARCH}${encodeURIComponent(query)}` : `${TMDB_SEARCH}popular`;
+        const response = await fetch(url);
+        const data = await response.json();
+        renderMovieCards(data.results);
+      } catch (error) {
+        console.error('Error fetching movies:', error);
+      }
+    }
+
+    // Fetch movie details
+    async function fetchMovieDetails(id) {
+      try {
+        const response = await fetch(TMDB_DETAILS(id));
+        const data = await response.json();
+        document.getElementById('releaseDate').textContent = data.release_date || 'N/A';
+        document.getElementById('overview').textContent = data.overview || 'N/A';
+        document.getElementById('rating').textContent = data.vote_average ? `${data.vote_average}/10` : 'N/A';
+      } catch (error) {
+        console.error('Error fetching movie details:', error);
+        // Fallback to Previous API (placeholder)
+        try {
+          const previousResponse = await fetch(`${PREVIOUS_API_URL}/movie?id=${id}`, {
+            headers: { 'Authorization': `Bearer ${PREVIOUS_API_KEY}` } // Adjust headers if needed
+          });
+          const previousData = await previousResponse.json();
+          document.getElementById('releaseDate').textContent = previousData.release_date || 'N/A';
+          document.getElementById('overview').textContent = previousData.overview || 'N/A';
+          document.getElementById('rating').textContent = previousData.rating || 'N/A';
+        } catch (prevError) {
+          console.error('Error with previous API:', prevError);
+        }
+      }
+    }
+
+    // Render movie cards
     function renderMovieCards(movies) {
       movieCards.innerHTML = '';
       movies.forEach(movie => {
         const card = document.createElement('div');
         card.className = 'bg-gray-800 border border-gray-600 rounded-lg p-4 hover:bg-gray-700 transition-all duration-300 cursor-pointer';
         card.innerHTML = `
-          <img src="${movie.poster}" alt="${movie.title}" class="w-full rounded-t-lg">
+          <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" class="w-full rounded-t-lg" onerror="this.src='https://via.placeholder.com/300x450';">
           <h3 class="text-lg font-semibold mt-2">${movie.title}</h3>
-          <p class="text-sm text-gray-400">IMDb ID: ${movie.id}</p>
+          <p class="text-sm text-gray-400">IMDb ID: ${movie.imdb_id || 'N/A'}</p>
         `;
         card.addEventListener('click', () => {
-          document.getElementById('playerSection').classList.remove('hidden');
+          playerSection.classList.remove('hidden');
+          fetchMovieDetails(movie.id);
         });
         movieCards.appendChild(card);
       });
     }
 
-    renderMovieCards(sampleMovies);
-
-    // Toggle info details
-    document.getElementById('infoToggle').addEventListener('click', () => {
-      document.getElementById('infoDetails').classList.toggle('hidden');
-    });
+    // Initial load
+    fetchMovies();
 
     // Search functionality
     document.getElementById('searchButton').addEventListener('click', () => {
       const searchInput = document.getElementById('searchInput').value.trim();
       if (imdbRegex.test(searchInput)) {
-        const matchedMovie = sampleMovies.find(m => m.id === searchInput);
-        renderMovieCards(matchedMovie ? [matchedMovie] : []);
+        fetchMovieDetails(searchInput.replace('tt', ''));
+        renderMovieCards([{ id: searchInput.replace('tt', ''), title: 'Loading...', poster_path: '' }]);
       } else {
-        const filteredMovies = sampleMovies.filter(m => m.title.toLowerCase().includes(searchInput.toLowerCase()));
-        renderMovieCards(filteredMovies);
+        fetchMovies(searchInput);
       }
     });
     document.getElementById('searchInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') document.getElementById('searchButton').click();
     });
 
-    // Watch button
+    // Toggle info details
+    document.getElementById('infoToggle').addEventListener('click', () => {
+      document.getElementById('infoDetails').classList.toggle('hidden');
+    });
+
+    // Watch button (embed logic)
     document.getElementById('watchButton').addEventListener('click', () => {
+      const imdbId = document.getElementById('searchInput').value.trim().replace('tt', '');
       const server = document.getElementById('serverSelect').value;
-      console.log('Watching with server:', server);
+      let embedUrl = '';
+      switch (server) {
+        case '2embed':
+          embedUrl = `https://2embed.to/embed/tmdb/movie?id=${imdbId}`;
+          break;
+        case 'vidsrcme':
+          embedUrl = `https://vidsrc.me/embed/${imdbId}`;
+          break;
+        case 'vidsrcto':
+          embedUrl = `https://vidsrc.to/embed/${imdbId}`;
+          break;
+        case 'test':
+          embedUrl = `https://test.com/embed/${imdbId}`; // Placeholder
+          break;
+      }
+      if (embedUrl) {
+        playerSection.innerHTML = `
+          <iframe src="${embedUrl}" frameborder="0" allowfullscreen class="w-full h-64 mt-4"></iframe>
+          ${playerSection.innerHTML}`; // Preserve existing content
+      }
     });
 
     // Copy link
