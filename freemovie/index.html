@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -81,12 +42,12 @@ body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color: var(--text);
-  background: #0f1115;
+  background: #0f1115; /* Solid base color to prevent artifacts */
   position: relative;
   display: flex;
   min-height: 100vh;
   overflow-y: auto;
-  transform: translateZ(0);
+  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 body::before {
@@ -97,15 +58,16 @@ body::before {
   width: 100%;
   height: 100vh;
   min-height: 100%;
-  background: linear-gradient(45deg, rgba(0, 255, 100, 0.4) 0%, rgba(0, 255, 100, 0.3) 12.5%, rgba(0, 255, 100, 0.2) 25%, rgba(69, 149, 163, 0.2) 37.5%, rgba(138, 43, 226, 0.2) 50%, rgba(69, 117, 240, 0.2) 62.5%, rgba(0, 191, 255, 0.2) 75%, rgba(0, 191, 255, 0.3) 87.5%, rgba(0, 191, 255, 0.4) 100%);
-  background-size: 200% 200%;
-  animation: none;
+  background: linear-gradient(45deg, rgba(0, 255, 100, 0.4) 0%, rgba(0, 255, 100, 0.3) 12.5%, rgba(0, 255, 100, 0.2) 25%, rgba(69, 149, 163, 0.2) 37.5%, rgba(138, 43, 226, 0.2) 50%, rgba(69, 117, 240, 0.2) 62.5%, rgba(0, 191, 255, 0.2) 75%, rgba(0, 191, 255, 0.3) 87.5%, rgba(0, 191, 255, 0.4) 100%); /* Smoother gradient with more stops */
+  background-size: 200% 200%; /* Larger size for smoother appearance */
+  animation: none; /* Removed animation for static design */
   z-index: -1;
-  opacity: 0.5;
-  filter: none;
-  will-change: auto;
+  opacity: 0.5; /* Reduced opacity to minimize interference */
+  filter: none; /* Removed blur to avoid rendering issues */
+  will-change: auto; /* Removed will-change since no animation */
 }
 
+/* Fallback for reduced motion to match static state */
 @media (prefers-reduced-motion: reduce) {
   body::before {
     background: linear-gradient(45deg, rgba(0, 255, 100, 0.3), rgba(138, 43, 226, 0.2), rgba(0, 191, 255, 0.3));
@@ -123,12 +85,12 @@ body::before {
   align-items: center;
   gap: 14px;
   padding: 20px 10px;
-  transition: transform 0.3s ease; /* Keep transition but ensure it’s only triggered by .hidden */
+  transition: transform 0.3s ease;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .sidebar.hidden {
-  transform: translateX(-120px); /* Only move when .hidden is applied */
+  transform: translateX(-120px);
 }
 
 .brand {
@@ -354,8 +316,6 @@ iframe {
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 14px;
   animation: fadeIn 0.4s ease forwards;
-  z-index: 1;
-  transform: translateZ(0);
 }
 
 .movie {
@@ -365,8 +325,6 @@ iframe {
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 2;
-  backface-visibility: hidden;
 }
 
 .movie:hover {
@@ -377,7 +335,6 @@ iframe {
 .movie img {
   width: 100%;
   display: block;
-  image-rendering: -webkit-optimize-contrast;
 }
 
 .movie-title {
@@ -448,8 +405,7 @@ dialog {
     height: auto;
     flex-direction: row;
     justify-content: space-between;
-    transform: translateX(0); /* Reset transform for mobile view */
-    transition: none; /* Disable transition in mobile view to prevent unwanted movement */
+    transform: translateX(0);
   }
   .main {
     margin-left: 0;
@@ -597,7 +553,7 @@ a:focus, button:focus, input:focus, select:focus {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
-</style>
+  </style>
 
 </head>
 <body>
@@ -718,6 +674,46 @@ a:focus, button:focus, input:focus, select:focus {
     <p>Have fun, contribute, or reach out via GitHub if you have ideas or questions!</p>
   </div>
 </dialog>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script>
 <script src="mobile-fix.js"></script>
   <script src="main.js"></script>
   <script src="copy-link.js"></script>
