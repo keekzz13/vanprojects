@@ -81,38 +81,36 @@ body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color: var(--text);
-  background: linear-gradient(to bottom, #0f1115, #1a1a2e);
+  background: #0f1115; /* Changed to solid color to avoid potential artifact interactions */
   position: relative;
   display: flex;
   min-height: 100vh;
   overflow-y: auto;
-  transform: translateZ(0); /* Force hardware acceleration */
+  transform: translateZ(0); /* Force hardware acceleration for smoother rendering */
 }
 
 body::before {
   content: '';
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, rgba(0, 255, 100, 0.3), rgba(0, 191, 255, 0.3)); /* Static gradient */
+  height: 100vh;
+  min-height: 100%;
+  background: linear-gradient(45deg, rgba(0, 255, 100, 0.4) 0%, rgba(0, 255, 100, 0.3) 12.5%, rgba(0, 255, 100, 0.2) 25%, rgba(69, 149, 163, 0.2) 37.5%, rgba(138, 43, 226, 0.2) 50%, rgba(69, 117, 240, 0.2) 62.5%, rgba(0, 191, 255, 0.2) 75%, rgba(0, 191, 255, 0.3) 87.5%, rgba(0, 191, 255, 0.4) 100%); /* Added more color stops for smoother gradient to reduce banding */
+  background-size: 200% 200%; /* Increased size for smoother transitions */
+  animation: none; /* Removed animation to make it static as per request */
   z-index: -1;
-  opacity: 0.5;
-  filter: none; /* Remove blur to test */
-  will-change: background-position;
+  opacity: 0.5; /* Reduced opacity to minimize artifacts */
+  filter: none; /* Removed blur to avoid rendering issues */
+  will-change: auto; /* Removed will-change since no animation */
 }
 
-@keyframes aurora {
-  0% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
-  100% { background-position: 0% 0%; }
-}
+/* Removed @keyframes aurora since animation is disabled */
 
-/* Fallback for reduced motion to minimize lag on low-end devices */
+/* Fallback for reduced motion (updated to match static state) */
 @media (prefers-reduced-motion: reduce) {
   body::before {
-    animation: none;
     background: linear-gradient(45deg, rgba(0, 255, 100, 0.3), rgba(138, 43, 226, 0.2), rgba(0, 191, 255, 0.3));
   }
 }
@@ -382,7 +380,7 @@ iframe {
 .movie img {
   width: 100%;
   display: block;
-  image-rendering: -webkit-optimize-contrast; /* Browser-specific rendering */
+  image-rendering: -webkit-optimize-contrast; /* Optimize image rendering */
 }
 
 .movie-title {
