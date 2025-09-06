@@ -1,4 +1,43 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -42,12 +81,12 @@ body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color: var(--text);
-  background: #0f1115; /* Solid base color to prevent artifacts */
+  background: linear-gradient(to bottom, #0f1115, #1a1a2e);
   position: relative;
   display: flex;
   min-height: 100vh;
   overflow-y: auto;
-  transform: translateZ(0); /* Force hardware acceleration */
+  transform: translateZ(0);
 }
 
 body::before {
@@ -58,19 +97,27 @@ body::before {
   width: 100%;
   height: 100vh;
   min-height: 100%;
-  background: linear-gradient(45deg, rgba(0, 255, 100, 0.4) 0%, rgba(0, 255, 100, 0.3) 12.5%, rgba(0, 255, 100, 0.2) 25%, rgba(69, 149, 163, 0.2) 37.5%, rgba(138, 43, 226, 0.2) 50%, rgba(69, 117, 240, 0.2) 62.5%, rgba(0, 191, 255, 0.2) 75%, rgba(0, 191, 255, 0.3) 87.5%, rgba(0, 191, 255, 0.4) 100%); /* Smoother gradient with more stops */
-  background-size: 200% 200%; /* Larger size for smoother appearance */
-  animation: none; /* Removed animation for static design */
+  background: linear-gradient(45deg, rgba(0, 255, 100, 0.4) 0%, rgba(0, 255, 100, 0.2) 25%, rgba(138, 43, 226, 0.2) 50%, rgba(0, 191, 255, 0.2) 75%, rgba(0, 191, 255, 0.4) 100%);
+  background-size: 150% 150%; /* Reduced size for less intensive animation */
+  animation: none
   z-index: -1;
-  opacity: 0.5; /* Reduced opacity to minimize interference */
-  filter: none; /* Removed blur to avoid rendering issues */
-  will-change: auto; /* Removed will-change since no animation */
+  opacity: 0.5; /* Slightly reduced opacity to lighten load */
+  filter: none
+  will-change: background-position;
 }
 
-/* Fallback for reduced motion to match static state */
+@keyframes aurora {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+/* Fallback for reduced motion to minimize lag on low-end devices */
 @media (prefers-reduced-motion: reduce) {
   body::before {
-    background: linear-gradient(45deg, rgba(0, 255, 100, 0.3), rgba(138, 43, 226, 0.2), rgba(0, 191, 255, 0.3));
+    animation: none; /* Disable animation */
+    background: linear-gradient(45deg, rgba(0, 255, 100, 0.4), rgba(138, 43, 226, 0.2), rgba(0, 191, 255, 0.4)); /* Static gradient */
+    filter: blur(3px); /* Even lighter blur */
   }
 }
 
@@ -553,7 +600,7 @@ a:focus, button:focus, input:focus, select:focus {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
 }
-  </style>
+</style>
 
 </head>
 <body>
@@ -674,46 +721,6 @@ a:focus, button:focus, input:focus, select:focus {
     <p>Have fun, contribute, or reach out via GitHub if you have ideas or questions!</p>
   </div>
 </dialog>
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script>
 <script src="mobile-fix.js"></script>
   <script src="main.js"></script>
   <script src="copy-link.js"></script>
