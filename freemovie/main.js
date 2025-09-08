@@ -395,8 +395,8 @@
 ██   ██ ██    ██    ██       
 ██   ██  ██████     ██    ██ 
                                                         
-      `);
-      console.log("nag unsa ka diri dawg 🐶");
+ nag unsa ka diri dawg 😹🫵
+       );
     });
 
     window.addEventListener('DOMContentLoaded', () => {
