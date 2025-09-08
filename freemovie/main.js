@@ -396,7 +396,7 @@
 ██   ██  ██████     ██    ██ 
                                                         
  nag unsa ka diri dawg 😹🫵
-       );
+    ');
     });
 
     window.addEventListener('DOMContentLoaded', () => {
