@@ -388,7 +388,7 @@
     }
 
     window.addEventListener("load", () => {
-      console.log(`
+  console.log(`
 ██   ██ ██    ██ ██    ██ ██ 
 ██   ██ ██    ██  ██  ██  ██ 
 ███████ ██    ██   ████   ██ 
@@ -396,8 +396,8 @@
 ██   ██  ██████     ██    ██ 
                                                         
  nag unsa ka diri dawg 😹🫵
-    ');
-    });
+`);
+});
 
     window.addEventListener('DOMContentLoaded', () => {
       if (!new URLSearchParams(window.location.search).get('imdb')) {
