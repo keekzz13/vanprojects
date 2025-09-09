@@ -7,7 +7,7 @@ It allows searching for movies/TV shows by title or IMDb ID, fetching details fr
 
 ## ✨ Features
 - 🔎 **Search** movies and TV shows via TMDb
-- 🎬 **Play** via multiple embed servers (`vidsrc`, `2embed`, etc.)
+- 🎬 **Play** via multiple embed servers (`vidsrc.me`, `2embed`,`vidsrc.to`)
 - 📺 **TV support** with season & episode selection
 - 🧩 **Trending** fetch on load
 - 💾 **Local watch history** (stored in `localStorage`)
@@ -52,6 +52,7 @@ It allows searching for movies/TV shows by title or IMDb ID, fetching details fr
 - Original concept & code: [@vanprojects](https://github.com/aivanleigh25/vanprojects/)
 - Helper: daddygpt & grok and me (Aivan)
 - Movie data provided by [The Movie Database (TMDb)](https://www.themoviedb.org/)
+- ChatGPT for making README.md
 
 ---
 
