@@ -85,16 +85,16 @@
     function buildURL(server, imdbID, season=null, episode=null) {
       if (season && episode) {
         switch(server){
-          case 'vidsrcto': return `https://www.2embed.cc/embedtv/${imdbID}&s=${season}&e=${episode}`;
+          case '2embed': return `https://www.2embed.cc/embedtv/${imdbID}&s=${season}&e=${episode}`;
           case 'vidsrc': return `https://vidsrc.me/embed/tv?imdb=${imdbID}&s=${season}&e=${episode}`;
-          case '2embed': return `https://vidsrc.to/embed/tv/${imdbID}/${season}/${episode}`;
+          case 'vidsrcto': return `https://vidsrc.to/embed/tv/${imdbID}/${season}/${episode}`;
           case 'noads': return `https://vid-src-embeds-no-ads-demo.vercel.app/embed?url=${encodeURIComponent(`https://vidsrc.in/embed/${imdbID}/${season}-${episode}`)}`;
         }
       } else {
         switch(server){
-          case 'vidsrcto': return `https://www.2embed.cc/embed/${imdbID}`;
+          case '2embed': return `https://www.2embed.cc/embed/${imdbID}`;
           case 'vidsrc': return `https://vidsrc.me/embed/movie?imdb=${imdbID}`;
-          case '2embed': return `https://vidsrc.to/embed/movie/${imdbID}`;
+          case 'vidsrcto': return `https://vidsrc.to/embed/movie/${imdbID}`;
           case 'noads': return `https://vid-src-embeds-no-ads-demo.vercel.app/embed?url=${encodeURIComponent(`https://vidsrc.in/embed/${imdbID}`)}`;
         }
       }
