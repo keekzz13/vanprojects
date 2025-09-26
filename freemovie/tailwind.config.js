@@ -1,35 +1,19 @@
 module.exports = {
-  content: ["./index.html"],
+  content: ["./*.html"],
   theme: {
     extend: {
       colors: {
-        'dark': '#0F1419',
-        'sidebar': '#1a1f2b',
-        'text': '#ffffff',
-        'teal': '#00C7B7',
-        'teal-dark': '#00a69e',
-        'gray-300': '#d1d5db',
-        'gray-400': '#9ca3af',
-        'gray-600': '#4b5563',
-        'gray-700': '#374151',
-        'gray-800': '#1f2937',
-      },
-      fontFamily: {
-        'inter': ['Inter', 'sans-serif'],
-      },
-      boxShadow: {
-        'card': '0 4px 15px rgba(0, 0, 0, 0.3)',
-      },
-      animation: {
-        'fadeIn': 'fadeIn 0.3s ease-out',
-      },
-      keyframes: {
-        fadeIn: {
-          from: { opacity: 0 },
-          to: { opacity: 1 },
-        },
+        'ms-bg': '#0f1115',
+        'ms-panel': '#171923',
+        'ms-panel-2': '#1f2230',
+        'ms-text': '#eef2ff',
+        'ms-muted': '#aab2cf',
+        'ms-brand': '#00C7B7',
+        'ms-accent': '#51e1a7',
+        'ms-danger': '#ff6b6b',
+        'ms-border': '#2b3040',
       },
     },
   },
   plugins: [],
-}
+};
