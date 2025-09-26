@@ -12,11 +12,11 @@
   --ms-accent: #51e1a7;
   --ms-danger: #ff6b6b;
   --ms-border: #2b3040;
-  --ms-acrylic: rgba(23, 25, 35, 0.9); /* Adjusted for dark theme */
+  --ms-acrylic: rgba(23, 25, 35, 0.9);
 }
 
 body {
-  @apply flex flex-col min-h-screen bg-[--ms-bg] text-[--ms-text] font-sans;
+  @apply flex min-h-screen bg-[--ms-bg] text-[--ms-text] font-sans;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
@@ -33,28 +33,20 @@ body::before {
   }
 }
 
-nav {
-  @apply bg-[--ms-panel] shadow-md p-4 flex justify-center gap-4;
-}
-
-nav a {
-  @apply text-[--ms-muted] hover:text-[--ms-brand] px-3 py-2 rounded-lg transition-colors duration-200 font-semibold;
-}
-
 .sidebar {
-  @apply fixed top-0 left-0 w-32 bg-[--ms-panel] border-r border-[--ms-border] flex flex-col items-center gap-3 p-4 shadow-lg transition-transform duration-300;
+  @apply fixed top-0 left-0 w-32 bg-[--ms-panel] border-r border-[--ms-border] flex flex-col items-center gap-3 p-5 shadow-lg transition-transform duration-300 z-50;
 }
 
 .sidebar.hidden {
   @apply -translate-x-32;
 }
 
-.brand {
-  @apply text-[--ms-brand] font-bold uppercase text-sm mb-5;
+.home-btn {
+  @apply bg-transparent text-[--ms-text] font-bold text-base text-left hover:text-[--ms-brand] hover:underline transition-colors duration-200;
 }
 
 .navlink, .navbtn {
-  @apply text-[--ms-muted] bg-[--ms-panel-2] border border-[--ms-border] text-sm font-semibold px-3 py-2 rounded-lg hover:text-[--ms-text] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-center;
+  @apply text-[--ms-muted] bg-[--ms-panel-2] border border-[--ms-border] text-sm font-semibold px-3 py-2 rounded-lg hover:text-[--ms-text] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-center w-full;
 }
 
 .main {
@@ -89,16 +81,20 @@ nav a {
   @apply bg-[--ms-panel-2] border border-[--ms-border] text-[--ms-text] rounded-lg p-3 hover:brightness-110 transition-all duration-200;
 }
 
-.btn.primary, .btn.blue {
+.btn.blue, .btn.primary {
   @apply bg-[--ms-brand] border-transparent text-[#0a1024] font-bold;
 }
 
-.btn.ghost {
-  @apply bg-transparent;
+.btn:not(.blue):not(.primary) {
+  @apply bg-[--ms-panel-2] text-[--ms-text];
+}
+
+#watchBtn, #copyBtn, #fullscreenBtn {
+  @apply flex items-center gap-2;
 }
 
 .player {
-  @apply mt-4 bg-black border border-[--ms-border] rounded-xl shadow-lg overflow-visible hidden;
+  @apply mt-4 bg-black border border-[--ms-border] rounded-xl shadow-lg overflow-visible;
 }
 
 .player.active {
@@ -198,7 +194,7 @@ dialog {
 }
 
 .suggestions {
-  @apply absolute bg-[--ms-panel-2] border border-[--ms-border] rounded-lg p-2 max-h-48 overflow-y-auto w-full max-w-[260px] hidden z-10;
+  @apply absolute bg-[--ms-panel-2] border border-[--ms-border] rounded-lg p-2 max-h-48 overflow-y-auto w-full max-w-[260px] z-10;
 }
 
 .suggestion-item {
@@ -207,7 +203,7 @@ dialog {
 
 @media (max-width: 768px) {
   .sidebar {
-    @apply fixed bottom-0 left-0 right-0 top-auto flex-row justify-center gap-2 p-2 border-t border-[--ms-border] shadow-md overflow-x-auto;
+    @apply fixed bottom-0 left-0 right-0 top-auto flex-row justify-center gap-2 p-2 border-t border-[--ms-border] shadow-md overflow-x-auto z-50;
     flex-wrap: nowrap;
   }
 
@@ -219,8 +215,8 @@ dialog {
     @apply translate-y-full;
   }
 
-  .brand {
-    @apply hidden;
+  .home-btn {
+    @apply text-sm min-w-[60px];
   }
 
   .navlink, .navbtn {
@@ -241,6 +237,10 @@ dialog {
 
   .input {
     @apply w-full;
+  }
+
+  .results {
+    @apply grid-cols-1;
   }
 }
 
