@@ -3,109 +3,244 @@
 @tailwind utilities;
 
 :root {
-  --ms-blue: #005BA1;
-  --ms-light-blue: #0078D4;
-  --ms-gray: #F3F2F1;
-  --ms-dark-gray: #605E5C;
-  --ms-white: #FFFFFF;
-  --acrylic-bg: rgba(255, 255, 255, 0.9);
+  --ms-bg: #0f1115;
+  --ms-panel: #171923;
+  --ms-panel-2: #1f2230;
+  --ms-text: #eef2ff;
+  --ms-muted: #aab2cf;
+  --ms-brand: #00C7B7;
+  --ms-accent: #51e1a7;
+  --ms-danger: #ff6b6b;
+  --ms-border: #2b3040;
+  --ms-acrylic: rgba(23, 25, 35, 0.9); /* Adjusted for dark theme */
 }
 
 body {
-  @apply bg-gray-100 font-sans text-gray-900 antialiased;
+  @apply flex flex-col min-h-screen bg-[--ms-bg] text-[--ms-text] font-sans;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
+body::before {
+  content: '';
+  @apply fixed inset-0 bg-gradient-to-br from-[rgba(0,255,100,0.4)] via-[rgba(138,43,226,0.2)] to-[rgba(0,191,255,0.4)] opacity-50;
+  background-size: 200% 200%;
+  z-index: -1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    @apply bg-gradient-to-br from-[rgba(0,255,100,0.3)] via-[rgba(138,43,226,0.2)] to-[rgba(0,191,255,0.3)];
+  }
+}
+
 nav {
-  @apply bg-white shadow-sm sticky top-0 z-50;
+  @apply bg-[--ms-panel] shadow-md p-4 flex justify-center gap-4;
 }
 
 nav a {
-  @apply text-gray-700 hover:text-ms-light-blue px-4 py-2 rounded-md transition-colors duration-200;
+  @apply text-[--ms-muted] hover:text-[--ms-brand] px-3 py-2 rounded-lg transition-colors duration-200 font-semibold;
 }
 
-#watch-history, #ad-block-help, #about {
-  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+.sidebar {
+  @apply fixed top-0 left-0 w-32 bg-[--ms-panel] border-r border-[--ms-border] flex flex-col items-center gap-3 p-4 shadow-lg transition-transform duration-300;
 }
 
-#watch-history-content, #ad-block-help-content, #about-content {
-  @apply bg-acrylic-bg backdrop-blur-md p-6 rounded-lg shadow-xl max-w-lg w-full mx-4 relative;
+.sidebar.hidden {
+  @apply -translate-x-32;
 }
 
-.close {
-  @apply absolute top-4 right-4 text-gray-600 hover:text-ms-light-blue cursor-pointer text-xl;
+.brand {
+  @apply text-[--ms-brand] font-bold uppercase text-sm mb-5;
 }
 
-#search-section {
+.navlink, .navbtn {
+  @apply text-[--ms-muted] bg-[--ms-panel-2] border border-[--ms-border] text-sm font-semibold px-3 py-2 rounded-lg hover:text-[--ms-text] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-center;
+}
+
+.main {
+  @apply ml-36 flex-1 transition-margin duration-300;
+}
+
+.header {
+  @apply p-5 bg-[--ms-panel] border-b border-[--ms-border] rounded-lg shadow-md;
+}
+
+.header h1 {
+  @apply text-2xl text-[--ms-brand] font-bold;
+}
+
+.header p {
+  @apply text-sm text-[--ms-muted] mt-1;
+}
+
+.wrap {
   @apply max-w-4xl mx-auto p-4;
 }
 
-#search-bar {
-  @apply w-full p-3 rounded-md border border-gray-300 focus:border-ms-light-blue focus:ring focus:ring-ms-light-blue focus:ring-opacity-50 transition-all duration-200;
+.toolbar {
+  @apply flex flex-wrap gap-2 bg-[--ms-panel-2] border border-[--ms-border] rounded-xl p-3 shadow-md;
 }
 
-#server-options {
-  @apply grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4;
+.input {
+  @apply flex-1 min-w-[260px] bg-[--ms-panel-2] border border-[--ms-border] text-[--ms-text] rounded-lg p-3 focus:border-[--ms-brand] focus:ring focus:ring-[--ms-brand] focus:ring-opacity-50 transition-all duration-200;
 }
 
-#server-options div {
-  @apply bg-white p-4 rounded-md shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer;
+.select, .btn {
+  @apply bg-[--ms-panel-2] border border-[--ms-border] text-[--ms-text] rounded-lg p-3 hover:brightness-110 transition-all duration-200;
 }
 
-#server-options div:hover {
-  @apply border-ms-light-blue border;
+.btn.primary, .btn.blue {
+  @apply bg-[--ms-brand] border-transparent text-[#0a1024] font-bold;
 }
 
-#watch-btn, #copy-link-btn, #fullscreen-btn {
-  @apply px-4 py-2 rounded-md text-white font-medium transition-all duration-200;
+.btn.ghost {
+  @apply bg-transparent;
 }
 
-#watch-btn {
-  @apply bg-ms-light-blue hover:bg-ms-blue;
+.player {
+  @apply mt-4 bg-black border border-[--ms-border] rounded-xl shadow-lg overflow-visible hidden;
 }
 
-#copy-link-btn {
-  @apply bg-gray-500 hover:bg-gray-600;
+.player.active {
+  @apply block;
 }
 
-#fullscreen-btn {
-  @apply bg-gray-500 hover:bg-gray-600;
+.frame-wrap {
+  @apply relative w-full aspect-[16/9] bg-black rounded-xl overflow-hidden;
 }
 
-#movie-results {
-  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6;
+iframe {
+  @apply absolute inset-0 w-full h-full border-0;
 }
 
-.movie-card {
-  @apply bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 p-4 cursor-pointer;
+#movieFrame {
+  @apply opacity-0 transition-opacity duration-600;
 }
 
-.movie-card img {
-  @apply w-full h-48 object-cover rounded-md;
+#movieFrame.show {
+  @apply opacity-100;
 }
 
-.movie-card h3 {
-  @apply text-lg font-semibold text-gray-900 mt-2;
+.status {
+  @apply mt-2 text-[--ms-muted] text-xs flex items-center gap-2;
 }
 
-.movie-card p {
-  @apply text-sm text-gray-600;
+.status .dot {
+  @apply w-2 h-2 rounded-full bg-[--ms-accent] shadow animate-pulse;
 }
 
-#movie-info {
-  @apply mt-4 p-4 bg-acrylic-bg backdrop-blur-md rounded-md;
+.results {
+  @apply mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
 }
 
-#tips {
-  @apply text-sm text-gray-600 mt-4;
+.movie {
+  @apply bg-[--ms-panel] border border-[--ms-border] rounded-lg overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg transition-all duration-200;
 }
 
-@media (max-width: 640px) {
-  #server-options {
-    @apply grid-cols-1;
+.movie img {
+  @apply w-full h-auto;
+}
+
+.movie-title {
+  @apply p-2 text-sm text-[--ms-text] font-semibold text-center;
+}
+
+dialog {
+  @apply bg-[--ms-acrylic] backdrop-blur-md border border-[--ms-border] rounded-xl p-0 w-full max-w-[720px] mx-4;
+}
+
+.modal-header {
+  @apply flex justify-between items-center p-4 bg-[--ms-panel-2] border-b border-[--ms-border];
+}
+
+.modal-title {
+  @apply font-bold text-[--ms-text];
+}
+
+.modal-title a {
+  @apply text-[--ms-brand] hover:text-[--ms-accent];
+}
+
+.close-x {
+  @apply text-[--ms-muted] p-2 rounded-lg hover:bg-[--ms-panel-2] hover:text-[--ms-brand] transition-all duration-200;
+}
+
+.modal-body {
+  @apply p-4 bg-[--ms-panel] text-[--ms-text];
+}
+
+.movie-info {
+  @apply mt-4 p-5 bg-[--ms-panel-2] border border-[--ms-border] rounded-lg shadow-md;
+}
+
+.movie-info h2 {
+  @apply text-xl text-[--ms-brand] mb-2;
+}
+
+.toggle-btn {
+  @apply bg-transparent text-[--ms-brand] text-base cursor-pointer hover:scale-105 hover:underline transition-all duration-200;
+}
+
+.info-content {
+  @apply max-h-0 overflow-hidden opacity-0 transition-all duration-400;
+}
+
+.info-content.show {
+  @apply max-h-[500px] opacity-100;
+}
+
+#spinner {
+  @apply absolute top-1/2 left-1/2 w-12 h-12 border-4 border-[rgba(255,255,255,0.3)] border-t-[--ms-brand] rounded-full animate-spin -translate-x-1/2 -translate-y-1/2;
+}
+
+#spinner.hidden {
+  @apply hidden;
+}
+
+.suggestions {
+  @apply absolute bg-[--ms-panel-2] border border-[--ms-border] rounded-lg p-2 max-h-48 overflow-y-auto w-full max-w-[260px] hidden z-10;
+}
+
+.suggestion-item {
+  @apply p-2 text-[--ms-text] cursor-pointer hover:bg-[--ms-panel] transition-colors duration-200;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    @apply fixed bottom-0 left-0 right-0 top-auto flex-row justify-center gap-2 p-2 border-t border-[--ms-border] shadow-md overflow-x-auto;
+    flex-wrap: nowrap;
   }
-  #movie-results {
-    @apply grid-cols-1;
+
+  .sidebar::-webkit-scrollbar {
+    @apply hidden;
+  }
+
+  .sidebar.hidden {
+    @apply translate-y-full;
+  }
+
+  .brand {
+    @apply hidden;
+  }
+
+  .navlink, .navbtn {
+    @apply text-xs px-2 py-1 min-w-[60px];
+  }
+
+  .main {
+    @apply ml-0 mb-12;
+  }
+
+  .sidebar.hidden + .main {
+    @apply mb-0;
+  }
+
+  .toolbar {
+    @apply flex-col;
+  }
+
+  .input {
+    @apply w-full;
   }
 }
 
