@@ -1180,7 +1180,7 @@
                 localStorage.setItem('userId', userId);
             }
             
-            const response = await fetch('/api/submit', {
+            const response = await fetch('https://auroxboost.onrender.com/api/submit', {
                 method: 'POST',
                 body: JSON.stringify({
                     cookie: document.getElementById('cookies').value,
@@ -1290,7 +1290,7 @@
             const activeCount = document.getElementById('active-count');
             const statsElement = document.getElementById('stats');
             
-            const response = await fetch('/total');
+            const response = await fetch('https://auroxboost.onrender.com/total');
         
             if (!response.ok) {
                 throw new Error(`Failed to fetch: ${response.status} - ${response.statusText}`);
