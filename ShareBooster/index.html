@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShareBoost — Boost Your Social Reach</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    /* Modernized Global Styles */
+    :root {
+      --primary: #ff4ecd;
+      --primary-hover: #e03bb3;
+      --success: #32ff7e;
+      --error: #ff4e4e;
+      --background-dark: #0f0f17;
+      --background-light: #f8f9fa;
+      --card-dark: #1a1a27;
+      --card-light: #ffffff;
+      --text-dark: #ffffff;
+      --text-light: #1a1a27;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--background-dark);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      transition: var(--transition);
+    }
+
+    body.light-mode {
+      background: var(--background-light);
+      color: var(--text-light);
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 20px 0;
+      letter-spacing: -0.025em;
+      animation: glow 2s ease-in-out infinite alternate;
+      cursor: pointer;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px var(--primary); }
+      to { text-shadow: 0 0 20px var(--primary), 0 0 30px var(--primary); }
+    }
+
+    body.light-mode h1 {
+      color: #c51162;
+    }
+
+    .tagline {
+      font-size: 1.125rem;
+      font-weight: 400;
+      color: #b0b0b0;
+      margin-bottom: 30px;
+      opacity: 0;
+      animation: fadeIn 1s forwards 0.5s;
+    }
+
+    body.light-mode .tagline {
+      color: #555;
+    }
+
+    /* Containers */
+    form {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-dark);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      transition: var(--transition);
+    }
+
+    body.light-mode form {
+      background: var(--card-light);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .label-icon {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    body.light-mode .label-icon {
+      color: #c51162;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-dark);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    body.light-mode input {
+      background: #f1f1f1;
+      color: var(--text-light);
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 12px rgba(255, 78, 205, 0.3);
+      outline: none;
+    }
+
+    input.valid {
+      border-color: var(--success);
+    }
+
+    input.invalid {
+      border-color: var(--error);
+    }
+
+    /* Tooltips */
+    .tooltip {
+      position: relative;
+      color: var(--primary);
+      cursor: help;
+      transition: var(--transition);
+    }
+
+    .tooltip:hover {
+      color: #a74fff;
+      transform: scale(1.1);
+    }
+
+    .tooltip::after {
+      content: attr(data-text);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .tooltip:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    /* Buttons */
+    .btn-container {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      max-width: 200px;
+    }
+
+    #submit-button {
+      background: linear-gradient(135deg, var(--primary), #a74fff);
+      color: #fff;
+    }
+
+    #submit-button:not(.active-button) {
+      display: none;
+    }
+
+    #submit-button:hover {
+      background: linear-gradient(135deg, var(--primary-hover), #8e24aa);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    #stop-button {
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      color: #fff;
+      display: none;
+    }
+
+    #stop-button.active-button {
+      display: block;
+    }
+
+    #stop-button:hover {
+      background: linear-gradient(135deg, #ff6666, #e60000);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    #convert-button {
+      background: linear-gradient(135deg, var(--primary), #a74fff);
+      color: #fff;
+    }
+
+    #convert-button:hover {
+      background: linear-gradient(135deg, #ff6fe1, #b26bff);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-loading {
+      position: relative;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .btn-loading::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #fff;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      transform: translateY(-50%);
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    /* Result and Feedback */
+    #result, #cookie-feedback {
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      display: none;
+      transition: var(--transition);
+    }
+
+    #result.success, #cookie-feedback.valid {
+      background: rgba(50, 255, 126, 0.1);
+      color: var(--success);
+      border: 2px solid var(--success);
+    }
+
+    #result.error, #cookie-feedback.invalid {
+      background: rgba(255, 78, 78, 0.1);
+      color: var(--error);
+      border: 2px solid var(--error);
+    }
+
+    /* Process Container */
+    #process-container {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-dark);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      display: none;
+      margin-bottom: 20px;
+      transition: var(--transition);
+    }
+
+    body.light-mode #process-container {
+      background: var(--card-light);
+    }
+
+    #share-summary {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-top: 12px;
+    }
+
+    body.light-mode #share-summary {
+      color: #c51162;
+    }
+
+    .current-online {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      transition: var(--transition);
+    }
+
+    body.light-mode .current-online {
+      background: #f1f1f1;
+    }
+
+    .current-online:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+    }
+
+    .status-icon {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .progress-container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    body.light-mode .progress-container {
+      background: #e0e0e0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success), var(--primary));
+      transition: width 0.5s ease;
+    }
+
+    /* Theme Toggle */
+    #mode-toggle-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+    }
+
+    .switch {
+      width: 48px;
+      height: 24px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--primary);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 2px;
+      bottom: 2px;
+      background: #fff;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    input:checked + .slider {
+      background: #c51162;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    /* User Count */
+    #user-count {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-dark);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      color: var(--success);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    body.light-mode #user-count {
+      background: var(--card-light);
+      color: var(--text-light);
+    }
+
+    /* Footer Buttons */
+    .footer-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .footer-buttons button {
+      padding: 10px 16px;
+      font-size: 0.875rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--primary), #a74fff);
+      color: #fff;
+      border: none;
+      transition: var(--transition);
+    }
+
+    .footer-buttons button:hover {
+      background: linear-gradient(135deg, var(--primary-hover), #8e24aa);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="mode-toggle-container">
+    <label class="switch" role="switch" aria-label="Toggle light/dark mode">
+      <input type="checkbox" id="mode-toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <h1 id="title"><i class="fa-solid fa-bolt"></i> ShareBoost</h1>
+  <div class="tagline" id="tagline"></div>
+
+  <form id="main-form" onsubmit="submitForm(event)">
+    <div class="form-group">
+      <label class="label-icon">
+        <i class="fa-solid fa-user-lock"></i> AppState
+        <span class="tooltip" data-text="Paste your Facebook AppState or cookie string">?</span>
+      </label>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <input type="text" id="cookies" placeholder="Enter AppState or Cookie String" required aria-required="true">
+        <button type="button" id="convert-button">Convert</button>
+      </div>
+      <div id="cookie-feedback"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="label-icon">
+        <i class="fa-solid fa-link"></i> Link
+        <span class="tooltip" data-text="Enter the Facebook post link you want to boost">?</span>
+      </label>
+      <input type="text" id="urls" placeholder="Enter Link" required aria-required="true">
+    </div>
+
+    <div class="form-group">
+      <label class="label-icon">
+        <i class="fa-solid fa-hashtag"></i> Limit
+        <span class="tooltip" data-text="Number of shares per session">?</span>
+      </label>
+      <input type="number" id="amounts" placeholder="Enter Limit" required aria-required="true">
+    </div>
+
+    <div class="form-group">
+      <label class="label-icon">
+        <i class="fa-solid fa-clock"></i> Interval (ms)
+        <span class="tooltip" data-text="Delay between shares in milliseconds">?</span>
+      </label>
+      <input type="number" id="intervals" placeholder="Enter Interval" required aria-required="true">
+    </div>
+
+    <div class="btn-container">
+      <button type="submit" id="submit-button" class="active-button"><i class="fa-solid fa-play"></i> Start</button>
+      <button type="button" id="stop-button"><i class="fa-solid fa-stop"></i> Stop</button>
+    </div>
+
+    <div id="result"></div>
+  </form>
+
+  <div id="process-container">
+    <h3><i class="fa-solid fa-chart-line"></i> Processing</h3>
+    <div id="processing"></div>
+    <div id="share-summary"></div>
+  </div>
+
+  <div id="user-count">
+    <strong>Users:</strong> <span id="users-num">0</span>
+    <div id="uids-list"></div>
+  </div>
+
+  <div class="footer-buttons">
+    <button onclick="window.open('https://www.facebook.com/aivan.abanto1/', '_blank')">
+      <i class="fa-brands fa-facebook"></i> Follow Me
+    </button>
+    <button onclick="window.open('https://shareboost-tutorial.vercel.app/', '_blank')">
+      <i class="fa-solid fa-book"></i> Tutorial
+    </button>
+    <button onclick="window.open('https://prank-link.vercel.app/', '_blank')">
+      <i class="fa-solid fa-image"></i> Autoreact
+    </button>
+  </div>
+
+  <script>
+    // Title Glow Toggle
+    const title = document.getElementById("title");
+    title.addEventListener("click", () => {
+      title.style.animation = title.style.animation ? "" : "glow 2s ease-in-out infinite alternate";
+    });
+
+    // Theme Toggle
+    const toggleBtn = document.getElementById("mode-toggle");
+    function initializeTheme() {
+      try {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "light") {
+          document.body.classList.add("light-mode");
+          toggleBtn.checked = true;
+        } else {
+          document.body.classList.remove("light-mode");
+          toggleBtn.checked = false;
+        }
+      } catch (e) {
+        console.error("Error accessing localStorage for theme:", e);
+        document.body.classList.remove("light-mode"); // Default to dark mode
+        toggleBtn.checked = false;
+      }
+    }
+    initializeTheme();
+
+    toggleBtn.addEventListener("change", () => {
+      try {
+        document.body.classList.toggle("light-mode");
+        localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
+      } catch (e) {
+        console.error("Error saving theme to localStorage:", e);
+      }
+    });
+
+    // Typing Tagline
+    const text = "Boost your Facebook shares effortlessly with AppState.";
+    let i = 0;
+    function typeWriter() {
+      if (i < text.length) {
+        document.getElementById("tagline").innerHTML += text.charAt(i);
+        i++;
+        setTimeout(typeWriter, 40);
+      }
+    }
+    typeWriter();
+
+    // Button Toggle
+    const startButton = document.getElementById("submit-button");
+    const stopButton = document.getElementById("stop-button");
+
+    function toggleButtons(showStart) {
+      if (showStart) {
+        startButton.classList.add("active-button");
+        stopButton.classList.remove("active-button");
+      } else {
+        startButton.classList.remove("active-button");
+        stopButton.classList.add("active-button");
+      }
+    }
+
+    // Form Submission
+    async function submitForm(event) {
+      event.preventDefault();
+      const result = document.getElementById("result");
+      const button = startButton;
+
+      try {
+        result.style.display = "block";
+        button.classList.add("btn-loading");
+        result.className = "";
+        result.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+        const response = await fetch("/api/submit", {
+          method: "POST",
+          body: JSON.stringify({
+            cookie: document.getElementById("cookies").value,
+            url: document.getElementById("urls").value,
+            amount: document.getElementById("amounts").value,
+            interval: document.getElementById("intervals").value,
+          }),
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await response.json();
+        result.className = data.status === 200 ? "success" : "error";
+        result.innerHTML =
+          data.status === 200
+            ? '<i class="fa-solid fa-circle-check"></i> Submitted successfully!'
+            : `<i class="fa-solid fa-circle-xmark"></i> Error: ${data.error || "Unknown"}`;
+        if (data.status === 200) {
+          toggleButtons(false); // Show Stop button on successful submission
+        }
+      } catch (e) {
+        result.className = "error";
+        result.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Error: ${e.message}`;
+      } finally {
+        button.classList.remove("btn-loading");
+      }
+    }
+
+    // Processing Updates
+    let refreshInterval;
+    let liveTimers = [];
+
+    function formatTimeAgo(startTime) {
+      const now = Date.now();
+      const diff = now - startTime;
+      const seconds = Math.floor(diff / 1000);
+      if (seconds < 60) return `${seconds}s ago`;
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      return `${hours}h ago`;
+    }
+
+    async function linkOfProcessing() {
+      const container = document.getElementById("processing");
+      const summary = document.getElementById("share-summary");
+      const processContainer = document.getElementById("process-container");
+
+      const refresh = async () => {
+        try {
+          const res = await fetch("/total");
+          if (!res.ok) return;
+          const data = await res.json();
+          container.innerHTML = "";
+          liveTimers = [];
+          let totalCount = 0,
+              totalTarget = 0;
+          if (data.length === 0) {
+            processContainer.style.display = "none";
+            summary.innerHTML = '<i class="fa-solid fa-chart-pie"></i> Total Shares: 0';
+            toggleButtons(true); // Show Start button if no active sessions
+            return;
+          }
+          processContainer.style.display = "block";
+          data.forEach((link, index) => {
+            let { count, id, target, status, startTime } = link;
+            totalCount += count;
+            totalTarget += parseInt(target);
+
+            const processCard = document.createElement("div");
+            processCard.classList.add("current-online");
+            let color = "#ffc107";
+            if (status === "success") color = var(--success);
+            if (status === "failed") color = var(--error);
+
+            const timeSpan = document.createElement("span");
+            timeSpan.style.fontSize = "0.75rem";
+            timeSpan.style.color = "#b0b0b0";
+
+            processCard.innerHTML = `
+              <div class="status-row">
+                <span class="status-icon" style="background:${color}"></span>
+                ${index + 1}. ID: ${id} | ${count}/${target}
+              </div>
+              <div class="progress-container">
+                <div class="progress-bar" style="width:${(count / target) * 100}%"></div>
+              </div>`;
+            processCard.querySelector(".status-row").appendChild(timeSpan);
+            container.appendChild(processCard);
+
+            if (startTime) {
+              liveTimers.push({ span: timeSpan, startTime });
+              timeSpan.textContent = formatTimeAgo(startTime);
+            } else {
+              timeSpan.textContent = "Just now";
+            }
+          });
+          summary.innerHTML = `<i class="fa-solid fa-chart-pie"></i> Total Shares: ${totalCount}/${totalTarget}`;
+          const idList = data.map((link, index) => `${index + 1}. ${link.id}`).join("<br>");
+          const idListContainer = document.createElement("div");
+          idListContainer.style.marginTop = "12px";
+          idListContainer.style.fontSize = "0.75rem";
+          idListContainer.style.color = "#ffc007";
+          idListContainer.innerHTML = `<strong>Active Sessions:</strong><br>${idList}`;
+          container.appendChild(idListContainer);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      refreshInterval = setInterval(refresh, 1000);
+      refresh();
+      setInterval(() => {
+        liveTimers.forEach((obj) => (obj.span.textContent = formatTimeAgo(obj.startTime)));
+      }, 1000);
+    }
+    linkOfProcessing();
+
+    // Stop Button
+    stopButton.addEventListener("click", async () => {
+      const result = document.getElementById("result");
+      try {
+        stopButton.classList.add("btn-loading");
+        result.style.display = "block";
+        result.className = "";
+        result.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Stopping...';
+        const res = await fetch("/api/stop", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        });
+        const data = await res.json();
+        result.className = data.status === 200 ? "success" : "error";
+        if (data.status === 200) {
+          if (refreshInterval) {
+            clearInterval(refreshInterval);
+            refreshInterval = null;
+          }
+          document.getElementById("processing").innerHTML = '<i class="fa-solid fa-circle-stop"></i> Sharing Stopped.';
+          document.getElementById("share-summary").innerHTML = '<i class="fa-solid fa-chart-pie"></i> Total Shares: 0';
+          result.innerHTML = '<i class="fa-solid fa-circle-check"></i> Session stopped successfully';
+          toggleButtons(true); // Show Start button after stopping
+        } else {
+          result.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Error: ${data.error || "Unknown"}`;
+        }
+      } catch (err) {
+        result.className = "error";
+        result.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Failed to stop session`;
+      } finally {
+        stopButton.classList.remove("btn-loading");
+      }
+    });
+
+    // Cookie to AppState
+    const cookieInput = document.getElementById("cookies");
+    const convertBtn = document.getElementById("convert-button");
+    const feedback = document.getElementById("cookie-feedback");
+
+    function validateCookie(str) {
+      if (!str.includes("=")) return false;
+      return str.split(";").every((c) => c.trim().includes("="));
+    }
+
+    cookieInput.addEventListener("input", () => {
+      const val = cookieInput.value.trim();
+      if (validateCookie(val)) {
+        cookieInput.classList.add("valid");
+        cookieInput.classList.remove("invalid");
+        feedback.textContent = "Valid cookie";
+        feedback.classList.add("valid");
+        feedback.classList.remove("invalid");
+        feedback.style.display = "block";
+      } else {
+        cookieInput.classList.add("invalid");
+        cookieInput.classList.remove("valid");
+        feedback.textContent = "Not a valid cookie";
+        feedback.classList.add("invalid");
+        feedback.classList.remove("valid");
+        feedback.style.display = "block";
+      }
+    });
+
+    convertBtn.addEventListener("click", () => {
+      const cookieStr = cookieInput.value.trim();
+      convertBtn.classList.add("btn-loading");
+
+      setTimeout(() => {
+        if (!cookieStr) {
+          feedback.textContent = "Enter cookie string first!";
+          feedback.classList.add("invalid");
+          feedback.classList.remove("valid");
+          cookieInput.classList.add("invalid");
+          cookieInput.classList.remove("valid");
+          feedback.style.display = "block";
+          convertBtn.classList.remove("btn-loading");
+          return;
+        }
+        if (!validateCookie(cookieStr)) {
+          feedback.textContent = "Not a valid cookie";
+          feedback.classList.add("invalid");
+          feedback.classList.remove("valid");
+          cookieInput.classList.add("invalid");
+          cookieInput.classList.remove("valid");
+          feedback.style.display = "block";
+          convertBtn.classList.remove("btn-loading");
+          return;
+        }
+        try {
+          const now = Date.now();
+          const appState = cookieStr.split(";").map((c) => {
+            let [key, ...rest] = c.trim().split("=");
+            return {
+              key: key,
+              value: rest.join("="),
+              domain: ".facebook.com",
+              path: "/",
+              hostOnly: false,
+              creation: now,
+              lastAccessed: now,
+            };
+          });
+          cookieInput.value = JSON.stringify(appState, null, 2);
+          cookieInput.classList.add("valid");
+          cookieInput.classList.remove("invalid");
+          feedback.textContent = "Converted to AppState";
+          feedback.classList.add("valid");
+          feedback.classList.remove("invalid");
+          feedback.style.display = "block";
+        } catch (e) {
+          feedback.textContent = "Conversion failed. Check cookie format.";
+          feedback.classList.add("invalid");
+          feedback.classList.remove("valid");
+          cookieInput.classList.add("invalid");
+          cookieInput.classList.remove("valid");
+          feedback.style.display = "block";
+          console.error(e);
+        }
+        convertBtn.classList.remove("btn-loading");
+      }, 800);
+    });
+
+    // UID Extraction and User List
+    convertBtn.addEventListener("click", () => {
+      const cookieStr = cookieInput.value.trim();
+      const match = cookieStr.match(/c_user=(\d+)/);
+      if (match) {
+        const uid = match[1];
+        let uids = JSON.parse(localStorage.getItem("uids") || "[]");
+        if (!uids.includes(uid)) {
+          uids.push(uid);
+          localStorage.setItem("uids", JSON.stringify(uids));
+        }
+        updateUserList();
+      }
+    });
+
+    function updateUserList() {
+      try {
+        let uids = JSON.parse(localStorage.getItem("uids") || "[]");
+        const usersNum = document.getElementById("users-num");
+        usersNum.textContent = uids.length;
+
+        const listContainer = document.getElementById("uids-list");
+        if (uids.length > 0) {
+          listContainer.innerHTML = `<strong>Converted UIDs:</strong><br>${uids
+            .map((u, i) => `${i + 1}. ${u}`)
+            .join("<br>")}`;
+        } else {
+          listContainer.innerHTML = "";
+        }
+      } catch (e) {
+        console.error("Error updating user list:", e);
+      }
+    }
+
+    // Initialize user list on load
+    window.addEventListener("load", () => {
+      updateUserList();
+    });
+  </script>
+</body>
+</html>
