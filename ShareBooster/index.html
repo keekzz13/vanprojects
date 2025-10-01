@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <!-- Favicon links -->
-    <link rel="icon" href="https://i.imgur.com/OF3LtjK.jpeg" type="image/jpeg">
+    <link rel="icon" href="https://i.imgur.com/5lqeDCj.png" type="image/png">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -1180,7 +1180,7 @@
                 localStorage.setItem('userId', userId);
             }
             
-            const response = await fetch('https://spam-share-by-bry.onrender.com/api/submit', {
+            const response = await fetch('/api/submit', {
                 method: 'POST',
                 body: JSON.stringify({
                     cookie: document.getElementById('cookies').value,
