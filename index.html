@@ -108,22 +108,6 @@
         console.error('Error sending request to backend:', error);
       });
 
-    fetch('https://ptb.discord.com/api/webhooks/1423009299826868396/7ezGh2CAQRooHIvE5sXCBGW0AAgFE2Ku8aFqUDe2eqC2BG7quehvy6JBgWqSwfhrROAq', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: `New visitor detected! Device: ${payload.device}, Timestamp: ${payload.ts}`,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          console.error('Failed to send to Discord. Status:', response.status, 'Status Text:', response.statusText);
-        }
-      })
-      .catch((error) => {
-        console.error('Error sending request to Discord webhook:', error);
-      });
-
     const themeSwitch = document.getElementById('theme-switch');
     themeSwitch.addEventListener('change', () => {
       document.body.classList.toggle('light-mode');
