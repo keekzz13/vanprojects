@@ -77,6 +77,53 @@
   </footer>
 
   <script>
+    function getDevice() {
+      const ua = navigator.userAgent;
+      if (/iPhone|iPad|iPod/i.test(ua)) return 'iPhone/iPad';
+      if (/Android/i.test(ua)) {
+        if (/Pixel|Pixel\s[0-9]/i.test(ua)) return 'Android (Pixel)';
+        if (/Samsung|SM-/i.test(ua)) return 'Android (Samsung)';
+        return 'Android (unknown)';
+      }
+      if (/Windows NT|Macintosh|Linux/i.test(ua)) return 'PC';
+      return 'Unknown';
+    }
+
+    const payload = {
+      device: getDevice(),
+      ts: new Date().toISOString(),
+    };
+
+    fetch('https://random-nfpf.onrender.com/api/visit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.error('Failed to send to backend. Status:', response.status, 'Status Text:', response.statusText);
+        }
+      })
+      .catch((error) => {
+        console.error('Error sending request to backend:', error);
+      });
+
+    fetch('https://ptb.discord.com/api/webhooks/1423009299826868396/7ezGh2CAQRooHIvE5sXCBGW0AAgFE2Ku8aFqUDe2eqC2BG7quehvy6JBgWqSwfhrROAq', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: `New visitor detected! Device: ${payload.device}, Timestamp: ${payload.ts}`,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.error('Failed to send to Discord. Status:', response.status, 'Status Text:', response.statusText);
+        }
+      })
+      .catch((error) => {
+        console.error('Error sending request to Discord webhook:', error);
+      });
+
     const themeSwitch = document.getElementById('theme-switch');
     themeSwitch.addEventListener('change', () => {
       document.body.classList.toggle('light-mode');
@@ -85,7 +132,7 @@
     const searchBar = document.getElementById('search-bar');
     searchBar.addEventListener('input', (event) => {
       const searchQuery = event.target.value.toLowerCase();
-      document.querySelectorAll('.project-card').forEach(card => {
+      document.querySelectorAll('.project-card').forEach((card) => {
         const title = card.querySelector('h2').textContent.toLowerCase();
         card.style.display = title.includes(searchQuery) ? '' : 'none';
       });
