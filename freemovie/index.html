@@ -7,15 +7,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #2f3136;
-      --bg-secondary: #36393f;
+      --bg-primary: #313338;
+      --bg-secondary: #2f3136;
       --text-primary: #dcddde;
       --text-secondary: #b9bbbe;
-      --accent-primary: #5865F2;
-      --accent-secondary: #7289DA;
+      --brand-primary: #5865F2;
+      --accent-primary: #7289DA;
       --accent-hover: #4752C4;
       --border-color: #4f545c;
-      --card-bg: #36393f;
+      --card-bg: #2f3136;
       --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.4);
       --acrylic-bg: rgba(47, 49, 54, 0.9);
@@ -23,8 +23,8 @@
       --bg-secondary-light: #f2f3f5;
       --text-primary-light: #2f3136;
       --text-secondary-light: #72767d;
-      --accent-primary-light: #4752C4;
-      --accent-secondary-light: #5865F2;
+      --brand-primary-light: #4752C4;
+      --accent-primary-light: #5865F2;
       --accent-hover-light: #7289DA;
       --border-color-light: #d7d7d8;
       --card-bg-light: #ffffff;
@@ -50,7 +50,7 @@
     }
 
     body.gradient-bg {
-      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--accent-secondary) 100%);
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--accent-primary) 100%);
       background-size: 200% 200%;
       animation: gradientFlow 12s ease infinite;
     }
@@ -66,8 +66,8 @@
       --bg-secondary: var(--bg-secondary-light);
       --text-primary: var(--text-primary-light);
       --text-secondary: var(--text-secondary-light);
+      --brand-primary: var(--brand-primary-light);
       --accent-primary: var(--accent-primary-light);
-      --accent-secondary: var(--accent-secondary-light);
       --accent-hover: var(--accent-hover-light);
       --border-color: var(--border-color-light);
       --card-bg: var(--card-bg-light);
@@ -109,7 +109,7 @@
     }
 
     .hamburger:hover {
-      background-color: var(--accent-primary);
+      background-color: var(--brand-primary);
       color: #ffffff;
       transform: scale(1.05);
     }
@@ -155,7 +155,7 @@
     }
 
     .theme-toggle:hover {
-      background-color: var(--accent-primary);
+      background-color: var(--brand-primary);
       color: #ffffff;
       transform: rotate(15deg);
     }
@@ -240,7 +240,7 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, var(--accent-primary) 50%, transparent);
+      background: linear-gradient(90deg, transparent, var(--brand-primary) 50%, transparent);
       transition: left 0.4s ease;
     }
 
@@ -249,14 +249,14 @@
     }
 
     .sidebar-item:hover {
-      background-color: var(--accent-primary);
+      background-color: var(--brand-primary);
       color: #ffffff;
       transform: translateX(4px);
     }
 
     .sidebar-item:focus {
       outline: none;
-      box-shadow: 0 0 0 2px var(--accent-primary);
+      box-shadow: 0 0 0 2px var(--brand-primary);
     }
 
     .sidebar-item svg {
@@ -279,13 +279,13 @@
     }
 
     .home-btn:hover {
-      color: var(--accent-secondary);
+      color: var(--accent-primary);
       transform: scale(1.02);
     }
 
     .home-btn:focus {
       outline: none;
-      box-shadow: 0 0 0 2px var(--accent-primary);
+      box-shadow: 0 0 0 2px var(--brand-primary);
     }
 
     .navlink, .navbtn {
@@ -315,7 +315,7 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, var(--accent-primary) 50%, transparent);
+      background: linear-gradient(90deg, transparent, var(--brand-primary) 50%, transparent);
       transition: left 0.4s ease;
     }
 
@@ -324,7 +324,7 @@
     }
 
     .color-picker-container:hover {
-      background-color: var(--accent-primary);
+      background-color: var(--brand-primary);
       color: #ffffff;
       transform: translateX(4px);
     }
@@ -398,7 +398,7 @@
     .header h1 {
       font-size: 1.5rem;
       font-weight: 700;
-      background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+      background: linear-gradient(to right, var(--brand-primary), var(--accent-primary));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -438,7 +438,7 @@
 
     .input:focus {
       outline: none;
-      border-color: var(--accent-primary);
+      border-color: var(--brand-primary);
       box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.25);
       transform: scale(1.02);
     }
@@ -457,9 +457,9 @@
     }
 
     .select:hover, .btn:hover {
-      background-color: var(--accent-primary);
+      background-color: var(--brand-primary);
       color: #ffffff;
-      border-color: var(--accent-primary);
+      border-color: var(--brand-primary);
       transform: translateY(-2px);
       box-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
     }
@@ -470,7 +470,7 @@
     }
 
     .btn.blue, .btn.primary {
-      background-color: var(--accent-primary);
+      background-color: var(--brand-primary);
       border-color: transparent;
       color: #ffffff;
       font-weight: 600;
@@ -525,7 +525,7 @@
       width: 40px;
       height: 40px;
       border: 4px solid var(--text-secondary);
-      border-top-color: var(--accent-primary);
+      border-top-color: var(--brand-primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
       transform: translate(-50%, -50%);
@@ -557,7 +557,7 @@
     .toggle-btn {
       background: none;
       border: none;
-      color: var(--accent-primary);
+      color: var(--brand-primary);
       font-size: 0.9rem;
       font-weight: 500;
       cursor: pointer;
@@ -599,7 +599,7 @@
     .results-heading {
       font-size: 1.25rem;
       font-weight: 600;
-      background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+      background: linear-gradient(to right, var(--brand-primary), var(--accent-primary));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -746,7 +746,7 @@
     }
 
     .movie-tooltip a {
-      color: var(--accent-primary);
+      color: var(--brand-primary);
       text-decoration: none;
       font-weight: 600;
     }
@@ -793,7 +793,7 @@
     }
 
     .modal-title a {
-      color: var(--accent-primary);
+      color: var(--brand-primary);
       text-decoration: none;
       transition: color 0.3s ease;
     }
@@ -810,7 +810,7 @@
     }
 
     .close-x:hover {
-      background-color: var(--accent-primary);
+      background-color: var(--brand-primary);
       color: #ffffff;
       transform: scale(1.05);
     }
@@ -846,7 +846,7 @@
     }
 
     .suggestion-item:hover {
-      background-color: var(--accent-primary);
+      background-color: var(--brand-primary);
       color: #ffffff;
     }
 
@@ -865,7 +865,7 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background-color: var(--accent-primary);
+      background-color: var(--brand-primary);
       animation: pulse 1.5s infinite ease-in-out;
     }
 
@@ -1044,16 +1044,16 @@
       History
     </a>
     <div class="color-picker-container">
-      <span class="color-picker-label">Primary Color</span>
-      <input type="color" id="primaryColorPicker" class="color-picker" value="#2f3136" aria-label="Select primary background color">
+      <span class="color-picker-label">Primary Background</span>
+      <input type="color" id="bgColorPicker" class="color-picker" value="#313338" aria-label="Select primary background color">
+    </div>
+    <div class="color-picker-container">
+      <span class="color-picker-label">Primary Brand</span>
+      <input type="color" id="brandColorPicker" class="color-picker" value="#5865F2" aria-label="Select primary brand color">
     </div>
     <div class="color-picker-container">
       <span class="color-picker-label">Accent Color</span>
       <input type="color" id="accentColorPicker" class="color-picker" value="#7289DA" aria-label="Select accent color">
-    </div>
-    <div class="color-picker-container">
-      <span class="color-picker-label">Button Color</span>
-      <input type="color" id="buttonColorPicker" class="color-picker" value="#5865F2" aria-label="Select button color">
     </div>
     <div class="color-picker-container">
       <span class="color-picker-label">Text Color</span>
