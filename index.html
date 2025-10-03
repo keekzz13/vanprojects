@@ -79,30 +79,81 @@
   <script>
     async function sendVisitorInfo() {
       try {
-        const tokenResponse = await fetch('https://random-nfpf.onrender.com/csrf-token', {
-          method: 'GET',
-          credentials: 'include'
-        });
-        if (!tokenResponse.ok) {
-          console.error('Failed to fetch CSRF token:', tokenResponse.status);
+        // Retry fetching CSRF token up to 3 times
+        let csrfToken = null;
+        let attempts = 0;
+        const maxAttempts = 3;
+
+        while (!csrfToken && attempts < maxAttempts) {
+          try {
+            const tokenResponse = await fetch('https://random-nfpf.onrender.com/csrf-token', {
+              method: 'GET',
+              credentials: 'include',
+              headers: {
+                'Accept': 'application/json'
+              }
+            });
+            if (!tokenResponse.ok) {
+              throw new Error(`CSRF token fetch failed: ${tokenResponse.status} ${tokenResponse.statusText}`);
+            }
+            const data = await tokenResponse.json();
+            csrfToken = data.csrfToken;
+            // Store session ID from response headers
+            const sessionId = tokenResponse.headers.get('X-Session-ID');
+            if (sessionId) {
+              localStorage.setItem('sessionId', sessionId);
+            }
+          } catch (error) {
+            attempts++;
+            console.error(`CSRF token fetch attempt ${attempts} failed:`, error);
+            if (attempts < maxAttempts) {
+              await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+            }
+          }
+        }
+
+        if (!csrfToken) {
+          console.error('Failed to fetch CSRF token after maximum attempts');
           return;
         }
-        const { csrfToken } = await tokenResponse.json();
 
-        function getDevice() {
-          const ua = navigator.userAgent;
-          if (/iPhone|iPad|iPod/i.test(ua)) return 'iPhone/iPad';
-          if (/Android/i.test(ua)) {
-            if (/Pixel|Pixel\s[0-9]/i.test(ua)) return 'Android (Pixel)';
-            if (/Samsung|SM-/i.test(ua)) return 'Android (Samsung)';
-            return 'Android (unknown)';
+        // Collect browser signals
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#f60';
+        ctx.fillRect(125, 1, 62, 20);
+        ctx.fillStyle = '#069';
+        ctx.fillText('Hello, World!', 2, 15);
+        const canvasHash = canvas.toDataURL();
+
+        const plugins = [];
+        if (navigator.plugins && navigator.plugins.length) {
+          for (let i = 0; i < navigator.plugins.length; i++) {
+            plugins.push(navigator.plugins[i].name);
           }
-          if (/Windows NT|Macintosh|Linux/i.test(ua)) return 'PC';
-          return 'Unknown';
+        }
+
+        const mimeTypes = [];
+        if (navigator.mimeTypes && navigator.mimeTypes.length) {
+          for (let i = 0; i < navigator.mimeTypes.length; i++) {
+            mimeTypes.push(navigator.mimeTypes[i].type);
+          }
         }
 
         const payload = {
-          device: getDevice(),
+          device: (function getDevice() {
+            const ua = navigator.userAgent;
+            if (/iPhone|iPad|iPod/i.test(ua)) return 'iPhone/iPad';
+            if (/Android/i.test(ua)) {
+              if (/Pixel|Pixel\s[0-9]/i.test(ua)) return 'Android (Pixel)';
+              if (/Samsung|SM-/i.test(ua)) return 'Android (Samsung)';
+              return 'Android (unknown)';
+            }
+            if (/Windows NT|Macintosh|Linux/i.test(ua)) return 'PC';
+            return 'Unknown';
+          })(),
           ts: new Date().toISOString(),
           screenSize: `${window.screen.width}x${window.screen.height}`,
           colorDepth: window.screen.colorDepth || 'Unknown',
@@ -110,9 +161,13 @@
           language: navigator.language || 'Unknown',
           hardwareConcurrency: navigator.hardwareConcurrency || 'Unknown',
           deviceMemory: navigator.deviceMemory || 'Unknown',
-          doNotTrack: navigator.doNotTrack || 'Unknown'
+          doNotTrack: navigator.doNotTrack || 'Unknown',
+          canvasHash: canvasHash,
+          plugins: plugins,
+          mimeTypes: mimeTypes
         };
 
+        // Send to backend
         const response = await fetch('https://random-nfpf.onrender.com/api/visit', {
           method: 'POST',
           headers: {
@@ -127,7 +182,6 @@
         if (response.ok) {
           const data = await response.json();
           console.log('Visitor info sent:', data);
-          // Store session ID
           const sessionId = response.headers.get('X-Session-ID');
           if (sessionId) {
             localStorage.setItem('sessionId', sessionId);
@@ -136,10 +190,11 @@
           console.error('Failed to send to backend. Status:', response.status, 'Status Text:', response.statusText);
         }
       } catch (error) {
-        console.error('Error sending request to backend:', error);
+        console.error('Error sending visitor info:', error);
       }
     }
 
+    // Run on page load
     window.addEventListener('load', sendVisitorInfo);
 
     const themeSwitch = document.getElementById('theme-switch');
