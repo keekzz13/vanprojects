@@ -16,10 +16,9 @@
       --accent-hover: #60a5fa;
       --border-color: #334155;
       --card-bg: #1f2a44;
-      --shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-      --shadow-hover: 0 10px 20px rgba(0, 0, 0, 0.3);
+      --shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      --shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.3);
       --acrylic-bg: rgba(30, 41, 59, 0.85);
-      --gradient-bg: linear-gradient(135deg, #1e3a8a, #3b82f6);
       /* Light theme variables */
       --bg-primary-light: #f8fafc;
       --bg-secondary-light: #e2e8f0;
@@ -29,10 +28,9 @@
       --accent-hover-light: #3b82f6;
       --border-color-light: #cbd5e1;
       --card-bg-light: #ffffff;
-      --shadow-light: 0 6px 12px rgba(0, 0, 0, 0.1);
-      --shadow-hover-light: 0 10px 20px rgba(0, 0, 0, 0.15);
+      --shadow-light: 0 4px 8px rgba(0, 0, 0, 0.1);
+      --shadow-hover-light: 0 8px 16px rgba(0, 0, 0, 0.15);
       --acrylic-bg-light: rgba(255, 255, 255, 0.85);
-      --gradient-bg-light: linear-gradient(135deg, #93c5fd, #3b82f6);
     }
 
     * {
@@ -43,7 +41,7 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--gradient-bg);
+      background: var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
@@ -63,22 +61,30 @@
       --shadow: var(--shadow-light);
       --shadow-hover: var(--shadow-hover-light);
       --acrylic-bg: var(--acrylic-bg-light);
-      --gradient-bg: var(--gradient-bg-light);
+    }
+
+    body.sidebar-open {
+      overflow: hidden;
+    }
+
+    .header-bar {
+      position: fixed;
+      top: 0.75rem;
+      right: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 1200;
     }
 
     .hamburger {
-      position: fixed;
-      top: 1rem;
-      left: 1rem;
       background-color: var(--acrylic-bg);
       border: 1px solid var(--border-color);
       border-radius: 0.5rem;
       padding: 0.5rem;
       cursor: pointer;
-      z-index: 1100;
       transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      display: none;
+      backdrop-filter: blur(8px);
+      color: var(--text-primary);
     }
 
     .hamburger:hover {
@@ -87,21 +93,38 @@
       transform: scale(1.1);
     }
 
+    .theme-toggle {
+      background-color: var(--acrylic-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      color: var(--text-primary);
+    }
+
+    .theme-toggle:hover {
+      background-color: var(--accent-primary);
+      color: #ffffff;
+      transform: rotate(15deg);
+    }
+
     .sidebar {
-      width: 260px;
+      width: 240px;
       height: 100vh;
       position: fixed;
       top: 0;
       left: 0;
       background-color: var(--acrylic-bg);
       border-right: 1px solid var(--border-color);
-      padding: 2rem 1rem;
+      padding: 1.5rem 0.75rem;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.5rem;
       transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1000;
-      backdrop-filter: blur(12px);
+      z-index: 1100;
+      backdrop-filter: blur(8px);
       animation: slideIn 0.4s ease-out;
     }
 
@@ -111,6 +134,25 @@
 
     .sidebar.active {
       transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .sidebar.active + .sidebar-overlay {
+      opacity: 1;
+      pointer-events: auto;
     }
 
     .sidebar-item {
@@ -148,13 +190,13 @@
     }
 
     .sidebar-item svg {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       flex-shrink: 0;
     }
 
     .home-btn {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 600;
       color: var(--text-primary);
     }
@@ -164,18 +206,19 @@
     }
 
     .navlink, .navbtn {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 500;
       width: 100%;
       text-align: left;
     }
 
     .main {
-      margin-left: 260px;
-      padding: 2rem;
+      margin-left: 240px;
+      padding: 1.5rem;
       flex: 1;
       transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       animation: fadeIn 0.5s ease-out;
+      z-index: 900;
     }
 
     .sidebar.hidden + .main {
@@ -184,17 +227,18 @@
 
     .header {
       background-color: var(--acrylic-bg);
-      padding: 1.75rem;
-      border-radius: 1rem;
+      padding: 1rem;
+      border-radius: 0.75rem;
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow);
-      margin-bottom: 2rem;
-      backdrop-filter: blur(12px);
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(8px);
+      z-index: 1000;
       animation: slideUp 0.5s ease-out;
     }
 
     .header h1 {
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 700;
       background: linear-gradient(to right, var(--accent-primary), var(--accent-hover));
       -webkit-background-clip: text;
@@ -203,55 +247,56 @@
     }
 
     .header p {
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       color: var(--text-secondary);
-      margin-top: 0.5rem;
+      margin-top: 0.25rem;
     }
 
     .wrap {
-      max-width: 1280px;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
     .toolbar {
       display: flex;
       flex-wrap: wrap;
-      gap: 1rem;
-      padding: 1.25rem;
+      gap: 0.75rem;
+      padding: 0.75rem;
       background-color: var(--acrylic-bg);
-      border-radius: 1rem;
+      border-radius: 0.75rem;
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
       animation: slideUp 0.5s ease-out;
     }
 
     .input {
       flex: 1;
-      min-width: 220px;
-      padding: 0.85rem;
+      min-width: 200px;
+      padding: 0.65rem;
       background-color: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 0.75rem;
+      border-radius: 0.5rem;
       color: var(--text-primary);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       transition: all 0.3s ease;
     }
 
     .input:focus {
       outline: none;
       border-color: var(--accent-primary);
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
       transform: scale(1.02);
     }
 
     .select, .btn {
-      padding: 0.85rem 1.25rem;
+      padding: 0.65rem 1rem;
       background-color: var(--bg-secondary);
       border: 1px solid var(--border-color);
-      border-radius: 0.75rem;
+      border-radius: 0.5rem;
       color: var(--text-primary);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
@@ -284,13 +329,14 @@
     }
 
     .player {
-      margin-top: 1.5rem;
-      border-radius: 1rem;
+      margin-top: 1rem;
+      border-radius: 0.75rem;
       overflow: hidden;
       box-shadow: var(--shadow);
       position: relative;
       display: none;
       animation: fadeIn 0.5s ease-out;
+      z-index: 900;
     }
 
     .player.active {
@@ -323,9 +369,9 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 48px;
-      height: 48px;
-      border: 5px solid var(--text-secondary);
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--text-secondary);
       border-top-color: var(--accent-primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
@@ -336,37 +382,42 @@
       display: none;
     }
 
-    .results {
+    .trending-results, .search-results {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1.75rem;
-      margin-top: 2rem;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.5rem;
       position: relative;
       animation: slideUp 0.5s ease-out;
+      z-index: 900;
     }
 
-    .results::before {
-      content: 'Trending This Week';
-      font-size: 1.5rem;
+    .results-heading {
+      font-size: 1.25rem;
       font-weight: 600;
       color: var(--text-primary);
-      margin-bottom: 1rem;
-      display: block;
+      margin: 1rem 0 0.75rem;
       background: linear-gradient(to right, var(--accent-primary), var(--accent-hover));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: fadeIn 0.5s ease-out;
+    }
+
+    .empty-state {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin: 2rem 0;
     }
 
     .movie {
-      background-color: var(--card-bg);
-      border-radius: 1rem;
+      position: relative;
+      height: 270px;
+      border-radius: 0.75rem;
       overflow: hidden;
       box-shadow: var(--shadow);
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
-      position: relative;
       animation: cardPop 0.5s ease-out forwards;
       opacity: 0;
     }
@@ -378,27 +429,122 @@
     .movie:nth-child(5) { animation-delay: 0.5s; }
 
     .movie:hover {
-      transform: translateY(-8px) scale(1.03);
-      box-shadow: var(--shadow-hover), 0 0 15px rgba(59, 130, 246, 0.3);
+      transform: translateY(-6px) scale(1.05);
+      box-shadow: var(--shadow-hover), 0 0 12px rgba(59, 130, 246, 0.4);
     }
 
     .movie img {
       width: 100%;
-      height: 200px;
+      height: 100%;
       object-fit: cover;
-      transition: transform 0.4s ease;
+      transition: transform 0.3s ease;
     }
 
     .movie:hover img {
-      transform: scale(1.05);
+      transform: scale(1.1);
+    }
+
+    .movie::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40%;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+      z-index: 1;
+    }
+
+    .movie-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1rem;
+      transform: translateY(20px);
+    }
+
+    .movie:hover .movie-overlay {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .movie-title {
-      padding: 1rem;
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
       font-size: 0.9rem;
-      font-weight: 500;
-      text-align: center;
+      font-weight: 600;
+      color: #ffffff;
+      z-index: 2;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .movie-year {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 1rem;
+      font-size: 0.75rem;
+      color: #ffffff;
+      z-index: 2;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .movie-info-hover {
+      color: #ffffff;
+      font-size: 0.75rem;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(20px);
+    }
+
+    .movie:hover .movie-info-hover {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .movie-tooltip {
+      position: absolute;
+      background-color: var(--acrylic-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      max-width: 300px;
+      width: 90%;
+      z-index: 1300;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
       color: var(--text-primary);
+      font-size: 0.85rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(10px);
+    }
+
+    .movie:hover .movie-tooltip {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .movie-tooltip a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .movie-tooltip a:hover {
+      color: var(--accent-hover);
     }
 
     dialog {
@@ -407,14 +553,15 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background-color: var(--acrylic-bg);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(8px);
       border: 1px solid var(--border-color);
-      border-radius: 1rem;
-      max-width: 640px;
+      border-radius: 0.75rem;
+      max-width: 600px;
       width: 90%;
       padding: 0;
       box-shadow: var(--shadow);
       animation: modalPop 0.3s ease-out;
+      z-index: 2000;
     }
 
     dialog::backdrop {
@@ -426,13 +573,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.25rem;
+      padding: 1rem;
       background-color: var(--bg-secondary);
       border-bottom: 1px solid var(--border-color);
     }
 
     .modal-title {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 600;
       color: var(--text-primary);
     }
@@ -461,9 +608,9 @@
     }
 
     .modal-body {
-      padding: 1.75rem;
+      padding: 1.25rem;
       color: var(--text-primary);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     .suggestions {
@@ -471,20 +618,20 @@
       top: 100%;
       left: 0;
       width: 100%;
-      max-width: 320px;
+      max-width: 300px;
       background-color: var(--acrylic-bg);
       border: 1px solid var(--border-color);
-      border-radius: 0.75rem;
-      max-height: 240px;
+      border-radius: 0.5rem;
+      max-height: 200px;
       overflow-y: auto;
-      z-index: 10;
+      z-index: 1500;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(8px);
       animation: slideDown 0.3s ease-out;
     }
 
     .suggestion-item {
-      padding: 0.75rem 1.25rem;
+      padding: 0.65rem 1rem;
       color: var(--text-primary);
       cursor: pointer;
       transition: all 0.3s ease;
@@ -493,25 +640,6 @@
     .suggestion-item:hover {
       background-color: var(--accent-primary);
       color: #ffffff;
-    }
-
-    .theme-toggle {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      padding: 0.75rem;
-      background-color: var(--acrylic-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(12px);
-    }
-
-    .theme-toggle:hover {
-      background-color: var(--accent-primary);
-      color: #ffffff;
-      transform: rotate(15deg);
     }
 
     .info-content {
@@ -530,10 +658,11 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      margin-top: 1rem;
-      font-size: 0.9rem;
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
       color: var(--text-secondary);
       animation: fadeIn 0.5s ease-out;
+      z-index: 900;
     }
 
     .status .dot {
@@ -581,8 +710,9 @@
     }
 
     @media (max-width: 768px) {
-      .hamburger {
-        display: block;
+      .header-bar {
+        top: 1rem;
+        right: 1rem;
       }
 
       .sidebar {
@@ -598,13 +728,13 @@
       }
 
       .sidebar-item {
-        padding: 1rem;
-        font-size: 1rem;
+        padding: 0.75rem;
+        font-size: 0.9rem;
       }
 
       .main {
         margin-left: 0;
-        padding: 1.5rem;
+        padding: 1rem;
       }
 
       .toolbar {
@@ -616,13 +746,19 @@
         width: 100%;
       }
 
-      .results {
+      .trending-results, .search-results {
         grid-template-columns: 1fr;
+        gap: 1rem;
       }
 
-      .theme-toggle {
-        top: 0.75rem;
-        right: 4.5rem;
+      .movie-tooltip {
+        max-width: 90%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+      }
+
+      .movie:hover .movie-tooltip {
+        transform: translateX(-50%) translateY(0);
       }
     }
 
@@ -632,56 +768,58 @@
   </style>
 </head>
 <body>
-  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
-    </svg>
-  </button>
-
-  <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  </button>
+  <div class="header-bar">
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <svg class="w-6 h-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
+      </svg>
+    </button>
+  </div>
 
   <nav class="sidebar hidden" id="sidebar">
-    <a href="#" class="home-btn sidebar-item" id="homeBtn">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="#" class="home-btn sidebar-item" id="homeBtn" aria-label="Home">
+      <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 5v6h4v-6m-6 0h6" />
       </svg>
       Home
     </a>
-    <a href="#helpModal" class="navlink sidebar-item" id="openHelp">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="#helpModal" class="navlink sidebar-item" id="openHelp" aria-label="Ad-block help">
+      <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       Ad-block
     </a>
-    <a href="https://www.imdb.com" target="_blank" class="navlink sidebar-item">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="https://www.imdb.com" target="_blank" class="navlink sidebar-item" aria-label="Visit IMDb">
+      <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
       </svg>
       IMDb
     </a>
-    <a href="#aboutModal" class="navlink sidebar-item" id="openAbout">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="#aboutModal" class="navlink sidebar-item" id="openAbout" aria-label="About this site">
+      <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       About
     </a>
-    <a href="#historyModal" class="navlink sidebar-item" id="openHistory">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <a href="#historyModal" class="navlink sidebar-item" id="openHistory" aria-label="View watch history">
+      <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       History
     </a>
   </nav>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <main class="main">
     <dialog id="historyModal" class="historyModal">
       <div class="modal-header">
         <h2 class="modal-title">Watch History</h2>
-        <button class="close-x" id="historyClose">✕</button>
+        <button class="close-x" id="historyClose" aria-label="Close history modal">✕</button>
       </div>
       <div class="modal-body">
         <ul id="historyList"></ul>
@@ -695,24 +833,24 @@
       </header>
 
       <div class="toolbar">
-        <input type="text" id="imdbInput" class="input" placeholder="Search by title or IMDb ID...">
+        <input type="text" id="imdbInput" class="input" placeholder="Search by title or IMDb ID..." aria-label="Search movies by title or IMDb ID">
         <div class="suggestions" id="suggestions" style="display: none;"></div>
-        <select id="serverSelect" class="select">
+        <select id="serverSelect" class="select" aria-label="Select streaming server">
           <option value="2embed">Server 1 – 2Embed</option>
           <option value="vidsrc">Server 2 – Vidsrc.me</option>
           <option value="vidsrcto">Server 3 – Vidsrc.to</option>
           <option value="noads">Server 4 – Test (fewer ads)</option>
         </select>
-        <select id="seasonSelect" class="select" style="display: none;">
+        <select id="seasonSelect" class="select" style="display: none;" aria-label="Select season">
           <option value="">Select Season</option>
         </select>
-        <select id="episodeSelect" class="select" style="display: none;">
+        <select id="episodeSelect" class="select" style="display: none;" aria-label="Select episode">
           <option value="">Select Episode</option>
         </select>
-        <button id="searchBtn" class="btn">🔍 Search</button>
-        <button id="watchBtn" class="btn blue">▶ Watch</button>
-        <button id="copyBtn" class="btn">🔗 Copy Link</button>
-        <button id="fullscreenBtn" class="btn">⛶ Fullscreen</button>
+        <button id="searchBtn" class="btn" aria-label="Search movies">🔍 Search</button>
+        <button id="watchBtn" class="btn blue" aria-label="Watch movie">▶ Watch</button>
+        <button id="copyBtn" class="btn" aria-label="Copy movie link">🔗 Copy Link</button>
+        <button id="fullscreenBtn" class="btn" aria-label="Toggle fullscreen">⛶ Fullscreen</button>
       </div>
 
       <div class="player" id="playerContainer">
@@ -724,7 +862,7 @@
 
       <div class="movie-info" id="movieInfo" style="display: none;">
         <h2 id="movieTitle">Movie Title</h2>
-        <button class="toggle-btn" id="toggleInfo">More info ▼</button>
+        <button class="toggle-btn" id="toggleInfo" aria-label="Toggle movie details">More info ▼</button>
         <div class="info-content hidden" id="extraInfo">
           <p><strong>Release Date:</strong> <span id="releaseDate">N/A</span></p>
           <p><strong>Overview:</strong> <span id="movieOverview">N/A</span></p>
@@ -738,7 +876,15 @@
         <span id="statusText">Ready. Tip: Press Enter or click Search to find movies.</span>
       </div>
 
-      <div class="results" id="results"></div>
+      <section class="trending-results" id="trendingResults">
+        <h2 class="results-heading" id="trendingHeading" style="display: none;">Trending This Week</h2>
+        <div class="empty-state" id="trendingEmpty" style="display: none;">No trending movies or shows found.</div>
+      </section>
+
+      <section class="search-results" id="searchResults">
+        <h2 class="results-heading" id="searchHeading" style="display: none;">Search Results</h2>
+        <div class="empty-state" id="searchEmpty" style="display: none;">No results found for your search.</div>
+      </section>
 
       <p class="text-[var(--text-secondary)] text-sm mt-4">
         Heads-up: Only embed content you have the rights to watch. Some third-party players show ads; see Ad-block Help for tips. If a server fails, try a different one.
@@ -748,7 +894,7 @@
     <dialog id="helpModal" class="helpModal">
       <div class="modal-header">
         <h2 class="modal-title">Watch with fewer ads using <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/bodlkgedljnclnbfkgingnfmjdlkfjh" target="_blank">uBlock Origin Lite</a></h2>
-        <button class="close-x" id="helpClose">✕</button>
+        <button class="close-x" id="helpClose" aria-label="Close ad-block help modal">✕</button>
       </div>
       <div class="modal-body">
         <p>These steps are for Chromium-based browsers (Chrome, Edge, Brave, etc.). For Firefox, install the classic uBlock Origin add-on.</p>
@@ -763,7 +909,7 @@
     <dialog id="aboutModal" class="aboutModal">
       <div class="modal-header">
         <h2 class="modal-title">About This Site</h2>
-        <button class="close-x" id="aboutClose">✕</button>
+        <button class="close-x" id="aboutClose" aria-label="Close about modal">✕</button>
       </div>
       <div class="modal-body">
         <p>Welcome to our Free Movies platform! Search by movie title or paste an IMDb ID, then click a movie card to load it instantly in the player.</p>
@@ -779,6 +925,7 @@
       const themeToggle = document.getElementById('themeToggle');
       const hamburger = document.getElementById('hamburger');
       const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
 
       // Theme toggle
       themeToggle.addEventListener('click', () => {
@@ -786,15 +933,26 @@
         localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
       });
 
-      // Load saved theme
+      // Load saved theme (default to dark)
       if (localStorage.getItem('theme') === 'light') {
         document.body.classList.add('light');
+      } else {
+        document.body.classList.remove('light');
+        localStorage.setItem('theme', 'dark');
       }
 
       // Hamburger menu toggle
       hamburger.addEventListener('click', () => {
         sidebar.classList.toggle('active');
         sidebar.classList.toggle('hidden');
+        document.body.classList.toggle('sidebar-open');
+      });
+
+      // Close sidebar when overlay is clicked
+      sidebarOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        sidebar.classList.add('hidden');
+        document.body.classList.remove('sidebar-open');
       });
     });
   </script>
