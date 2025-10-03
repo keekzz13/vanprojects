@@ -69,10 +69,12 @@
 
     .header-bar {
       position: fixed;
-      top: 0.75rem;
-      right: 0.75rem;
+      top: 1rem;
+      left: 1rem;
+      right: 1rem;
       display: flex;
-      gap: 0.5rem;
+      justify-content: space-between;
+      align-items: center;
       z-index: 1200;
     }
 
@@ -80,11 +82,17 @@
       background-color: var(--acrylic-bg);
       border: 1px solid var(--border-color);
       border-radius: 0.5rem;
-      padding: 0.5rem;
+      padding: 0.75rem;
+      font-size: 1.5rem;
       cursor: pointer;
       transition: all 0.3s ease;
       backdrop-filter: blur(8px);
       color: var(--text-primary);
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .hamburger:hover {
@@ -98,10 +106,16 @@
       border: 1px solid var(--border-color);
       border-radius: 50%;
       padding: 0.5rem;
+      font-size: 1.25rem;
       cursor: pointer;
       transition: all 0.3s ease;
       backdrop-filter: blur(8px);
       color: var(--text-primary);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .theme-toggle:hover {
@@ -213,9 +227,10 @@
     }
 
     .main {
-      margin-left: 240px;
       padding: 1.5rem;
       flex: 1;
+      display: flex;
+      justify-content: center;
       transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       animation: fadeIn 0.5s ease-out;
       z-index: 900;
@@ -223,6 +238,16 @@
 
     .sidebar.hidden + .main {
       margin-left: 0;
+    }
+
+    .sidebar.active + .main {
+      margin-left: 240px;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
     }
 
     .header {
@@ -250,11 +275,6 @@
       font-size: 0.8rem;
       color: var(--text-secondary);
       margin-top: 0.25rem;
-    }
-
-    .wrap {
-      max-width: 1200px;
-      margin: 0 auto;
     }
 
     .toolbar {
@@ -382,6 +402,57 @@
       display: none;
     }
 
+    .movie-info {
+      margin-top: 1rem;
+      background-color: var(--acrylic-bg);
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      animation: slideUp 0.5s ease-out;
+      z-index: 900;
+    }
+
+    .movie-info h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: var(--accent-primary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .toggle-btn:hover {
+      color: var(--accent-hover);
+    }
+
+    .info-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.4s ease;
+      opacity: 0;
+    }
+
+    .info-content.show {
+      max-height: 500px;
+      opacity: 1;
+    }
+
+    .info-content p {
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
     .trending-results, .search-results {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -477,25 +548,28 @@
       transform: translateY(0);
     }
 
-    .movie-title {
+    .movie-title, .movie-year {
       position: absolute;
-      bottom: 1rem;
       left: 1rem;
-      font-size: 0.9rem;
-      font-weight: 600;
       color: #ffffff;
       z-index: 2;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      transition: opacity 0.3s ease;
+    }
+
+    .movie-title {
+      bottom: 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
     }
 
     .movie-year {
-      position: absolute;
       bottom: 2.5rem;
-      left: 1rem;
       font-size: 0.75rem;
-      color: #ffffff;
-      z-index: 2;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .movie:hover .movie-title, .movie:hover .movie-year {
+      opacity: 0;
     }
 
     .movie-info-hover {
@@ -528,13 +602,15 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease, transform 0.3s ease;
-      transform: translateY(10px);
+      top: -100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
     }
 
     .movie:hover .movie-tooltip {
       opacity: 1;
       pointer-events: auto;
-      transform: translateY(0);
+      transform: translateX(-50%) translateY(0);
     }
 
     .movie-tooltip a {
@@ -642,18 +718,6 @@
       color: #ffffff;
     }
 
-    .info-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease, opacity 0.4s ease;
-      opacity: 0;
-    }
-
-    .info-content.show {
-      max-height: 500px;
-      opacity: 1;
-    }
-
     .status {
       display: flex;
       align-items: center;
@@ -711,8 +775,21 @@
 
     @media (max-width: 768px) {
       .header-bar {
-        top: 1rem;
-        right: 1rem;
+        top: 0.75rem;
+        left: 0.75rem;
+        right: 0.75rem;
+      }
+
+      .hamburger {
+        width: 40px;
+        height: 40px;
+        padding: 0.5rem;
+      }
+
+      .theme-toggle {
+        width: 36px;
+        height: 36px;
+        padding: 0.4rem;
       }
 
       .sidebar {
@@ -735,6 +812,10 @@
       .main {
         margin-left: 0;
         padding: 1rem;
+      }
+
+      .sidebar.active + .main {
+        margin-left: 0;
       }
 
       .toolbar {
@@ -769,16 +850,8 @@
 </head>
 <body>
   <div class="header-bar">
-    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-      <svg class="w-6 h-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-      <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
-      </svg>
-    </button>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">☰</button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🔆</button>
   </div>
 
   <nav class="sidebar hidden" id="sidebar">
@@ -816,17 +889,17 @@
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <main class="main">
-    <dialog id="historyModal" class="historyModal">
-      <div class="modal-header">
-        <h2 class="modal-title">Watch History</h2>
-        <button class="close-x" id="historyClose" aria-label="Close history modal">✕</button>
-      </div>
-      <div class="modal-body">
-        <ul id="historyList"></ul>
-      </div>
-    </dialog>
-
     <div class="wrap">
+      <dialog id="historyModal" class="historyModal">
+        <div class="modal-header">
+          <h2 class="modal-title">Watch History</h2>
+          <button class="close-x" id="historyClose" aria-label="Close history modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <ul id="historyList"></ul>
+        </div>
+      </dialog>
+
       <header class="header">
         <h1>Free Movies</h1>
         <p>Search or paste an IMDb ID (e.g., tt11083552), pick a server, then hit Watch.</p>
@@ -890,34 +963,34 @@
         Heads-up: Only embed content you have the rights to watch. Some third-party players show ads; see Ad-block Help for tips. If a server fails, try a different one.
       </p>
     </div>
-
-    <dialog id="helpModal" class="helpModal">
-      <div class="modal-header">
-        <h2 class="modal-title">Watch with fewer ads using <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/bodlkgedljnclnbfkgingnfmjdlkfjh" target="_blank">uBlock Origin Lite</a></h2>
-        <button class="close-x" id="helpClose" aria-label="Close ad-block help modal">✕</button>
-      </div>
-      <div class="modal-body">
-        <p>These steps are for Chromium-based browsers (Chrome, Edge, Brave, etc.). For Firefox, install the classic uBlock Origin add-on.</p>
-        <ul>
-          <li>Install <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/bodlkgedljnclnbfkgingnfmjdlkfjh" target="_blank">uBlock Origin Lite</a> from the Chrome Web Store.</li>
-          <li>Pin it and make sure blocking is On for this site.</li>
-          <li>Reload. Most popups/banners should be gone.</li>
-        </ul>
-      </div>
-    </dialog>
-
-    <dialog id="aboutModal" class="aboutModal">
-      <div class="modal-header">
-        <h2 class="modal-title">About This Site</h2>
-        <button class="close-x" id="aboutClose" aria-label="Close about modal">✕</button>
-      </div>
-      <div class="modal-body">
-        <p>Welcome to our Free Movies platform! Search by movie title or paste an IMDb ID, then click a movie card to load it instantly in the player.</p>
-        <p>This site is completely free to use and open for you to explore. Want to make it your own? Fork the code on GitHub with proper credit to us! ✌️</p>
-        <p>Have fun, contribute, or reach out via GitHub if you have ideas or questions!</p>
-      </div>
-    </dialog>
   </main>
+
+  <dialog id="helpModal" class="helpModal">
+    <div class="modal-header">
+      <h2 class="modal-title">Watch with fewer ads using <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/bodlkgedljnclnbfkgingnfmjdlkfjh" target="_blank">uBlock Origin Lite</a></h2>
+      <button class="close-x" id="helpClose" aria-label="Close ad-block help modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>These steps are for Chromium-based browsers (Chrome, Edge, Brave, etc.). For Firefox, install the classic uBlock Origin add-on.</p>
+      <ul>
+        <li>Install <a href="https://chromewebstore.google.com/detail/ublock-origin-lite/bodlkgedljnclnbfkgingnfmjdlkfjh" target="_blank">uBlock Origin Lite</a> from the Chrome Web Store.</li>
+        <li>Pin it and make sure blocking is On for this site.</li>
+        <li>Reload. Most popups/banners should be gone.</li>
+      </ul>
+    </div>
+  </dialog>
+
+  <dialog id="aboutModal" class="aboutModal">
+    <div class="modal-header">
+      <h2 class="modal-title">About This Site</h2>
+      <button class="close-x" id="aboutClose" aria-label="Close about modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Welcome to our Free Movies platform! Search by movie title or paste an IMDb ID, then click a movie card to load it instantly in the player.</p>
+      <p>This site is completely free to use and open for you to explore. Want to make it your own? Fork the code on GitHub with proper credit to us! ✌️</p>
+      <p>Have fun, contribute, or reach out via GitHub if you have ideas or questions!</p>
+    </div>
+  </dialog>
 
   <script>
     // Theme toggle and hamburger menu logic
@@ -934,11 +1007,11 @@
       });
 
       // Load saved theme (default to dark)
-      if (localStorage.getItem('theme') === 'light') {
-        document.body.classList.add('light');
-      } else {
+      if (localStorage.getItem('theme') !== 'light') {
         document.body.classList.remove('light');
         localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.add('light');
       }
 
       // Hamburger menu toggle
