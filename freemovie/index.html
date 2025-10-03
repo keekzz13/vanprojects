@@ -14,6 +14,12 @@
     </svg>
   </button>
 
+  <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
   <nav class="sidebar" id="sidebar">
     <a href="#" class="home-btn sidebar-item" id="homeBtn">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,8 +99,8 @@
 
       <div class="player" id="playerContainer" style="display: none;">
         <div class="frame-wrap">
-          <iframe id="movieFrame"></iframe>
-          <div id="spinner" class="hidden"></div>
+          <iframe id="movieFrame" allow="autoplay; fullscreen"></iframe>
+          <div id="spinner"></div>
         </div>
       </div>
 
