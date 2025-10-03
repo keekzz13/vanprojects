@@ -551,19 +551,21 @@ input:checked + .slider:before {
 }
 
 .notification {
-  display: none;
+  display: block;            
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 1002;
   opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateX(100%);  
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;        
 }
 
 .notification.active {
-  display: block;
   opacity: 1;
   transform: translateX(0);
+  pointer-events: auto;        
 }
 
 .notification-content {
@@ -577,6 +579,12 @@ input:checked + .slider:before {
   border: 1px solid var(--border-color);
   backdrop-filter: blur(10px);
   max-width: 320px;
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .notification.success .notification-content {
@@ -701,9 +709,18 @@ body.light-mode {
   --warning-color: var(--warning-color-light);
   --info-color: var(--info-color-light);
 }
+
 .placeholder-note {
-  opacity: 0.5;          /* faded look */
-  font-style: italic;    /* optional */
-  font-size: 0.9em;      /* slightly smaller */
+  opacity: 0.5;
+  font-style: italic;
+  font-size: 0.9em;
+  margin-left: 4px;
+  display: inline-block;
+  animation: fadePlaceholder 0.8s ease 0.3s both; /* smooth fade-in */
+}
+
+@keyframes fadePlaceholder {
+  from { opacity: 0; }
+  to { opacity: 0.5; }
 }
 
