@@ -97,17 +97,17 @@
         <button id="fullscreenBtn" class="btn">⛶ Fullscreen</button>
       </div>
 
-      <div class="player" id="playerContainer" style="display: none;">
+      <div class="player" id="playerContainer">
         <div class="frame-wrap">
-          <iframe id="movieFrame" allow="autoplay; fullscreen"></iframe>
-          <div id="spinner"></div>
+          <iframe id="movieFrame" allow="autoplay; fullscreen" allowfullscreen></iframe>
+          <div id="spinner" class="hidden"></div>
         </div>
       </div>
 
       <div class="movie-info" id="movieInfo" style="display: none;">
         <h2 id="movieTitle">Movie Title</h2>
         <button class="toggle-btn" id="toggleInfo">More info ▼</button>
-        <div class="info-content" id="extraInfo">
+        <div class="info-content hidden" id="extraInfo">
           <p><strong>Release Date:</strong> <span id="releaseDate">N/A</span></p>
           <p><strong>Overview:</strong> <span id="movieOverview">N/A</span></p>
           <p><strong>Rating:</strong> <span id="movieRating">N/A</span></p>
