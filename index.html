@@ -37,12 +37,12 @@
     </div>
     <ul>
       <li>
-        <a href="https://github.com/aivanleigh25/vanprojects" target="_blank">
+        <a href="https://github.com/aivanleigh25/vanprojects" target="_blank" class="menu-link">
           <i class="fab fa-github"></i> View Source on GitHub
         </a>
       </li>
       <li>
-        <a href="#" id="contact-admin">
+        <a href="#" id="contact-admin" class="menu-link">
           <i class="fas fa-headset"></i> Contact Admin
         </a>
       </li>
@@ -120,6 +120,18 @@
     </div>
   </div>
 
+  <!-- Notification Pop-up -->
+  <div class="notification" id="notification">
+    <div class="notification-content">
+      <i class="fas fa-check-circle notification-icon"></i>
+      <div class="notification-text">
+        <h3 id="notification-title">Success</h3>
+        <p id="notification-message">Message sent successfully! paabota lang sa dawg.</p>
+      </div>
+      <span class="close-notification">&times;</span>
+    </div>
+  </div>
+
   <script src="/client.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -130,6 +142,20 @@
       const menuIcon = document.getElementById('menu-icon');
       const sideMenu = document.getElementById('side-menu');
       const closeMenu = document.getElementById('close-menu');
+      const notification = document.getElementById('notification');
+      const closeNotification = notification.querySelector('.close-notification');
+      const notificationTitle = document.getElementById('notification-title');
+      const notificationMessage = document.getElementById('notification-message');
+
+      function showNotification(title, message, type = 'success') {
+        notificationTitle.textContent = title;
+        notificationMessage.textContent = message;
+        notification.className = `notification ${type}`;
+        notification.classList.add('active');
+        setTimeout(() => {
+          notification.classList.remove('active');
+        }, 5000);
+      }
 
       menuIcon.addEventListener('click', function() {
         sideMenu.classList.add('active');
@@ -149,12 +175,19 @@
         contactModal.classList.remove('active');
       });
 
+      closeNotification.addEventListener('click', function() {
+        notification.classList.remove('active');
+      });
+
       window.addEventListener('click', function(e) {
         if (e.target === contactModal) {
           contactModal.classList.remove('active');
         }
         if (e.target === sideMenu) {
           sideMenu.classList.remove('active');
+        }
+        if (e.target === notification) {
+          notification.classList.remove('active');
         }
       });
 
@@ -182,15 +215,15 @@
             });
 
             if (response.ok) {
-              alert('Message sent successfully! Our admin will contact you soon.');
+              showNotification('Success', 'Message sent successfully! Our admin will contact you soon.', 'success');
               contactModal.classList.remove('active');
               contactForm.reset();
             } else {
-              alert('Failed to send message. Please try again later.');
+              showNotification('Error', 'Failed to send message. Please try again later.', 'error');
             }
           } catch (error) {
             console.error('Error sending message:', error);
-            alert('An error occurred. Please try again later.');
+            showNotification('Error', 'An error occurred. Please try again later.', 'error');
           }
         });
       }
