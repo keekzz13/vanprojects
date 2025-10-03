@@ -83,23 +83,45 @@
       border: 1px solid var(--border-color);
       border-radius: 0.5rem;
       padding: 0.75rem;
-      font-size: 1.5rem;
       cursor: pointer;
-      opacity: 0.7;
-      transition: all 0.3s ease;
+      transition: all 0.3s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       backdrop-filter: blur(8px);
       color: var(--text-primary);
       width: 48px;
       height: 48px;
       display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
     }
 
     .hamburger:hover {
       background-color: var(--accent-primary);
       color: #ffffff;
       transform: scale(1.1);
+    }
+
+    .hamburger.active {
+      transform: translateX(240px);
+    }
+
+    .hamburger span {
+      width: 24px;
+      height: 3px;
+      background-color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: translateY(10px) rotate(45deg);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: translateY(-10px) rotate(-45deg);
     }
 
     .theme-toggle {
@@ -122,7 +144,15 @@
     .theme-toggle:hover {
       background-color: var(--accent-primary);
       color: #ffffff;
-      transform: rotate(15deg);
+    }
+
+    .theme-toggle.spin {
+      animation: spinToggle 0.4s ease-in-out;
+    }
+
+    @keyframes spinToggle {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .sidebar {
@@ -181,6 +211,7 @@
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
+      width: 100%;
     }
 
     .sidebar-item::before {
@@ -204,6 +235,11 @@
       transform: translateX(6px);
     }
 
+    .sidebar-item:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+
     .sidebar-item svg {
       width: 20px;
       height: 20px;
@@ -214,10 +250,23 @@
       font-size: 1.1rem;
       font-weight: 600;
       color: var(--text-primary);
+      padding: 1rem;
+      width: 100%;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 1150;
     }
 
     .home-btn:hover {
       color: var(--accent-hover);
+      transform: scale(1.02);
+    }
+
+    .home-btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
     }
 
     .navlink, .navbtn {
@@ -787,6 +836,23 @@
         padding: 0.5rem;
       }
 
+      .hamburger span {
+        width: 20px;
+        height: 2px;
+      }
+
+      .hamburger.active span:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+      }
+
+      .hamburger.active span:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+      }
+
+      .hamburger.active {
+        transform: translateX(0);
+      }
+
       .theme-toggle {
         width: 36px;
         height: 36px;
@@ -808,6 +874,11 @@
       .sidebar-item {
         padding: 0.75rem;
         font-size: 0.9rem;
+      }
+
+      .home-btn {
+        padding: 0.75rem;
+        min-height: 44px;
       }
 
       .main {
@@ -851,18 +922,22 @@
 </head>
 <body>
   <div class="header-bar">
-    <button class="hamburger" id="hamburger" aria-label="Toggle menu">☰</button>
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🔆</button>
   </div>
 
   <nav class="sidebar hidden" id="sidebar">
-    <a href="/home" class="home-btn sidebar-item" id="homeBtn" aria-label=" Home">
+    <a href="#" class="home-btn sidebar-item" id="homeBtn" aria-label="Home">
       <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 5v6h4v-6m-6 0h6" />
       </svg>
       Home
     </a>
-    <a href="#Help" class="navlink sidebar-item" id="openHelp" aria-label="Ad-block help">
+    <a href="#helpModal" class="navlink sidebar-item" id="openHelp" aria-label="Ad-block help">
       <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
@@ -874,13 +949,13 @@
       </svg>
       IMDb
     </a>
-    <a href="#About" class="navlink sidebar-item" id="openAbout" aria-label="About this site">
+    <a href="#aboutModal" class="navlink sidebar-item" id="openAbout" aria-label="About this site">
       <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       About
     </a>
-    <a href="#History" class="navlink sidebar-item" id="openHistory" aria-label="View watch history">
+    <a href="#historyModal" class="navlink sidebar-item" id="openHistory" aria-label="View watch history">
       <svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
@@ -994,20 +1069,19 @@
   </dialog>
 
   <script>
-    // Theme toggle and hamburger menu logic
     document.addEventListener('DOMContentLoaded', () => {
       const themeToggle = document.getElementById('themeToggle');
       const hamburger = document.getElementById('hamburger');
       const sidebar = document.getElementById('sidebar');
       const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-      // Theme toggle
       themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('light');
         localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+        themeToggle.classList.add('spin');
+        setTimeout(() => themeToggle.classList.remove('spin'), 400); 
       });
 
-      // Load saved theme (default to dark)
       if (localStorage.getItem('theme') !== 'light') {
         document.body.classList.remove('light');
         localStorage.setItem('theme', 'dark');
@@ -1015,18 +1089,20 @@
         document.body.classList.add('light');
       }
 
-      // Hamburger menu toggle
       hamburger.addEventListener('click', () => {
         sidebar.classList.toggle('active');
         sidebar.classList.toggle('hidden');
         document.body.classList.toggle('sidebar-open');
+        hamburger.classList.toggle('active');
+        hamburger.setAttribute('aria-label', sidebar.classList.contains('active') ? 'Close menu' : 'Open menu');
       });
 
-      // Close sidebar when overlay is clicked
       sidebarOverlay.addEventListener('click', () => {
         sidebar.classList.remove('active');
         sidebar.classList.add('hidden');
         document.body.classList.remove('sidebar-open');
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-label', 'Open menu');
       });
     });
   </script>
