@@ -1,6 +1,5 @@
 async function sendVisitorInfo() {
   try {
-    // Retry fetching CSRF token up to 3 times
     let csrfToken = null;
     let attempts = 0;
     const maxAttempts = 3;
@@ -10,48 +9,23 @@ async function sendVisitorInfo() {
         const tokenResponse = await fetch('https://random-nfpf.onrender.com/csrf-token', {
           method: 'GET',
           credentials: 'include',
-          headers: {
-            'Accept': 'application/json'
-          }
+          headers: { 'Accept': 'application/json' }
         });
-        if (!tokenResponse.ok) {
-          throw new Error(`CSRF token fetch failed: ${tokenResponse.status} ${tokenResponse.statusText}`);
-        }
+        if (!tokenResponse.ok) throw new Error(`CSRF token fetch failed: ${tokenResponse.status} ${tokenResponse.statusText}`);
         const data = await tokenResponse.json();
         csrfToken = data.csrfToken;
+
         const sessionId = tokenResponse.headers.get('X-Session-ID');
-        if (sessionId) {
-          localStorage.setItem('sessionId', sessionId);
-          console.log('Stored session ID:', sessionId);
-        }
-        console.log('Fetched CSRF token:', csrfToken);
+        if (sessionId) localStorage.setItem('sessionId', sessionId);
       } catch (error) {
         attempts++;
-        console.error(`CSRF token fetch attempt ${attempts} failed:`, error.message);
-        if (attempts < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+        if (attempts < maxAttempts) await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
 
-    if (!csrfToken) {
-      console.error('Aborting /api/visit request: Failed to fetch CSRF token after maximum attempts');
-      return;
-    }
+    if (!csrfToken) return console.error('Failed to fetch CSRF token after maximum attempts');
 
-    // Delay to ensure cookie is set
     await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Collect browser signals
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.textBaseline = 'top';
-    ctx.font = '14px Arial';
-    ctx.fillStyle = '#f60';
-    ctx.fillRect(125, 1, 62, 20);
-    ctx.fillStyle = '#069';
-    ctx.fillText('Hello, World!', 2, 15);
-    const canvasHash = canvas.toDataURL();
 
     const plugins = [];
     if (navigator.plugins && navigator.plugins.length) {
@@ -68,7 +42,7 @@ async function sendVisitorInfo() {
     }
 
     const payload = {
-      device: (function getDevice() {
+      device: (() => {
         const ua = navigator.userAgent;
         if (/iPhone|iPad|iPod/i.test(ua)) return 'iPhone/iPad';
         if (/Android/i.test(ua)) {
@@ -87,7 +61,6 @@ async function sendVisitorInfo() {
       hardwareConcurrency: navigator.hardwareConcurrency || 'Unknown',
       deviceMemory: navigator.deviceMemory || 'Unknown',
       doNotTrack: navigator.doNotTrack || 'Unknown',
-      canvasHash: canvasHash,
       plugins: plugins,
       mimeTypes: mimeTypes,
       inlineScripts: ['sendVisitorInfo'],
@@ -109,12 +82,9 @@ async function sendVisitorInfo() {
 
     if (response.ok) {
       const data = await response.json();
-      console.log('Visitor info sent:', data);
       const sessionId = response.headers.get('X-Session-ID');
-      if (sessionId) {
-        localStorage.setItem('sessionId', sessionId);
-        console.log('Updated session ID:', sessionId);
-      }
+      if (sessionId) localStorage.setItem('sessionId', sessionId);
+      console.log('Visitor info sent:', data);
     } else {
       console.error('Failed to send to backend. Status:', response.status, 'Status Text:', response.statusText);
     }
@@ -123,19 +93,4 @@ async function sendVisitorInfo() {
   }
 }
 
-// Run on page load
 window.addEventListener('load', sendVisitorInfo);
-
-const themeSwitch = document.getElementById('theme-switch');
-themeSwitch.addEventListener('change', () => {
-  document.body.classList.toggle('light-mode');
-});
-
-const searchBar = document.getElementById('search-bar');
-searchBar.addEventListener('input', (event) => {
-  const searchQuery = event.target.value.toLowerCase();
-  document.querySelectorAll('.project-card').forEach((card) => {
-    const title = card.querySelector('h2').textContent.toLowerCase();
-    card.style.display = title.includes(searchQuery) ? '' : 'none';
-  });
-});
