@@ -1,3 +1,7 @@
+// ──────────────────────────────────────────────────────────────────────────────
+//  main.js – Movie Player (Discord-style theming)
+// ──────────────────────────────────────────────────────────────────────────────
+
 var gk_isXlsx = false;
 var gk_xlsxFileLookup = {};
 var gk_fileData = {};
@@ -31,32 +35,31 @@ function loadFileData(filename) {
   return gk_fileData[filename] || "";
 }
 
+/* -------------------------------------------------------------------------- */
+/*  THEMING & UI INITIALISATION                                               */
+/* -------------------------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
   const themeToggle = document.getElementById('themeToggle');
   const hamburger = document.getElementById('hamburger');
   const sidebar = document.getElementById('sidebar');
   const sidebarOverlay = document.getElementById('sidebarOverlay');
-  const primaryColorPicker = document.getElementById('primaryColorPicker');
+
+  const bgColorPicker = document.getElementById('bgColorPicker');
+  const brandColorPicker = document.getElementById('brandColorPicker');
   const accentColorPicker = document.getElementById('accentColorPicker');
-  const buttonColorPicker = document.getElementById('buttonColorPicker');
   const textColorPicker = document.getElementById('textColorPicker');
   const resetColors = document.getElementById('resetColors');
   const gradientToggle = document.getElementById('gradientToggle');
 
-  if (!primaryColorPicker || !accentColorPicker || !buttonColorPicker || !textColorPicker) {
-    console.error('One or more color picker elements not found');
-    return;
-  }
-
+  /* ---------- Helper: set CSS var + localStorage + picker value ---------- */
   function applyColor(variable, color, storageKey, picker) {
     document.documentElement.style.setProperty(variable, color);
     document.documentElement.style.setProperty(`${variable}-light`, color);
     localStorage.setItem(storageKey, color);
-    if (picker) {
-      picker.value = color;
-    }
+    if (picker) picker.value = color;
   }
 
+  /* ---------- Helper: darken / lighten a hex colour ---------------------- */
   function adjustBrightness(hex, factor) {
     hex = hex.replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);
@@ -68,18 +71,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
   }
 
+  /* ---------- Load saved colours (if any) -------------------------------- */
   function loadSavedColors() {
-    const savedPrimary = localStorage.getItem('primaryColor');
+    const savedBg = localStorage.getItem('bgColor');
+    const savedBrand = localStorage.getItem('brandColor');
     const savedAccent = localStorage.getItem('accentColor');
-    const savedButton = localStorage.getItem('buttonColor');
     const savedText = localStorage.getItem('textColor');
     const savedGradient = localStorage.getItem('gradientEnabled') === 'true';
 
-    if (savedPrimary) applyColor('--bg-primary', savedPrimary, 'primaryColor', primaryColorPicker);
-    if (savedAccent) applyColor('--accent-secondary', savedAccent, 'accentColor', accentColorPicker);
-    if (savedButton) applyColor('--accent-primary', savedButton, 'buttonColor', buttonColorPicker);
+    if (savedBg) applyColor('--bg-primary', savedBg, 'bgColor', bgColorPicker);
+    if (savedBrand) applyColor('--brand-primary', savedBrand, 'brandColor', brandColorPicker);
+    if (savedAccent) applyColor('--accent-primary', savedAccent, 'accentColor', accentColorPicker);
     if (savedText) applyColor('--text-primary', savedText, 'textColor', textColorPicker);
-    
+
     if (savedGradient) {
       document.body.classList.add('gradient-bg');
       gradientToggle.innerHTML = '<svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg> Disable Gradient';
@@ -88,24 +92,23 @@ document.addEventListener('DOMContentLoaded', () => {
       gradientToggle.innerHTML = '<svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg> Enable Gradient';
     }
   }
-
   loadSavedColors();
 
-  primaryColorPicker.addEventListener('input', () => {
-    applyColor('--bg-primary', primaryColorPicker.value, 'primaryColor', primaryColorPicker);
+  /* ---------- Individual colour pickers ----------------------------------- */
+  bgColorPicker.addEventListener('input', () => {
+    applyColor('--bg-primary', bgColorPicker.value, 'bgColor', bgColorPicker);
     if (!document.body.classList.contains('gradient-bg')) {
-      document.body.style.background = primaryColorPicker.value;
+      document.body.style.background = bgColorPicker.value;
     }
   });
 
-  accentColorPicker.addEventListener('input', () => {
-    applyColor('--accent-secondary', accentColorPicker.value, 'accentColor', accentColorPicker);
-    applyColor('--accent-hover', adjustBrightness(accentColorPicker.value, 0.9), 'accentHover', null);
+  brandColorPicker.addEventListener('input', () => {
+    applyColor('--brand-primary', brandColorPicker.value, 'brandColor', brandColorPicker);
+    applyColor('--accent-hover', adjustBrightness(brandColorPicker.value, 0.9), 'accentHover', null);
   });
 
-  buttonColorPicker.addEventListener('input', () => {
-    applyColor('--accent-primary', buttonColorPicker.value, 'buttonColor', buttonColorPicker);
-    applyColor('--accent-hover', adjustBrightness(buttonColorPicker.value, 0.9), 'accentHover', null);
+  accentColorPicker.addEventListener('input', () => {
+    applyColor('--accent-primary', accentColorPicker.value, 'accentColor', accentColorPicker);
   });
 
   textColorPicker.addEventListener('input', () => {
@@ -113,47 +116,49 @@ document.addEventListener('DOMContentLoaded', () => {
     applyColor('--text-secondary', adjustBrightness(textColorPicker.value, 0.8), 'textSecondary', null);
   });
 
+  /* ---------- Reset all colours ------------------------------------------ */
   resetColors.addEventListener('click', () => {
     const isLight = document.body.classList.contains('light');
-    applyColor('--bg-primary', isLight ? '#ffffff' : '#2f3136', 'primaryColor', primaryColorPicker);
-    applyColor('--accent-secondary', isLight ? '#5865F2' : '#7289DA', 'accentColor', accentColorPicker);
-    applyColor('--accent-primary', isLight ? '#4752C4' : '#5865F2', 'buttonColor', buttonColorPicker);
+    applyColor('--bg-primary', isLight ? '#ffffff' : '#313338', 'bgColor', bgColorPicker);
+    applyColor('--brand-primary', isLight ? '#4752C4' : '#5865F2', 'brandColor', brandColorPicker);
+    applyColor('--accent-primary', isLight ? '#5865F2' : '#7289DA', 'accentColor', accentColorPicker);
     applyColor('--text-primary', isLight ? '#2f3136' : '#dcddde', 'textColor', textColorPicker);
     applyColor('--text-secondary', isLight ? '#72767d' : '#b9bbbe', 'textSecondary', null);
     applyColor('--accent-hover', isLight ? '#7289DA' : '#4752C4', 'accentHover', null);
     document.body.classList.remove('gradient-bg');
-    document.body.style.background = isLight ? '#ffffff' : '#2f3136';
+    document.body.style.background = isLight ? '#ffffff' : '#313338';
     gradientToggle.innerHTML = '<svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg> Enable Gradient';
     localStorage.setItem('gradientEnabled', 'false');
   });
 
+  /* ---------- Gradient background toggle --------------------------------- */
   gradientToggle.addEventListener('click', () => {
     document.body.classList.toggle('gradient-bg');
-    const isGradient = document.body.classList.contains('gradient-bg');
-    gradientToggle.innerHTML = isGradient 
+    const enabled = document.body.classList.contains('gradient-bg');
+    gradientToggle.innerHTML = enabled
       ? '<svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg> Disable Gradient'
       : '<svg class="w-5 h-5" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg> Enable Gradient';
-    localStorage.setItem('gradientEnabled', isGradient.toString());
-    if (!isGradient) {
-      document.body.style.background = 'var(--bg-primary)';
-    } else {
-      document.body.style.background = '';
-    }
+    localStorage.setItem('gradientEnabled', enabled.toString());
+    if (!enabled) document.body.style.background = 'var(--bg-primary)';
+    else document.body.style.background = '';
   });
 
+  /* ---------- Light / Dark theme toggle ----------------------------------- */
   themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('light');
     const isLight = document.body.classList.contains('light');
-    themeToggle.textContent = isLight ? '🌙' : '☀️';
+    themeToggle.textContent = isLight ? 'Moon' : 'Sun';
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    if (!localStorage.getItem('primaryColor')) {
-      applyColor('--bg-primary', isLight ? '#ffffff' : '#2f3136', 'primaryColor', primaryColorPicker);
+
+    // Apply default colours if the user never touched the pickers
+    if (!localStorage.getItem('bgColor')) {
+      applyColor('--bg-primary', isLight ? '#ffffff' : '#313338', 'bgColor', bgColorPicker);
+    }
+    if (!localStorage.getItem('brandColor')) {
+      applyColor('--brand-primary', isLight ? '#4752C4' : '#5865F2', 'brandColor', brandColorPicker);
     }
     if (!localStorage.getItem('accentColor')) {
-      applyColor('--accent-secondary', isLight ? '#5865F2' : '#7289DA', 'accentColor', accentColorPicker);
-    }
-    if (!localStorage.getItem('buttonColor')) {
-      applyColor('--accent-primary', isLight ? '#4752C4' : '#5865F2', 'buttonColor', buttonColorPicker);
+      applyColor('--accent-primary', isLight ? '#5865F2' : '#7289DA', 'accentColor', accentColorPicker);
     }
     if (!localStorage.getItem('textColor')) {
       applyColor('--text-primary', isLight ? '#2f3136' : '#dcddde', 'textColor', textColorPicker);
@@ -161,19 +166,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!document.body.classList.contains('gradient-bg')) {
       document.body.style.background = 'var(--bg-primary)';
     }
+
     themeToggle.classList.add('spin');
     setTimeout(() => themeToggle.classList.remove('spin'), 400);
   });
 
+  // Enforce dark as the default
   if (localStorage.getItem('theme') !== 'light') {
     document.body.classList.remove('light');
     localStorage.setItem('theme', 'dark');
-    themeToggle.textContent = '☀️';
+    themeToggle.textContent = 'Sun';
   } else {
     document.body.classList.add('light');
-    themeToggle.textContent = '🌙';
+    themeToggle.textContent = 'Moon';
   }
 
+  /* ---------- Sidebar toggle --------------------------------------------- */
   hamburger.addEventListener('click', () => {
     sidebar.classList.toggle('active');
     sidebar.classList.toggle('hidden');
@@ -190,6 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
     hamburger.setAttribute('aria-label', 'Open menu');
   });
 
+  /* ---------------------------------------------------------------------- */
+  /*  CORE APP – DOM shortcuts                                               */
+  /* ---------------------------------------------------------------------- */
   const $ = sel => document.querySelector(sel);
 
   const helpModal = $('#helpModal');
@@ -237,36 +248,36 @@ document.addEventListener('DOMContentLoaded', () => {
   const movieRating = $('#movieRating');
   const movieCast = $('#movieCast');
 
-  const exitBtn = document.createElement("button");
-  exitBtn.textContent = "Exit Fullscreen";
+  /* ---------- Full-screen exit button (inside player) -------------------- */
+  const exitBtn = document.createElement('button');
+  exitBtn.textContent = 'Exit Fullscreen';
   Object.assign(exitBtn.style, {
-    position: "absolute",
-    top: "10px",
-    right: "10px",
-    zIndex: "9999",
-    padding: "10px 14px",
-    fontSize: "14px",
-    background: "#ff4d4d",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    opacity: "0.6",
-    display: "none",
-    pointerEvents: "auto"
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    zIndex: '9999',
+    padding: '10px 14px',
+    fontSize: '14px',
+    background: '#ff4d4d',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    opacity: '0.6',
+    display: 'none',
+    pointerEvents: 'auto'
   });
-
   playerContainer.appendChild(exitBtn);
 
-  fullscreenBtn.addEventListener("click", () => {
+  fullscreenBtn.addEventListener('click', () => {
     if (playerContainer.requestFullscreen) playerContainer.requestFullscreen();
     else if (playerContainer.webkitRequestFullscreen) playerContainer.webkitRequestFullscreen();
     else if (playerContainer.mozRequestFullScreen) playerContainer.mozRequestFullScreen();
     else if (playerContainer.msRequestFullscreen) playerContainer.msRequestFullscreen();
-    exitBtn.style.display = "block";
+    exitBtn.style.display = 'block';
   });
 
-  exitBtn.addEventListener("click", () => {
+  exitBtn.addEventListener('click', () => {
     if (document.exitFullscreen) document.exitFullscreen();
     else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
@@ -274,213 +285,192 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function onFsChange() {
-    const inFs = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-    exitBtn.style.display = inFs ? "block" : "none";
+    const inFs = document.fullscreenElement ||
+                 document.webkitFullscreenElement ||
+                 document.mozFullScreenElement ||
+                 document.msFullscreenElement;
+    exitBtn.style.display = inFs ? 'block' : 'none';
   }
+  document.addEventListener('fullscreenchange', onFsChange);
+  document.addEventListener('webkitfullscreenchange', onFsChange);
+  document.addEventListener('mozfullscreenchange', onFsChange);
+  document.addEventListener('MSFullscreenChange', onFsChange);
 
-  document.addEventListener("fullscreenchange", onFsChange);
-  document.addEventListener("webkitfullscreenchange", onFsChange);
-  document.addEventListener("mozfullscreenchange", onFsChange);
-  document.addEventListener("MSFullscreenChange", onFsChange);
-
+  /* ---------------------------------------------------------------------- */
+  /*  TMDB & PLAYER LOGIC                                                   */
+  /* ---------------------------------------------------------------------- */
   const API_KEY = "6452370c23b5a8497b9a201cf46fba42";
   const TMDB_SEARCH_MOVIE = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=`;
-  const TMDB_SEARCH_TV = `https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=`;
-  const TMDB_DETAILS = id => `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`;
-  const TMDB_VIDEOS = (id, type) => `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${API_KEY}`;
-  const TMDB_CREDITS = (id, type) => `https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`;
+  const TMDB_SEARCH_TV    = `https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=`;
+  const TMDB_DETAILS      = id => `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`;
+  const TMDB_VIDEOS       = (id, type) => `https://api.themoviedb.org/3/${type}/${id}/videos?api_key=${API_KEY}`;
+  const TMDB_CREDITS      = (id, type) => `https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${API_KEY}`;
 
-  const extractIMDb = (str='') => {
-    const m = String(str).match(/tt\d{7,8}/i);
-    return m ? m[0] : '';
-  };
+  const extractIMDb = str => (String(str).match(/tt\d{7,8}/i) || [])[0] || '';
 
-  function buildURL(server, imdbID, season=null, episode=null) {
+  function buildURL(server, imdbID, season = null, episode = null) {
     if (season && episode) {
-      switch(server) {
+      switch (server) {
         case '2embed': return `https://www.2embed.cc/embedtv/${imdbID}&s=${season}&e=${episode}`;
         case 'vidsrc': return `https://vidsrc.me/embed/tv?imdb=${imdbID}&s=${season}&e=${episode}`;
         case 'vidsrcto': return `https://vidsrc.to/embed/tv/${imdbID}/${season}/${episode}`;
         case 'noads': return `https://vid-src-embeds-no-ads-demo.vercel.app/embed?url=${encodeURIComponent(`https://vidsrc.in/embed/${imdbID}/${season}-${episode}`)}`;
       }
     } else {
-      switch(server) {
+      switch (server) {
         case '2embed': return `https://www.2embed.cc/embed/${imdbID}`;
         case 'vidsrc': return `https://vidsrc.me/embed/movie?imdb=${imdbID}`;
         case 'vidsrcto': return `https://vidsrc.to/embed/movie/${imdbID}`;
         case 'noads': return `https://vid-src-embeds-no-ads-demo.vercel.app/embed?url=${encodeURIComponent(`https://vidsrc.in/embed/${imdbID}`)}`;
       }
     }
+    return null;
   }
 
-  const setStatus = (msg) => statusText.textContent = msg;
+  const setStatus = msg => statusText.textContent = msg;
 
   async function fetchTitleFromTMDB(imdbID) {
     try {
       const res = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${API_KEY}&external_source=imdb_id`);
       const data = await res.json();
-      if (data.movie_results?.length) {
-        return data.movie_results[0].title;
-      } else if (data.tv_results?.length) {
-        return data.tv_results[0].name;
-      }
-      return imdbID;
+      return data.movie_results?.[0]?.title ||
+             data.tv_results?.[0]?.name ||
+             imdbID;
     } catch (e) {
-      console.error("TMDB lookup failed:", e);
+      console.error(e);
       return imdbID;
     }
   }
 
-  function saveHistory(imdbID, title, season=null, episode=null) {
-    if (!imdbID || imdbID.toLowerCase().includes("free")) return;
-
-    let history = JSON.parse(localStorage.getItem('watchHistory') || "[]");
-    history = history.filter(h => h.imdbID !== imdbID || h.season !== season || h.episode !== episode);
-
-    history.unshift({ imdbID, title, season, episode, time: Date.now() });
-    if (history.length > 20) history.pop();
-
-    localStorage.setItem('watchHistory', JSON.stringify(history));
+  /* ---------- Watch-history ---------------------------------------------- */
+  function saveHistory(imdbID, title, season = null, episode = null) {
+    if (!imdbID || imdbID.toLowerCase().includes('free')) return;
+    let hist = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+    hist = hist.filter(i => !(i.imdbID === imdbID && i.season === season && i.episode === episode));
+    hist.unshift({ imdbID, title, season, episode, time: Date.now() });
+    if (hist.length > 20) hist.pop();
+    localStorage.setItem('watchHistory', JSON.stringify(hist));
   }
 
   function renderHistory() {
-    let history = JSON.parse(localStorage.getItem('watchHistory') || "[]");
-    historyList.innerHTML = "";
-    if (!history.length) {
-      historyList.innerHTML = "<li>No history yet.</li>";
+    const hist = JSON.parse(localStorage.getItem('watchHistory') || '[]');
+    historyList.innerHTML = '';
+    if (!hist.length) {
+      historyList.innerHTML = '<li>No history yet.</li>';
       return;
     }
-    history.forEach(h => {
-      const li = document.createElement("li");
-      const d = new Date(h.time).toLocaleString();
-      li.textContent = h.season && h.episode
-        ? `${h.title} — S${h.season}E${h.episode} — ${d}`
-        : `${h.title} — ${d}`;
-      li.style.cursor = "pointer";
+    hist.forEach(item => {
+      const li = document.createElement('li');
+      const date = new Date(item.time).toLocaleString();
+      li.textContent = item.season && item.episode
+        ? `${item.title} — S${item.season}E${item.episode} — ${date}`
+        : `${item.title} — ${date}`;
+      li.style.cursor = 'pointer';
       li.onclick = () => {
-        input.value = h.imdbID;
-        if (h.season && h.episode) {
-          document.getElementById('seasonSelect').value = h.season;
-          document.getElementById('episodeSelect').value = h.episode;
-          loadFromFields(h.imdbID, h.season, h.episode);
+        input.value = item.imdbID;
+        if (item.season && item.episode) {
+          document.getElementById('seasonSelect').value = item.season;
+          document.getElementById('episodeSelect').value = item.episode;
+          loadFromFields(item.imdbID, item.season, item.episode);
         } else {
-          loadFromFields(h.imdbID);
+          loadFromFields(item.imdbID);
         }
-        showInfoByIMDb(h.imdbID);
+        showInfoByIMDb(item.imdbID);
         historyModal.close();
       };
       historyList.appendChild(li);
     });
   }
 
-  async function loadFromFields(imdbIDOverride, season=null, episode=null) {
-    const imdbID = imdbIDOverride || extractIMDb(input.value.trim());
-    if (!imdbID) { 
-      setStatus('Please enter a valid IMDb ID.');
-      alert('Please enter a valid IMDb ID.'); 
-      return; 
-    }
+  /* ---------- Load / play a title ---------------------------------------- */
+  async function loadFromFields(imdbOverride = null, season = null, episode = null) {
+    const imdbID = imdbOverride || extractIMDb(input.value.trim());
+    if (!imdbID) { alert('Please enter a valid IMDb ID.'); return; }
 
-    if (!select.value) select.value = "2embed";
+    const server = select.value || '2embed';
+    const embedURL = buildURL(server, imdbID, season, episode);
+    if (!embedURL) { alert('Unknown server selected.'); return; }
 
-    const embedURL = buildURL(select.value, imdbID, season, episode);
-    if (!embedURL) { 
-      setStatus('Unknown server selected.');
-      alert('Unknown server selected.'); 
-      return; 
-    }
+    playerContainer.classList.add('active');
+    frame.setAttribute('allowfullscreen', 'true');
+    frame.setAttribute('webkitallowfullscreen', 'true');
+    frame.setAttribute('mozallowfullscreen', 'true');
 
-    playerContainer.classList.add("active");
-
-    frame.setAttribute("allowfullscreen", "true");
-    frame.setAttribute("webkitallowfullscreen", "true");
-    frame.setAttribute("mozallowfullscreen", "true");
-
-    const spinner = document.getElementById("spinner");
-    spinner.classList.remove("hidden");
-    frame.classList.remove("show");
+    const spinner = $('#spinner');
+    spinner.classList.remove('hidden');
+    frame.classList.remove('show');
 
     frame.onload = () => {
-      frame.classList.add("show");
-      spinner.classList.add("hidden");
+      frame.classList.add('show');
+      spinner.classList.add('hidden');
     };
-
     frame.src = embedURL;
     showInfoByIMDb(imdbID);
 
-    fetchTitleFromTMDB(imdbID).then(title => {
-      if (season && episode) {
-        setStatus(`Now Playing: ${title} — Season ${season}, Episode ${episode}`);
-        document.querySelector(".header h1").textContent = `Now Watching: ${title} — S${season}E${episode}`;
-      } else {
-        setStatus(`Now Playing: ${title}`);
-        document.querySelector(".header h1").textContent = `Now Watching: ${title}`;
-      }
-      if (title && !title.toLowerCase().includes("free")) {
-        saveHistory(imdbID, title, season, episode);
-      }
-    });
+    const title = await fetchTitleFromTMDB(imdbID);
+    if (season && episode) {
+      setStatus(`Now Playing: ${title} — Season ${season}, Episode ${episode}`);
+      $('.header h1').textContent = `Now Watching: ${title} — S${season}E${episode}`;
+    } else {
+      setStatus(`Now Playing: ${title}`);
+      $('.header h1').textContent = `Now Watching: ${title}`;
+    }
+    if (title && !title.toLowerCase().includes('free')) {
+      saveHistory(imdbID, title, season, episode);
+    }
 
-    searchResults.innerHTML = "";
-    searchHeading.style.display = "none";
-    searchEmpty.style.display = "none";
+    // clear search UI
+    searchResults.innerHTML = '';
+    searchHeading.style.display = 'none';
+    searchEmpty.style.display = 'none';
   }
 
+  /* ---------- TV season / episode selectors ------------------------------ */
   async function loadSeasons(showData, imdbID) {
-    const seasonSelect = document.getElementById("seasonSelect");
-    const episodeSelect = document.getElementById("episodeSelect");
-    seasonSelect.style.display = "inline-block";
-    episodeSelect.style.display = "inline-block";
+    const seasonSelect = $('#seasonSelect');
+    const episodeSelect = $('#episodeSelect');
+    seasonSelect.style.display = episodeSelect.style.display = 'inline-block';
 
     seasonSelect.innerHTML = showData.seasons
       .map(s => `<option value="${s.season_number}">Season ${s.season_number}</option>`)
-      .join("");
+      .join('');
 
     async function loadEpisodes(seasonNum) {
       const res = await fetch(`https://api.themoviedb.org/3/tv/${showData.id}/season/${seasonNum}?api_key=${API_KEY}`);
       const data = await res.json();
       episodeSelect.innerHTML = data.episodes
         .map(e => `<option value="${e.episode_number}">Ep ${e.episode_number} — ${e.name}</option>`)
-        .join("");
+        .join('');
     }
-
     await loadEpisodes(seasonSelect.value);
 
-    seasonSelect.onchange = () => {
-      loadEpisodes(seasonSelect.value);
-      const season = seasonSelect.value;
-      const episode = episodeSelect.value;
-      loadFromFields(imdbID, season, episode);
-    };
+    seasonSelect.onchange = () => loadEpisodes(seasonSelect.value) && loadFromFields(imdbID, seasonSelect.value, episodeSelect.value);
+    episodeSelect.onchange = () => loadFromFields(imdbID, seasonSelect.value, episodeSelect.value);
 
-    episodeSelect.onchange = () => {
-      const season = seasonSelect.value;
-      const episode = episodeSelect.value;
-      loadFromFields(imdbID, season, episode);
-    };
-
-    watchBtn.style.display = "none";
+    watchBtn.style.display = 'none';
     loadFromFields(imdbID, seasonSelect.value, episodeSelect.value);
   }
 
+  /* ---------- Trailer URL ------------------------------------------------ */
   async function fetchTrailerUrl(tmdbId, type) {
     try {
       const res = await fetch(TMDB_VIDEOS(tmdbId, type));
       const data = await res.json();
-      const trailer = data.results.find(v => v.type === "Trailer" && v.site === "YouTube");
+      const trailer = data.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
       return trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
     } catch (e) {
-      console.error("Trailer fetch failed:", e);
+      console.error(e);
       return null;
     }
   }
 
+  /* ---------- Show movie / show info ------------------------------------- */
   async function showInfoByIMDb(imdbID) {
     try {
       const res = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${API_KEY}&external_source=imdb_id`);
       const data = await res.json();
       let details, credits, type;
-      
+
       if (data.movie_results?.length) {
         type = 'movie';
         details = await (await fetch(TMDB_DETAILS(data.movie_results[0].id))).json();
@@ -506,51 +496,51 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleInfo.textContent = extraInfo.classList.contains('show') ? 'Less info' : 'More info';
       };
     } catch (e) {
-      console.error("Failed to load movie info:", e);
+      console.error(e);
       movieInfo.style.display = 'none';
     }
   }
 
+  /* ---------- Search TMDB ------------------------------------------------ */
   async function searchTMDB(query) {
     if (!query) return;
-    setStatus("Searching…");
-    trendingResults.innerHTML = "";
-    trendingHeading.style.display = "none";
-    trendingEmpty.style.display = "none";
-    searchResults.innerHTML = "";
-    searchHeading.style.display = "block";
-    searchEmpty.style.display = "none";
+    setStatus('Searching…');
+    trendingResults.innerHTML = '';
+    trendingHeading.style.display = 'none';
+    trendingEmpty.style.display = 'none';
+    searchResults.innerHTML = '';
+    searchHeading.style.display = 'block';
+    searchEmpty.style.display = 'none';
 
-    const [resMovie, resTV] = await Promise.all([
+    const [movieRes, tvRes] = await Promise.all([
       fetch(TMDB_SEARCH_MOVIE + encodeURIComponent(query)),
       fetch(TMDB_SEARCH_TV + encodeURIComponent(query))
     ]);
-
-    const movies = (await resMovie.json()).results || [];
-    const shows = (await resTV.json()).results || [];
-    const items = [...movies, ...shows];
+    const movies = (await movieRes.json()).results || [];
+    const shows  = (await tvRes.json()).results || [];
+    const items  = [...movies, ...shows];
 
     if (!items.length) {
-      setStatus("No results found.");
-      searchHeading.style.display = "block";
-      searchEmpty.style.display = "block";
+      setStatus('No results found.');
+      searchHeading.style.display = 'block';
+      searchEmpty.style.display = 'block';
       return;
     }
 
-    items.forEach(async (m, index) => {
+    items.forEach(async (m, idx) => {
       if (!m.poster_path) return;
       const title = m.title || m.name;
-      const year = m.release_date ? m.release_date.split('-')[0] : m.first_air_date ? m.first_air_date.split('-')[0] : 'N/A';
+      const year  = (m.release_date || m.first_air_date || '').split('-')[0] || 'N/A';
       const rating = m.vote_average ? m.vote_average.toFixed(1) : 'N/A';
-      const overview = m.overview ? m.overview.substring(0, 100) + (m.overview.length > 100 ? '...' : '') : 'No description';
+      const overview = m.overview ? m.overview.slice(0, 100) + (m.overview.length > 100 ? '...' : '') : 'No description';
       const trailerUrl = await fetchTrailerUrl(m.id, m.title ? 'movie' : 'tv');
 
-      const div = document.createElement("div");
-      div.className = "movie";
-      div.style.animationDelay = `${0.1 * (index + 1)}s`;
-      div.setAttribute('aria-label', `Select ${title} (${year})`);
-      div.innerHTML = `
-        <img src="https://image.tmdb.org/t/p/w342${m.poster_path}">
+      const card = document.createElement('div');
+      card.className = 'movie';
+      card.style.animationDelay = `${0.1 * (idx + 1)}s`;
+      card.setAttribute('aria-label', `Select ${title} (${year})`);
+      card.innerHTML = `
+        <img src="https://image.tmdb.org/t/p/w342${m.poster_path}" alt="${title}">
         <div class="movie-year">${year}</div>
         <div class="movie-title">${title}</div>
         <div class="movie-overlay">
@@ -560,78 +550,75 @@ document.addEventListener('DOMContentLoaded', () => {
             <p>${overview}</p>
           </div>
         </div>
-        <div class="movie-tooltip" style="top: -100%; left: 50%; transform: translateX(-50%) translateY(10px);">
+        <div class="movie-tooltip">
           <strong>${title}</strong> (${year})<br>
           <p><strong>Rating:</strong> ${rating}</p>
           <p>${overview}</p>
           ${trailerUrl ? `<a href="${trailerUrl}" target="_blank">Watch Trailer</a>` : '<p>No trailer available</p>'}
         </div>
       `;
-      div.onclick = async () => {
-        const type = m.title ? "movie" : "tv";
+
+      card.onclick = async () => {
+        const type = m.title ? 'movie' : 'tv';
         const detRes = await fetch(`https://api.themoviedb.org/3/${type}/${m.id}?api_key=${API_KEY}&append_to_response=external_ids`);
         const det = await detRes.json();
         const imdbID = det.external_ids?.imdb_id;
-        if (imdbID) {
-          input.value = imdbID;
-          if (type === "tv") {
-            await loadSeasons(det, imdbID);
-          } else {
-            loadFromFields(imdbID);
-          }
-          searchResults.innerHTML = "";
-          searchHeading.style.display = "none";
-          searchEmpty.style.display = "none";
-        } else {
-          setStatus("No IMDb ID found.");
-        }
+        if (!imdbID) { setStatus('No IMDb ID found.'); return; }
+
+        input.value = imdbID;
+        if (type === 'tv') await loadSeasons(det, imdbID);
+        else loadFromFields(imdbID);
+
+        searchResults.innerHTML = '';
+        searchHeading.style.display = 'none';
+        searchEmpty.style.display = 'none';
       };
-      searchResults.appendChild(div);
+      searchResults.appendChild(card);
     });
-    setStatus("Click a title to watch.");
-    searchHeading.style.display = "block";
-    searchEmpty.style.display = items.length ? "none" : "block";
+
+    setStatus('Click a title to watch.');
+    searchHeading.style.display = 'block';
+    searchEmpty.style.display = items.length ? 'none' : 'block';
   }
 
+  /* ---------- Load trending titles (initial view) ----------------------- */
   async function loadTrending() {
-    setStatus("Loading trending…");
-    trendingResults.innerHTML = "";
-    searchResults.innerHTML = "";
-    searchHeading.style.display = "none";
-    searchEmpty.style.display = "none";
-    trendingHeading.style.display = "block";
-    trendingEmpty.style.display = "none";
+    setStatus('Loading trending…');
+    trendingResults.innerHTML = '';
+    searchResults.innerHTML = '';
+    searchHeading.style.display = 'none';
+    searchEmpty.style.display = 'none';
+    trendingHeading.style.display = 'block';
+    trendingEmpty.style.display = 'none';
 
-    const [resMovies, resShows] = await Promise.all([
+    const [movieRes, tvRes] = await Promise.all([
       fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}`),
       fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}`)
     ]);
-
-    const movies = (await resMovies.json()).results || [];
-    const shows = (await resShows.json()).results || [];
-    const items = [...movies, ...shows].slice(0, 20);
+    const movies = (await movieRes.json()).results || [];
+    const shows  = (await tvRes.json()).results || [];
+    const items  = [...movies, ...shows].slice(0, 20);
 
     if (!items.length) {
-      setStatus("No trending movies or shows found.");
-      trendingHeading.style.display = "block";
-      trendingEmpty.style.display = "block";
+      setStatus('No trending items found.');
+      trendingHeading.style.display = 'block';
+      trendingEmpty.style.display = 'block';
       return;
     }
 
-    items.forEach(async (m, index) => {
+    items.forEach(async (m, idx) => {
       if (!m.poster_path) return;
       const title = m.title || m.name;
-      const year = m.release_date ? m.release_date.split('-')[0] : m.first_air_date ? m.first_air_date.split('-')[0] : 'N/A';
+      const year  = (m.release_date || m.first_air_date || '').split('-')[0] || 'N/A';
       const rating = m.vote_average ? m.vote_average.toFixed(1) : 'N/A';
-      const overview = m.overview ? m.overview.substring(0, 100) + (m.overview.length > 100 ? '...' : '') : 'No description';
+      const overview = m.overview ? m.overview.slice(0, 100) + (m.overview.length > 100 ? '...' : '') : 'No description';
       const trailerUrl = await fetchTrailerUrl(m.id, m.title ? 'movie' : 'tv');
 
-      const div = document.createElement("div");
-      div.className = "movie";
-      div.style.animationDelay = `${0.1 * (index + 1)}s`;
-      div.setAttribute('aria-label', `Select ${title} (${year})`);
-      div.innerHTML = `
-        <img src="https://image.tmdb.org/t/p/w342${m.poster_path}">
+      const card = document.createElement('div');
+      card.className = 'movie';
+      card.style.animationDelay = `${0.1 * (idx + 1)}s`;
+      card.innerHTML = `
+        <img src="https://image.tmdb.org/t/p/w342${m.poster_path}" alt="${title}">
         <div class="movie-year">${year}</div>
         <div class="movie-title">${title}</div>
         <div class="movie-overlay">
@@ -641,55 +628,54 @@ document.addEventListener('DOMContentLoaded', () => {
             <p>${overview}</p>
           </div>
         </div>
-        <div class="movie-tooltip" style="top: -100%; left: 50%; transform: translateX(-50%) translateY(10px);">
+        <div class="movie-tooltip">
           <strong>${title}</strong> (${year})<br>
           <p><strong>Rating:</strong> ${rating}</p>
           <p>${overview}</p>
           ${trailerUrl ? `<a href="${trailerUrl}" target="_blank">Watch Trailer</a>` : '<p>No trailer available</p>'}
         </div>
       `;
-      div.onclick = async () => {
-        const type = m.title ? "movie" : "tv";
+
+      card.onclick = async () => {
+        const type = m.title ? 'movie' : 'tv';
         const detRes = await fetch(`https://api.themoviedb.org/3/${type}/${m.id}?api_key=${API_KEY}&append_to_response=external_ids`);
         const det = await detRes.json();
         const imdbID = det.external_ids?.imdb_id;
-        if (imdbID) {
-          input.value = imdbID;
-          if (type === "tv") {
-            await loadSeasons(det, imdbID);
-          } else {
-            loadFromFields(imdbID);
-          }
-          trendingResults.innerHTML = "";
-          trendingHeading.style.display = "none";
-          trendingEmpty.style.display = "none";
-        } else {
-          setStatus("No IMDb ID found.");
-        }
+        if (!imdbID) { setStatus('No IMDb ID found.'); return; }
+
+        input.value = imdbID;
+        if (type === 'tv') await loadSeasons(det, imdbID);
+        else loadFromFields(imdbID);
+
+        trendingResults.innerHTML = '';
+        trendingHeading.style.display = 'none';
+        trendingEmpty.style.display = 'none';
       };
-      trendingResults.appendChild(div);
+      trendingResults.appendChild(card);
     });
-    setStatus("Click a title to watch.");
-    trendingHeading.style.display = "block";
-    trendingEmpty.style.display = items.length ? "none" : "block";
+
+    setStatus('Click a title to watch.');
+    trendingHeading.style.display = 'block';
+    trendingEmpty.style.display = items.length ? 'none' : 'block';
   }
 
+  /* ---------- Autocomplete suggestions ----------------------------------- */
   async function fetchSuggestions(query) {
     if (!query) {
       suggestionsDiv.style.display = 'none';
       return;
     }
-    const [resMovie, resTV] = await Promise.all([
+    const [movieRes, tvRes] = await Promise.all([
       fetch(TMDB_SEARCH_MOVIE + encodeURIComponent(query)),
       fetch(TMDB_SEARCH_TV + encodeURIComponent(query))
     ]);
-    const movies = (await resMovie.json()).results || [];
-    const shows = (await resTV.json()).results || [];
-    const items = [...movies, ...shows].slice(0, 5);
+    const movies = (await movieRes.json()).results || [];
+    const shows  = (await tvRes.json()).results || [];
+    const results = [...movies, ...shows].slice(0, 5);
 
     suggestionsDiv.innerHTML = '';
-    if (items.length) {
-      items.forEach(item => {
+    if (results.length) {
+      results.forEach(item => {
         const div = document.createElement('div');
         div.className = 'suggestion-item';
         div.textContent = item.title || item.name;
@@ -706,9 +692,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  /* ---------- Input / button wiring -------------------------------------- */
   input.addEventListener('input', () => {
-    document.getElementById('seasonSelect').style.display = 'none';
-    document.getElementById('episodeSelect').style.display = 'none';
+    // reset TV selectors when typing a new query
+    $('#seasonSelect').style.display = 'none';
+    $('#episodeSelect').style.display = 'none';
     watchBtn.style.display = 'inline-block';
     fetchSuggestions(input.value.trim());
   });
@@ -716,35 +704,30 @@ document.addEventListener('DOMContentLoaded', () => {
   input.addEventListener('keypress', e => {
     if (e.key === 'Enter') {
       suggestionsDiv.style.display = 'none';
-      searchTMDB(input.value.trim());
+      const q = input.value.trim();
+      extractIMDb(q) ? loadFromFields() : searchTMDB(q);
     }
   });
 
-  document.getElementById('searchBtn').addEventListener('click', () => {
+  $('#searchBtn').addEventListener('click', () => {
     suggestionsDiv.style.display = 'none';
-    searchTMDB(input.value.trim());
+    const q = input.value.trim();
+    extractIMDb(q) ? loadFromFields() : searchTMDB(q);
   });
 
-  watchBtn.addEventListener('click', () => {
-    loadFromFields();
-  });
+  watchBtn.addEventListener('click', () => loadFromFields());
 
   copyBtn.addEventListener('click', () => {
     const imdbID = extractIMDb(input.value.trim());
-    if (!imdbID) {
-      setStatus('Please enter a valid IMDb ID to copy.');
-      return;
-    }
-    const url = buildURL(select.value, imdbID);
+    if (!imdbID) { setStatus('Enter a valid IMDb ID to copy.'); return; }
+    const url = buildURL(select.value || '2embed', imdbID);
     navigator.clipboard.writeText(url).then(() => {
-      setStatus('Link copied to clipboard!');
+      setStatus('Link copied!');
       setTimeout(() => setStatus('Ready. Tip: Press Enter or click Search to find movies.'), 2000);
-    }).catch(() => {
-      setStatus('Failed to copy link.');
-    });
+    }).catch(() => setStatus('Failed to copy.'));
   });
 
-  document.getElementById('homeBtn').addEventListener('click', () => {
+  $('#homeBtn').addEventListener('click', () => {
     input.value = '';
     frame.src = '';
     playerContainer.classList.remove('active');
@@ -752,12 +735,13 @@ document.addEventListener('DOMContentLoaded', () => {
     searchResults.innerHTML = '';
     searchHeading.style.display = 'none';
     searchEmpty.style.display = 'none';
-    document.getElementById('seasonSelect').style.display = 'none';
-    document.getElementById('episodeSelect').style.display = 'none';
+    $('#seasonSelect').style.display = 'none';
+    $('#episodeSelect').style.display = 'none';
     watchBtn.style.display = 'inline-block';
     setStatus('Ready. Tip: Press Enter or click Search to find movies.');
     loadTrending();
   });
 
+  /* ---------- Initial load ------------------------------------------------ */
   loadTrending();
 });
