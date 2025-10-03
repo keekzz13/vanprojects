@@ -701,3 +701,9 @@ body.light-mode {
   --warning-color: var(--warning-color-light);
   --info-color: var(--info-color-light);
 }
+.placeholder-note {
+  opacity: 0.5;          /* faded look */
+  font-style: italic;    /* optional */
+  font-size: 0.9em;      /* slightly smaller */
+}
+
