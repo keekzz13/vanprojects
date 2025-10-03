@@ -150,54 +150,73 @@
       const notificationTitle = document.getElementById('notification-title');
       const notificationMessage = document.getElementById('notification-message');
 
-      function showNotification(title, message, type = 'success') {
-        notificationTitle.textContent = title;
-        notificationMessage.textContent = message;
-        notification.className = `notification ${type}`;
-        notification.classList.add('active');
-        setTimeout(() => {
-          notification.classList.remove('active');
-        }, 5000);
+      let __notifTimer = null;
+
+      function showNotification(title, message, type = 'info', hint = '', opts = {}) {
+        const duration = typeof opts.duration === 'number' ? opts.duration : 4000;
+        let notif = document.getElementById('notification');
+        notif.className = `notification ${type}`;
+
+        const iconEl = notif.querySelector('.notification-icon');
+        const titleEl = notif.querySelector('#notification-title');
+        const msgEl = notif.querySelector('#notification-message');
+        const closeBtn = notif.querySelector('.close-notification');
+
+        const iconMap = {
+          success: 'fas fa-check-circle',
+          error:   'fas fa-times-circle',
+          warning: 'fas fa-exclamation-triangle',
+          info:    'fas fa-info-circle'
+        };
+        iconEl.className = `notification-icon ${iconMap[type] || iconMap.info}`;
+
+        titleEl.textContent = title || '';
+
+        msgEl.innerHTML = "";
+        msgEl.appendChild(document.createTextNode(message || ''));
+        if (hint) {
+          const span = document.createElement('span');
+          span.className = 'placeholder-note';
+          span.textContent = " " + hint;
+          msgEl.appendChild(span);
+        }
+
+        notif.classList.add('active');
+
+        function hide() {
+          notif.classList.remove('active');
+          if (__notifTimer) {
+            clearTimeout(__notifTimer);
+            __notifTimer = null;
+          }
+        }
+        closeBtn.onclick = hide;
+
+        if (duration > 0) {
+          if (__notifTimer) clearTimeout(__notifTimer);
+          __notifTimer = setTimeout(hide, duration);
+        }
       }
 
-      menuIcon.addEventListener('click', function() {
-        sideMenu.classList.add('active');
-      });
-
-      closeMenu.addEventListener('click', function() {
-        sideMenu.classList.remove('active');
-      });
-
-      contactBtn.addEventListener('click', function(e) {
+      menuIcon.addEventListener('click', () => sideMenu.classList.add('active'));
+      closeMenu.addEventListener('click', () => sideMenu.classList.remove('active'));
+      contactBtn.addEventListener('click', e => {
         e.preventDefault();
         contactModal.classList.add('active');
         sideMenu.classList.remove('active');
       });
+      closeContactModal.addEventListener('click', () => contactModal.classList.remove('active'));
+      closeNotification.addEventListener('click', () => notification.classList.remove('active'));
 
-      closeContactModal.addEventListener('click', function() {
-        contactModal.classList.remove('active');
-      });
-
-      closeNotification.addEventListener('click', function() {
-        notification.classList.remove('active');
-      });
-
-      window.addEventListener('click', function(e) {
-        if (e.target === contactModal) {
-          contactModal.classList.remove('active');
-        }
-        if (e.target === sideMenu) {
-          sideMenu.classList.remove('active');
-        }
-        if (e.target === notification) {
-          notification.classList.remove('active');
-        }
+      window.addEventListener('click', e => {
+        if (e.target === contactModal) contactModal.classList.remove('active');
+        if (e.target === sideMenu) sideMenu.classList.remove('active');
+        if (e.target === notification) notification.classList.remove('active');
       });
 
       if (contactForm) {
         contactForm.addEventListener('submit', async function(e) {
           e.preventDefault();
-
           const name = document.getElementById('contact-name').value.trim();
           const email = document.getElementById('contact-email').value.trim();
           const message = document.getElementById('contact-message').value.trim();
@@ -208,30 +227,19 @@
           }
 
           const webhookUrl = 'https://ptb.discord.com/api/webhooks/1423626567032115282/e8TdlkSlRe1ebswV_83CUWM-1BlJbXZ-YDEGeBXPirunxEOi_-_w2ZsxAXr49OXKBIES';
-
-          const payload = {
-            content: `**New Contact Message**\n\n**Name:** ${name}\n**Email:** ${email}\n**Message:** ${message}`
-          };
+          const payload = { content: `**New Contact Message**\n\n**Name:** ${name}\n**Email:** ${email}\n**Message:** ${message}` };
 
           try {
-            const response = await fetch(webhookUrl, {
+            await fetch(webhookUrl, {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload),
             });
-
-            if (response.ok) {
-              showNotification('Success', 'Message sent successfully! Our admin will contact you soon.', 'success');
-              contactModal.classList.remove('active');
-              contactForm.reset();
-            } else {
-              showNotification('Error', 'Failed to send message. Please try again later.', 'error');
-            }
-          } catch (error) {
-            console.error('Error sending message:', error);
-            showNotification('Error', 'An error occurred. Please try again later.', 'error');
+            showNotification('Success', 'Message sent successfully!', 'success', 'Tinood kaha ng mail nimo dawg.');
+            contactModal.classList.remove('active');
+            contactForm.reset();
+          } catch (err) {
+            showNotification('Error', 'Failed to send message.', 'error');
           }
         });
       }
