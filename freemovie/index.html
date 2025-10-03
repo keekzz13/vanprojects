@@ -5,10 +5,634 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie Player</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      /* Dark theme variables */
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --accent-primary: #3b82f6;
+      --accent-hover: #60a5fa;
+      --border-color: #334155;
+      --card-bg: #1f2a44;
+      --shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      --shadow-hover: 0 10px 20px rgba(0, 0, 0, 0.3);
+      --acrylic-bg: rgba(30, 41, 59, 0.85);
+      --gradient-bg: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      /* Light theme variables */
+      --bg-primary-light: #f8fafc;
+      --bg-secondary-light: #e2e8f0;
+      --text-primary-light: #0f172a;
+      --text-secondary-light: #475569;
+      --accent-primary-light: #2563eb;
+      --accent-hover-light: #3b82f6;
+      --border-color-light: #cbd5e1;
+      --card-bg-light: #ffffff;
+      --shadow-light: 0 6px 12px rgba(0, 0, 0, 0.1);
+      --shadow-hover-light: 0 10px 20px rgba(0, 0, 0, 0.15);
+      --acrylic-bg-light: rgba(255, 255, 255, 0.85);
+      --gradient-bg-light: linear-gradient(135deg, #93c5fd, #3b82f6);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--gradient-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      transition: all 0.4s ease-in-out;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    body.light {
+      --bg-primary: var(--bg-primary-light);
+      --bg-secondary: var(--bg-secondary-light);
+      --text-primary: var(--text-primary-light);
+      --text-secondary: var(--text-secondary-light);
+      --accent-primary: var(--accent-primary-light);
+      --accent-hover: var(--accent-hover-light);
+      --border-color: var(--border-color-light);
+      --card-bg: var(--card-bg-light);
+      --shadow: var(--shadow-light);
+      --shadow-hover: var(--shadow-hover-light);
+      --acrylic-bg: var(--acrylic-bg-light);
+      --gradient-bg: var(--gradient-bg-light);
+    }
+
+    .hamburger {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      background-color: var(--acrylic-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      cursor: pointer;
+      z-index: 1100;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      display: none;
+    }
+
+    .hamburger:hover {
+      background-color: var(--accent-primary);
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+
+    .sidebar {
+      width: 260px;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: var(--acrylic-bg);
+      border-right: 1px solid var(--border-color);
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      backdrop-filter: blur(12px);
+      animation: slideIn 0.4s ease-out;
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar.active {
+      transform: translateX(0);
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+      transition: left 0.4s ease;
+    }
+
+    .sidebar-item:hover::before {
+      left: 100%;
+    }
+
+    .sidebar-item:hover {
+      background-color: var(--accent-primary);
+      color: #ffffff;
+      transform: translateX(6px);
+    }
+
+    .sidebar-item svg {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .home-btn {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .home-btn:hover {
+      color: var(--accent-hover);
+    }
+
+    .navlink, .navbtn {
+      font-size: 0.9rem;
+      font-weight: 500;
+      width: 100%;
+      text-align: left;
+    }
+
+    .main {
+      margin-left: 260px;
+      padding: 2rem;
+      flex: 1;
+      transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .sidebar.hidden + .main {
+      margin-left: 0;
+    }
+
+    .header {
+      background-color: var(--acrylic-bg);
+      padding: 1.75rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      backdrop-filter: blur(12px);
+      animation: slideUp 0.5s ease-out;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(to right, var(--accent-primary), var(--accent-hover));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .header p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1.25rem;
+      background-color: var(--acrylic-bg);
+      border-radius: 1rem;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      animation: slideUp 0.5s ease-out;
+    }
+
+    .input {
+      flex: 1;
+      min-width: 220px;
+      padding: 0.85rem;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+      transform: scale(1.02);
+    }
+
+    .select, .btn {
+      padding: 0.85rem 1.25rem;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .select:hover, .btn:hover {
+      background-color: var(--accent-primary);
+      color: #ffffff;
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+
+    .select:active, .btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
+    }
+
+    .btn.blue, .btn.primary {
+      background-color: var(--accent-primary);
+      border-color: transparent;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .btn.blue:hover, .btn.primary:hover {
+      background-color: var(--accent-hover);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+    }
+
+    .player {
+      margin-top: 1.5rem;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      position: relative;
+      display: none;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .player.active {
+      display: block;
+    }
+
+    .frame-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background-color: #000;
+    }
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    #movieFrame.show {
+      opacity: 1;
+    }
+
+    #spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 48px;
+      height: 48px;
+      border: 5px solid var(--text-secondary);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      transform: translate(-50%, -50%);
+    }
+
+    #spinner.hidden {
+      display: none;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.75rem;
+      margin-top: 2rem;
+      position: relative;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    .results::before {
+      content: 'Trending This Week';
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: block;
+      background: linear-gradient(to right, var(--accent-primary), var(--accent-hover));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .movie {
+      background-color: var(--card-bg);
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      cursor: pointer;
+      position: relative;
+      animation: cardPop 0.5s ease-out forwards;
+      opacity: 0;
+    }
+
+    .movie:nth-child(1) { animation-delay: 0.1s; }
+    .movie:nth-child(2) { animation-delay: 0.2s; }
+    .movie:nth-child(3) { animation-delay: 0.3s; }
+    .movie:nth-child(4) { animation-delay: 0.4s; }
+    .movie:nth-child(5) { animation-delay: 0.5s; }
+
+    .movie:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: var(--shadow-hover), 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .movie img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .movie:hover img {
+      transform: scale(1.05);
+    }
+
+    .movie-title {
+      padding: 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: center;
+      color: var(--text-primary);
+    }
+
+    dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: var(--acrylic-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      max-width: 640px;
+      width: 90%;
+      padding: 0;
+      box-shadow: var(--shadow);
+      animation: modalPop 0.3s ease-out;
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem;
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .modal-title a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .modal-title a:hover {
+      color: var(--accent-hover);
+    }
+
+    .close-x {
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+    }
+
+    .close-x:hover {
+      background-color: var(--accent-primary);
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+
+    .modal-body {
+      padding: 1.75rem;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    .suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      max-width: 320px;
+      background-color: var(--acrylic-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 10;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .suggestion-item {
+      padding: 0.75rem 1.25rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .suggestion-item:hover {
+      background-color: var(--accent-primary);
+      color: #ffffff;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.75rem;
+      background-color: var(--acrylic-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(12px);
+    }
+
+    .theme-toggle:hover {
+      background-color: var(--accent-primary);
+      color: #ffffff;
+      transform: rotate(15deg);
+    }
+
+    .info-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.4s ease;
+      opacity: 0;
+    }
+
+    .info-content.show {
+      max-height: 500px;
+      opacity: 1;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .status .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent-primary);
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes cardPop {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes modalPop {
+      from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+      to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.5); }
+      100% { transform: scale(1); }
+    }
+
+    @media (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: 100vh;
+        top: 0;
+        padding: 1rem;
+        transform: translateX(-100%);
+      }
+
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      .sidebar-item {
+        padding: 1rem;
+        font-size: 1rem;
+      }
+
+      .main {
+        margin-left: 0;
+        padding: 1.5rem;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .input, .select, .btn {
+        width: 100%;
+      }
+
+      .results {
+        grid-template-columns: 1fr;
+      }
+
+      .theme-toggle {
+        top: 0.75rem;
+        right: 4.5rem;
+      }
+    }
+
+    [x-cloak] {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <button class="theme-toggle" aria-label="Toggle theme">
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
       <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M12 5a7 7 0 100 14 7 7 0 000-14z" />
     </svg>
@@ -20,18 +644,12 @@
     </svg>
   </button>
 
-  <nav class="sidebar" id="sidebar">
+  <nav class="sidebar hidden" id="sidebar">
     <a href="#" class="home-btn sidebar-item" id="homeBtn">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 5v6h4v-6m-6 0h6" />
       </svg>
       Home
-    </a>
-    <a href="#contact" class="navlink sidebar-item">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-      Contact
     </a>
     <a href="#helpModal" class="navlink sidebar-item" id="openHelp">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,6 +773,31 @@
     </dialog>
   </main>
 
+  <script>
+    // Theme toggle and hamburger menu logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const themeToggle = document.getElementById('themeToggle');
+      const hamburger = document.getElementById('hamburger');
+      const sidebar = document.getElementById('sidebar');
+
+      // Theme toggle
+      themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light');
+        localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+      });
+
+      // Load saved theme
+      if (localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light');
+      }
+
+      // Hamburger menu toggle
+      hamburger.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        sidebar.classList.toggle('hidden');
+      });
+    });
+  </script>
   <script src="main.js"></script>
 </body>
 </html>
