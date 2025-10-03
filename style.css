@@ -11,7 +11,7 @@
   --accent-color: #ff6ec7;
   --text-color: #e6e6ea;
   --bg-color: #06060a;
-  --card-bg: rgba(18, 12, 36, 0.9);
+  --card-bg: rgba(28, 22, 46, 0.92); /* Darkened for better contrast */
   --border-color: rgba(123, 92, 255, 0.3);
   --success-color: #00ff88;
   --error-color: #ff4d6d;
@@ -33,7 +33,7 @@
   --accent-color-light: #ff4081;
   --text-color-light: #222;
   --bg-color-light: #f7f9ff;
-  --card-bg-light: rgba(255, 255, 255, 0.95);
+  --card-bg-light: rgba(245, 245, 245, 0.95); /* Adjusted for light mode */
   --border-color-light: rgba(59, 107, 255, 0.2);
   --success-color-light: #00a86b;
   --error-color-light: #ff3333;
@@ -56,7 +56,7 @@ body {
 body {
   font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
   color: var(--text);
-  background: linear-gradient(135deg, var(--bg), #0b0d12 60%);
+  background: var(--bg); /* Removed gradient for solid background */
   overflow-x: hidden;
   position: relative;
   transition: background-color 0.3s ease, color 0.3s ease;
