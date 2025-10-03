@@ -6,6 +6,20 @@
   --muted: #aab2cf;
   --brand: #7c9cff;
   --border: #2b3040;
+  --primary-color: #7b5cff; /* purple */
+  --secondary-color: #00e5ff; /* cyan */
+  --accent-color: #ff6ec7; /* pink */
+  --text-color: #e6e6ea;
+  --bg-color: #06060a;
+  --card-bg: rgba(18, 12, 36, 0.85);
+  --border-color: rgba(123, 92, 255, 0.25);
+  --success-color: #00ff88;
+  --error-color: #ff4d6d;
+  --warning-color: #ffb86b;
+  --info-color: #00aaff;
+  --neon-glow: 0 0 10px var(--primary-color), 
+                0 0 20px var(--primary-color), 
+                0 0 30px var(--secondary-color);
 
   --bg-light: #f9f9f9;
   --panel-light: #ffffff;
@@ -14,6 +28,17 @@
   --muted-light: #6b7280;
   --brand-light: #4a90e2;
   --border-light: #e5e7eb;
+  --primary-color-light: #3b6bff;
+  --secondary-color-light: #00bcd4;
+  --accent-color-light: #ff4081;
+  --text-color-light: #222;
+  --bg-color-light: #f7f9ff;
+  --card-bg-light: rgba(255, 255, 255, 0.95);
+  --border-color-light: rgba(59, 107, 255, 0.18);
+  --success-color-light: #00a86b;
+  --error-color-light: #ff3333;
+  --warning-color-light: #ff9900;
+  --info-color-light: #3399ff;
 }
 
 * {
@@ -35,7 +60,6 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Floating Bubbles Background */
 .bubbles {
   position: fixed;
   top: 0;
@@ -115,7 +139,6 @@ body {
   }
 }
 
-/* Content Layer */
 .site-header,
 .site-footer {
   text-align: center;
@@ -253,6 +276,138 @@ input:checked + .slider:before {
   box-shadow: 0 6px 20px rgba(124, 156, 255, 0.6);
 }
 
+.contact-btn {
+  cursor: pointer;
+  color: #0b0b0b;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.25s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.contact-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.78);
+  z-index: 1001;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  border-radius: 10px;
+  width: 92%;
+  max-width: 520px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 25px;
+  position: relative;
+  box-shadow: 0 0 36px rgba(123, 92, 255, 0.12);
+  border: 1px solid var(--border-color);
+  animation: modalAppear 0.28s ease-out;
+}
+
+@keyframes modalAppear {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: all 0.25s;
+}
+
+.close-modal:hover {
+  color: var(--primary-color);
+  transform: rotate(90deg);
+}
+
+.contact-form .form-group {
+  margin-bottom: 15px;
+}
+
+.contact-form label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-color);
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--text-color);
+}
+
+.contact-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.submit-btn {
+  cursor: pointer;
+  color: #161616;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  transition: all 0.25s;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'Orbitron', sans-serif;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+}
+
 body.light-mode {
   --bg: var(--bg-light);
   --panel: var(--panel-light);
@@ -261,4 +416,15 @@ body.light-mode {
   --muted: var(--muted-light);
   --brand: var(--brand-light);
   --border: var(--border-light);
+  --primary-color: var(--primary-color-light);
+  --secondary-color: var(--secondary-color-light);
+  --accent-color: var(--accent-color-light);
+  --text-color: var(--text-color-light);
+  --bg-color: var(--bg-color-light);
+  --card-bg: var(--card-bg-light);
+  --border-color: var(--border-color-light);
+  --success-color: var(--success-color-light);
+  --error-color: var(--error-color-light);
+  --warning-color: var(--warning-color-light);
+  --info-color: var(--info-color-light);
 }
