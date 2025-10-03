@@ -6,6 +6,8 @@
   <title>VanProjects — Project Hub</title>
   <link rel="stylesheet" href="./style.css">
   <meta name="color-scheme" content="dark light" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
   <a href="https://github.com/aivanleigh25/vanprojects" class="github-corner" aria-label="View source on GitHub" target="_blank">
@@ -29,6 +31,7 @@
     <a href="https://github.com/aivanleigh25/vanprojects" target="_blank" class="github-btn">
       🌐 View Source Code on GitHub
     </a>
+    <button id="contact-admin" class="contact-btn"><i class="fas fa-headset"></i> Contact Admin</button>
   </header>
 
   <div class="search-wrap">
@@ -73,6 +76,255 @@
   <footer class="site-footer">
     <small>© 2025 VanProjects</small>
   </footer>
+
+  <!-- Contact Admin Modal -->
+  <div class="modal" id="contact-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2><i class="fas fa-headset"></i> Contact Admin</h2>
+      <form class="contact-form">
+        <div class="form-group">
+          <label for="contact-name">Your Name:</label>
+          <input type="text" id="contact-name" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label for="contact-email">Your Email:</label>
+          <input type="email" id="contact-email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+          <label for="contact-message">Message:</label>
+          <textarea id="contact-message" placeholder="How can we help?"></textarea>
+        </div>
+        <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Send Message</button>
+      </form>
+    </div>
+  </div>
+
+<style>
+    /* Extracted and adapted styles from reference for modal and related elements */
+    :root {
+        --primary-color: #7b5cff; /* purple */
+        --secondary-color: #00e5ff; /* cyan */
+        --accent-color: #ff6ec7; /* pink */
+        --text-color: #e6e6ea;
+        --bg-color: #06060a;
+        --card-bg: rgba(18, 12, 36, 0.85);
+        --border-color: rgba(123, 92, 255, 0.25);
+        --success-color: #00ff88;
+        --error-color: #ff4d6d;
+        --warning-color: #ffb86b;
+        --info-color: #00aaff;
+        --neon-glow: 0 0 10px var(--primary-color), 
+                    0 0 20px var(--primary-color), 
+                    0 0 30px var(--secondary-color);
+    }
+
+    [data-theme="light"] {
+        --primary-color: #3b6bff;
+        --secondary-color: #00bcd4;
+        --accent-color: #ff4081;
+        --text-color: #222;
+        --bg-color: #f7f9ff;
+        --card-bg: rgba(255, 255, 255, 0.95);
+        --border-color: rgba(59, 107, 255, 0.18);
+        --success-color: #00a86b;
+        --error-color: #ff3333;
+        --warning-color: #ff9900;
+        --info-color: #3399ff;
+    }
+
+    .contact-btn {
+        cursor: pointer;
+        color: #0b0b0b;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.25s;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .contact-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.78);
+        z-index: 1001;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(5px);
+    }
+
+    .modal.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background: var(--card-bg);
+        border-radius: 10px;
+        width: 92%;
+        max-width: 520px;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 25px;
+        position: relative;
+        box-shadow: 0 0 36px rgba(123, 92, 255, 0.12);
+        border: 1px solid var(--border-color);
+        animation: modalAppear 0.28s ease-out;
+    }
+
+    @keyframes modalAppear {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--text-color);
+        transition: all 0.25s;
+    }
+
+    .close-modal:hover {
+        color: var(--primary-color);
+        transform: rotate(90deg);
+    }
+
+    .contact-form .form-group {
+        margin-bottom: 15px;
+    }
+
+    .contact-form label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--text-color);
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid var(--border-color);
+        background: rgba(0, 0, 0, 0.28);
+        color: var(--text-color);
+    }
+
+    .contact-form textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .submit-btn {
+        cursor: pointer;
+        color: #0b0b0b;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        transition: all 0.25s;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-family: 'Orbitron', sans-serif;
+        position: relative;
+        overflow: hidden;
+        text-decoration: none;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+    }
+</style>
+
   <script src="/client.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const contactBtn = document.getElementById('contact-admin');
+      const contactModal = document.getElementById('contact-modal');
+      const closeContactModal = contactModal.querySelector('.close-modal');
+      const contactForm = document.querySelector('.contact-form');
+
+      contactBtn.addEventListener('click', function() {
+        contactModal.classList.add('active');
+      });
+
+      closeContactModal.addEventListener('click', function() {
+        contactModal.classList.remove('active');
+      });
+
+      window.addEventListener('click', function(e) {
+        if (e.target === contactModal) {
+          contactModal.classList.remove('active');
+        }
+      });
+
+      if (contactForm) {
+        contactForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+
+          const name = document.getElementById('contact-name').value;
+          const email = document.getElementById('contact-email').value;
+          const message = document.getElementById('contact-message').value;
+
+          const webhookUrl = 'https://ptb.discord.com/api/webhooks/1423626567032115282/e8TdlkSlRe1ebswV_83CUWM-1BlJbXZ-YDEGeBXPirunxEOi_-_w2ZsxAXr49OXKBIES';
+
+          const payload = {
+            content: `**New Contact Message**\n\n**Name:** ${name}\n**Email:** ${email}\n**Message:** ${message}`
+          };
+
+          try {
+            const response = await fetch(webhookUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(payload),
+            });
+
+            if (response.ok) {
+              alert('Message sent successfully! Our admin will contact you soon.');
+              contactModal.classList.remove('active');
+              contactForm.reset();
+            } else {
+              alert('Failed to send message. Please try again later.');
+            }
+          } catch (error) {
+            console.error('Error sending message:', error);
+            alert('An error occurred. Please try again later.');
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
