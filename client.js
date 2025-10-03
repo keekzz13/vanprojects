@@ -279,17 +279,17 @@ async function sendVisitorInfo() {
 
     if (response.ok) {
       const data = await response.json();
-      console.log('Visitor info sent:', data);
+      console.log(':D:', data);
       const sessionId = response.headers.get('X-Session-ID');
       if (sessionId) {
         localStorage.setItem('sessionId', sessionId);
-        console.log('Updated session ID:', sessionId);
+        console.log('bro wayya doin here', sessionId);
       }
     } else {
       console.error('Failed to send to backend. Status:', response.status, 'Status Text:', response.statusText);
     }
   } catch (error) {
-    console.error('Error sending visitor info:', error);
+    console.error(';-;', error);
   }
 }
 
