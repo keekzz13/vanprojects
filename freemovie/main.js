@@ -296,6 +296,7 @@ async function searchTMDB(query) {
     const div = document.createElement("div");
     div.className = "movie";
     div.style.animationDelay = `${0.1 * (index + 1)}s`;
+    div.setAttribute('aria-label', `Select ${title} (${year})`);
     div.innerHTML = `
       <img src="https://image.tmdb.org/t/p/w342${m.poster_path}">
       <div class="movie-year">${year}</div>
@@ -376,6 +377,7 @@ async function loadTrending() {
     const div = document.createElement("div");
     div.className = "movie";
     div.style.animationDelay = `${0.1 * (index + 1)}s`;
+    div.setAttribute('aria-label', `Select ${title} (${year})`);
     div.innerHTML = `
       <img src="https://image.tmdb.org/t/p/w342${m.poster_path}">
       <div class="movie-year">${year}</div>
