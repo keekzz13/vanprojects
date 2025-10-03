@@ -5,7 +5,280 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie Player</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      /* Dark theme variables */
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2a2a2a;
+      --text-primary: #f5f5f5;
+      --text-secondary: #a0a0a0;
+      --accent-primary: #3b82f6;
+      --accent-hover: #60a5fa;
+      --border-color: #3a3a3a;
+      --card-bg: #252525;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.2);
+      --acrylic-bg: rgba(42, 42, 42, 0.9);
+      /* Light theme variables */
+      --bg-primary-light: #ffffff;
+      --bg-secondary-light: #f5f5f5;
+      --text-primary-light: #1a1a1a;
+      --text-secondary-light: #4a4a4a;
+      --accent-primary-light: #2563eb;
+      --accent-hover-light: #3b82f6;
+      --border-color-light: #d1d1d1;
+      --card-bg-light: #ffffff;
+      --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.05);
+      --shadow-hover-light: 0 8px 16px rgba(0, 0, 0, 0.1);
+      --acrylic-bg-light: rgba(255, 255, 255, 0.9);
+    }
+
+    body {
+      @apply bg-[var(--bg-primary)] text-[var(--text-primary)] font-['Inter'] transition-colors duration-300 min-h-screen flex;
+    }
+
+    body.light {
+      --bg-primary: var(--bg-primary-light);
+      --bg-secondary: var(--bg-secondary-light);
+      --text-primary: var(--text-primary-light);
+      --text-secondary: var(--text-secondary-light);
+      --accent-primary: var(--accent-primary-light);
+      --accent-hover: var(--accent-hover-light);
+      --border-color: var(--border-color-light);
+      --card-bg: var(--card-bg-light);
+      --shadow: var(--shadow-light);
+      --shadow-hover: var(--shadow-hover-light);
+      --acrylic-bg: var(--acrylic-bg-light);
+    }
+
+    .sidebar {
+      @apply fixed top-0 left-0 h-full w-64 bg-[var(--bg-secondary)] border-r border-[var(--border-color)] flex flex-col p-4 gap-3 transition-transform duration-300 z-50;
+    }
+
+    .sidebar.hidden {
+      @apply -translate-x-full;
+    }
+
+    .sidebar-item {
+      @apply flex items-center gap-3 p-3 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-200;
+    }
+
+    .sidebar-item svg {
+      @apply w-5 h-5;
+    }
+
+    .home-btn {
+      @apply text-[var(--text-primary)] font-semibold text-lg hover:text-[var(--accent-hover)] transition-colors duration-200;
+    }
+
+    .navlink, .navbtn {
+      @apply text-[var(--text-secondary)] bg-[var(--bg-secondary)] border border-[var(--border-color)] text-sm font-semibold px-3 py-2 rounded-lg hover:text-[var(--text-primary)] hover:bg-[var(--accent-primary)] hover:shadow-md transition-all duration-200 text-center w-full;
+    }
+
+    .main {
+      @apply ml-64 p-6 flex-1 transition-all duration-300;
+    }
+
+    .sidebar.hidden + .main {
+      @apply ml-0;
+    }
+
+    .header {
+      @apply bg-[var(--bg-secondary)] p-5 rounded-lg shadow-[var(--shadow)] border border-[var(--border-color)];
+    }
+
+    .header h1 {
+      @apply text-2xl font-bold text-[var(--accent-primary)];
+    }
+
+    .header p {
+      @apply text-sm text-[var(--text-secondary)] mt-1;
+    }
+
+    .wrap {
+      @apply max-w-6xl mx-auto;
+    }
+
+    .toolbar {
+      @apply flex flex-wrap gap-3 p-4 bg-[var(--bg-secondary)] rounded-lg border border-[var(--border-color)] shadow-[var(--shadow)];
+    }
+
+    .input {
+      @apply flex-1 min-w-[200px] p-3 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] transition-all duration-200;
+    }
+
+    .select, .btn {
+      @apply px-4 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-200;
+    }
+
+    .btn.blue, .btn.primary {
+      @apply bg-[var(--accent-primary)] border-transparent text-white font-semibold hover:bg-[var(--accent-hover)];
+    }
+
+    #watchBtn, #copyBtn, #fullscreenBtn {
+      @apply flex items-center gap-2;
+    }
+
+    .player {
+      @apply mt-4 bg-black border border-[var(--border-color)] rounded-lg shadow-[var(--shadow)] overflow-hidden;
+    }
+
+    .player.active {
+      @apply block;
+    }
+
+    .frame-wrap {
+      @apply relative w-full aspect-[16/9] bg-black rounded-lg overflow-hidden;
+    }
+
+    iframe {
+      @apply absolute inset-0 w-full h-full border-0;
+    }
+
+    #movieFrame {
+      @apply opacity-0 transition-opacity duration-500;
+    }
+
+    #movieFrame.show {
+      @apply opacity-100;
+    }
+
+    .status {
+      @apply mt-2 text-[var(--text-secondary)] text-sm flex items-center gap-2;
+    }
+
+    .status .dot {
+      @apply w-2 h-2 rounded-full bg-[var(--accent-primary)] animate-pulse;
+    }
+
+    .results {
+      @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6;
+    }
+
+    .movie {
+      @apply bg-[var(--card-bg)] rounded-lg shadow-[var(--shadow)] overflow-hidden cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-[var(--shadow-hover)];
+    }
+
+    .movie img {
+      @apply w-full h-48 object-cover;
+    }
+
+    .movie-title {
+      @apply p-3 text-[var(--text-primary)] font-medium text-center text-sm;
+    }
+
+    dialog {
+      @apply bg-[var(--acrylic-bg)] backdrop-blur-md border border-[var(--border-color)] rounded-lg p-0 w-full max-w-[720px] mx-4;
+    }
+
+    .modal-header {
+      @apply flex justify-between items-center p-4 bg-[var(--bg-secondary)] border-b border-[var(--border-color)];
+    }
+
+    .modal-title {
+      @apply font-semibold text-[var(--text-primary)];
+    }
+
+    .modal-title a {
+      @apply text-[var(--accent-primary)] hover:text-[var(--accent-hover)];
+    }
+
+    .close-x {
+      @apply text-[var(--text-secondary)] p-2 rounded-lg hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-200;
+    }
+
+    .modal-body {
+      @apply p-4 text-[var(--text-primary)];
+    }
+
+    .movie-info {
+      @apply mt-4 p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg shadow-[var(--shadow)];
+    }
+
+    .movie-info h2 {
+      @apply text-lg font-semibold text-[var(--accent-primary)] mb-2;
+    }
+
+    .toggle-btn {
+      @apply bg-transparent text-[var(--accent-primary)] font-semibold cursor-pointer hover:text-[var(--accent-hover)] transition-all duration-200;
+    }
+
+    .info-content {
+      @apply max-h-0 overflow-hidden opacity-0 transition-all duration-400;
+    }
+
+    .info-content.show {
+      @apply max-h-[500px] opacity-100;
+    }
+
+    #spinner {
+      @apply absolute top-1/2 left-1/2 w-10 h-10 border-4 border-[var(--text-secondary)] border-t-[var(--accent-primary)] rounded-full animate-spin -translate-x-1/2 -translate-y-1/2;
+    }
+
+    #spinner.hidden {
+      @apply hidden;
+    }
+
+    .suggestions {
+      @apply absolute bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-2 max-h-48 overflow-y-auto w-full max-w-[260px] z-10 shadow-[var(--shadow)];
+    }
+
+    .suggestion-item {
+      @apply p-2 text-[var(--text-primary)] cursor-pointer hover:bg-[var(--accent-primary)] hover:text-white transition-colors duration-200 rounded;
+    }
+
+    .theme-toggle {
+      @apply fixed top-4 right-4 p-2 bg-[var(--bg-secondary)] rounded-full border border-[var(--border-color)] hover:bg-[var(--accent-primary)] hover:text-white transition-all duration-200 cursor-pointer;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        @apply fixed bottom-0 top-auto h-auto w-full flex-row justify-around p-2 border-t border-[var(--border-color)] overflow-x-auto;
+      }
+
+      .sidebar.hidden {
+        @apply translate-y-full;
+      }
+
+      .sidebar-item {
+        @apply text-xs p-2;
+      }
+
+      .main {
+        @apply ml-0 mb-16 p-4;
+      }
+
+      .sidebar.hidden + .main {
+        @apply mb-0;
+      }
+
+      .toolbar {
+        @apply flex-col;
+      }
+
+      .input {
+        @apply w-full;
+      }
+
+      .results {
+        @apply grid-cols-1;
+      }
+
+      .theme-toggle {
+        @apply top-2 right-2 p-1;
+      }
+    }
+
+    [x-cloak] {
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <button class="theme-toggle" aria-label="Toggle theme">
