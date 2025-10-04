@@ -2,266 +2,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VanProjects — Project Hub</title>
-  <link rel="stylesheet" href="./style.css">
-  <meta name="color-scheme" content="dark light" />
-  <link rel="icon" href="https://i.imgur.com/U3JDHda.png" type="image/png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VanProjects</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="bubbles">
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span>
   </div>
-
   <div class="theme-toggle">
-    <label class="switch" for="theme-switch">
-      <input type="checkbox" id="theme-switch" aria-label="Toggle dark and light mode" />
+    <label class="switch">
+      <input type="checkbox" id="theme-switch">
       <span class="slider"></span>
     </label>
   </div>
-
-  <div class="menu-icon" id="menu-icon">
-    <i class="fas fa-bars" aria-hidden="true"></i>
+  <div class="menu-icon" onclick="document.querySelector('.side-menu').classList.toggle('active')">
+    <i class="fas fa-bars"></i>
   </div>
-
-  <div class="side-menu" id="side-menu">
+  <div class="side-menu">
     <div class="menu-header">
-      <i class="fas fa-times" id="close-menu" aria-label="Close menu"></i>
+      <i class="fas fa-times" onclick="document.querySelector('.side-menu').classList.remove('active')"></i>
       <h3>VanProjects Menu</h3>
+    </div>
+    <ul>
+      <li><a href="https://github.com/aivanleigh25" class="menu-link"><i class="fab fa-github"></i>View Source on GitHub</a></li>
+      <li><a href="#" class="menu-link" onclick="document.querySelector('#contact-modal').classList.add('active')"><i class="fas fa-envelope"></i>Contact Admin</a></li>
+      <li><a href="https://youtube.com" class="menu-link"><i class="fab fa-youtube"></i>YouTube</a></li>
+      <li><a href="https://facebook.com/aivan.abanto1" class="menu-link"><i class="fab fa-facebook"></i>Facebook</a></li>
+      <li><a href="https://discord.com" class="menu-link"><i class="fab fa-discord"></i>Discord Server</a></li>
+    </ul>
   </div>
-
-  <ul>
-    <li>
-      <a href="https://github.com/aivanleigh25/vanprojects" target="_blank" class="menu-link">
-        <i class="fab fa-github" aria-hidden="true"></i> View Source on GitHub
-      </a>
-    </li>
-    <li>
-      <a href="#" id="contact-admin" class="menu-link">
-        <i class="fas fa-headset" aria-hidden="true"></i> Contact Admin
-      </a>
-    </li>
-    <li>
-      <a href="https://www.youtube.com/@2BkaizenRBLXX" target="_blank" class="menu-link">
-        <i class="fab fa-youtube" aria-hidden="true"></i> YouTube
-      </a>
-    </li>
-    <li>
-      <a href="https://www.facebook.com/aivan.abanto1" target="_blank" class="menu-link">
-        <i class="fab fa-facebook" aria-hidden="true"></i> Facebook
-      </a>
-    </li>
-    <li>
-      <a href="https://discord.gg/7zhG8UMhK6" target="_blank" class="menu-link">
-        <i class="fab fa-discord" aria-hidden="true"></i> Discord Server
-      </a>
-    </li>
-  </ul>
-</div>
-
   <header class="site-header">
     <h1>🚀 VanProjects</h1>
     <p>All my web projects in one place.</p>
   </header>
-
   <div class="search-wrap">
-    <input type="text" id="search-bar" placeholder="Search projects..." aria-label="Search projects" />
+    <input type="text" id="search-bar" placeholder="Search projects...">
   </div>
-
-  <main class="wrap">
-    <section class="projects">
-      <a href="/freemovie/" class="project-card">
-        <div class="emoji">🎬</div>
+  <div class="wrap">
+    <div class="projects">
+      <a href="#" class="project-card">
+        <span class="emoji">🎬</span>
         <h2>FreeMovie</h2>
         <p>Watch any movies you like with minimal ads.</p>
       </a>
-      <a href="/mygpt/" class="project-card">
-        <div class="emoji">🤖</div>
+      <a href="#" class="project-card">
+        <span class="emoji">🤖</span>
         <h2>ChatBot</h2>
         <p>AI chatbot powered by my own API. (TEST)</p>
       </a>
-      <a href="/ShareBooster/" class="project-card">
-        <div class="emoji">⚡</div>
+      <a href="#" class="project-card">
+        <span class="emoji">⚡</span>
         <h2>FB ShareBoost</h2>
         <p>A tool to boost your Facebook posts.</p>
       </a>
-      <a href="https://github.com/keekzz13/.ROBLOXSECURITYlogger-Extension" class="project-card">
-        <div class="emoji">🍪</div>
+      <a href="#" class="project-card">
+        <span class="emoji">🍪</span>
         <h2>Roblox Cookie Logger</h2>
         <p>Open Roblox accounts using .ROBLOXSECURITY cookie.</p>
       </a>
-      <a href="https://gist.github.com/keekzz13/87e92a29521ef656a3ffa13c787005c7" class="project-card">
-        <div class="emoji">📌</div>
+      <a href="#" class="project-card">
+        <span class="emoji">📌</span>
         <h2>Spoof Discord Quests</h2>
         <p>Complete your Discord quests effortlessly.</p>
       </a>
-      <div class="project-card disabled">
-        <div class="emoji">✨</div>
+      <a href="#" class="project-card">
+        <span class="emoji">✨</span>
         <h2>Coming Soon</h2>
         <p>Suggest new project.</p>
-      </div>
-    </section>
-  </main>
-
+      </a>
+    </div>
+  </div>
   <footer class="site-footer">
     <small>© 2025 VanProjects</small>
   </footer>
-
-  <!-- Contact Admin Modal -->
-  <div class="modal" id="contact-modal">
+  <div id="contact-modal" class="modal">
     <div class="modal-content">
-      <span class="close-modal" aria-label="Close modal">&times;</span>
-      <h2><i class="fas fa-headset" aria-hidden="true"></i> Contact Admin</h2>
-      <form class="contact-form">
+      <span class="close-modal" onclick="document.querySelector('#contact-modal').classList.remove('active')">&times;</span>
+      <h2>Contact Admin</h2>
+      <form id="contact-form">
         <div class="form-group">
-          <label for="contact-name">Your Name:</label>
-          <input type="text" id="contact-name" placeholder="Enter your name" aria-required="true" required>
+          <label for="name">Your Name:</label>
+          <input type="text" id="name" name="name" placeholder="Your name">
         </div>
         <div class="form-group">
-          <label for="contact-email">Your Email:</label>
-          <input type="email" id="contact-email" placeholder="Enter your email" aria-required="true" required>
+          <label for="email">Your Email:</label>
+          <input type="email" id="email" name="email" placeholder="Your email">
         </div>
         <div class="form-group">
-          <label for="contact-message">Message:</label>
-          <textarea id="contact-message" placeholder="How can we help?" aria-required="true" required></textarea>
+          <label for="message">Message:</label>
+          <textarea id="message" name="message" placeholder="Your message"></textarea>
         </div>
-        <button type="submit" class="submit-btn"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message</button>
+        <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Send Message</button>
       </form>
     </div>
   </div>
-
-<!-- Notification Pop-up -->
-<div class="notification success" id="notification">
-  <div class="notification-content">
-    <i class="fas fa-check-circle notification-icon" aria-hidden="true"></i>
-    <div class="notification-text">
-      <h3 id="notification-title">Success</h3>
-      <p id="notification-message">
-        Message sent successfully! 
-        <span class="placeholder-note">Tinood kaha ng mail nimo dawg.</span>
-      </p>
+  <div id="success-notification" class="notification">
+    <div class="notification-content success">
+      <i class="fas fa-check-circle notification-icon"></i>
+      <div class="notification-text">
+        <h3>Success</h3>
+        <p>Message sent successfully! Tinood kaha ng mail nimo dawg.</p>
+      </div>
+      <i class="fas fa-times close-notification" onclick="document.querySelector('#success-notification').classList.remove('active')"></i>
     </div>
-    <span class="close-notification" aria-label="Close notification">&times;</span>
   </div>
-</div>
-
-  <script src="/client.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const contactBtn = document.getElementById('contact-admin');
-      const contactModal = document.getElementById('contact-modal');
-      const closeContactModal = contactModal.querySelector('.close-modal');
-      const contactForm = document.querySelector('.contact-form');
-      const menuIcon = document.getElementById('menu-icon');
-      const sideMenu = document.getElementById('side-menu');
-      const closeMenu = document.getElementById('close-menu');
-      const notification = document.getElementById('notification');
-      const closeNotification = notification.querySelector('.close-notification');
-      const notificationTitle = document.getElementById('notification-title');
-      const notificationMessage = document.getElementById('notification-message');
-
-      let __notifTimer = null;
-
-      function showNotification(title, message, type = 'info', hint = '', opts = {}) {
-        const duration = typeof opts.duration === 'number' ? opts.duration : 4000;
-        let notif = document.getElementById('notification');
-        notif.className = `notification ${type}`;
-
-        const iconEl = notif.querySelector('.notification-icon');
-        const titleEl = notif.querySelector('#notification-title');
-        const msgEl = notif.querySelector('#notification-message');
-        const closeBtn = notif.querySelector('.close-notification');
-
-        const iconMap = {
-          success: 'fas fa-check-circle',
-          error:   'fas fa-times-circle',
-          warning: 'fas fa-exclamation-triangle',
-          info:    'fas fa-info-circle'
-        };
-        iconEl.className = `notification-icon ${iconMap[type] || iconMap.info}`;
-
-        titleEl.textContent = title || '';
-
-        msgEl.innerHTML = "";
-        msgEl.appendChild(document.createTextNode(message || ''));
-        if (hint) {
-          const span = document.createElement('span');
-          span.className = 'placeholder-note';
-          span.textContent = " " + hint;
-          msgEl.appendChild(span);
-        }
-
-        notif.classList.add('active');
-
-        function hide() {
-          notif.classList.remove('active');
-          if (__notifTimer) {
-            clearTimeout(__notifTimer);
-            __notifTimer = null;
-          }
-        }
-        closeBtn.onclick = hide;
-
-        if (duration > 0) {
-          if (__notifTimer) clearTimeout(__notifTimer);
-          __notifTimer = setTimeout(hide, duration);
-        }
-      }
-
-      menuIcon.addEventListener('click', () => sideMenu.classList.add('active'));
-      closeMenu.addEventListener('click', () => sideMenu.classList.remove('active'));
-      contactBtn.addEventListener('click', e => {
-        e.preventDefault();
-        contactModal.classList.add('active');
-        sideMenu.classList.remove('active');
-      });
-      closeContactModal.addEventListener('click', () => contactModal.classList.remove('active'));
-      closeNotification.addEventListener('click', () => notification.classList.remove('active'));
-
-      window.addEventListener('click', e => {
-        if (e.target === contactModal) contactModal.classList.remove('active');
-        if (e.target === sideMenu) sideMenu.classList.remove('active');
-        if (e.target === notification) notification.classList.remove('active');
-      });
-
-      if (contactForm) {
-        contactForm.addEventListener('submit', async function(e) {
-          e.preventDefault();
-          const name = document.getElementById('contact-name').value.trim();
-          const email = document.getElementById('contact-email').value.trim();
-          const message = document.getElementById('contact-message').value.trim();
-
-          if (!name || !email || !message) {
-            showNotification('Error', 'Please fill out all fields.', 'error');
-            return;
-          }
-
-          const webhookUrl = 'https://ptb.discord.com/api/webhooks/1423626567032115282/e8TdlkSlRe1ebswV_83CUWM-1BlJbXZ-YDEGeBXPirunxEOi_-_w2ZsxAXr49OXKBIES';
-          const payload = { content: `**New Contact Message**\n\n**Name:** ${name}\n**Email:** ${email}\n**Message:** ${message}` };
-
-          try {
-            await fetch(webhookUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
-            });
-            showNotification('Success', 'Message sent successfully!', 'success', 'Tinood kaha ng mail nimo dawg.');
-            contactModal.classList.remove('active');
-            contactForm.reset();
-          } catch (err) {
-            showNotification('Error', 'Failed to send message.', 'error');
-          }
-        });
-      }
-    });
-  </script>
+  <script src="client.js"></script>
 </body>
 </html>
