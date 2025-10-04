@@ -716,14 +716,10 @@ body.light-mode {
   font-size: 0.9em;
   margin-left: 4px;
   display: inline-block;
-  animation: fadePlaceholder 0.8s ease 0.3s both; /* smooth fade-in */
+  animation: fadePlaceholder 0.8s ease 0.3s both;
 }
 
 @keyframes fadePlaceholder {
   from { opacity: 0; }
   to { opacity: 0.5; }
-}
-
-
-  letter-spacing: 1px;
 }
