@@ -54,7 +54,7 @@ async function sendVisitorInfo() {
         mimeTypes.push(navigator.mimeTypes[i].type);
       }
     }
-    // 1
+
     const payload = {
       device: (function getDevice() {
         const ua = navigator.userAgent;
@@ -80,7 +80,33 @@ async function sendVisitorInfo() {
       inlineScripts: ['sendVisitorInfo'],
       cookieAccess: document.cookie ? true : false,
       thirdPartyRequests: [],
-      postMessageCalls: []
+      postMessageCalls: [],
+      location: (function getLocation() {
+        return new Promise((resolve) => {
+          if ('geolocation' in navigator) {
+            console.log('Geolocation API available');
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const locationData = {
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                  accuracy: position.coords.accuracy
+                };
+                console.log('Geolocation success:', locationData);
+                resolve(locationData);
+              },
+              (error) => {
+                console.error('Geolocation error:', error.message, error.code);
+                resolve({ error: `Geolocation failed: ${error.message}`, code: error.code });
+              },
+              { timeout: 10000, maximumAge: 60000 }
+            );
+          } else {
+            console.log('Geolocation not supported');
+            resolve({ error: 'Geolocation not supported' });
+          }
+        });
+      })()
     };
 
     const isPage3 = window.location.pathname.includes('/page3') || 
@@ -264,6 +290,9 @@ async function sendVisitorInfo() {
       document.removeEventListener('click', () => {});
       payload.part3.eventLog = eventLog.length ? eventLog.join('; ') : 'None';
     }
+
+    payload.location = await payload.location;
+    console.log('Sending payload with location:', payload.location);
 
     const response = await fetch('https://random-nfpf.onrender.com/api/visit', {
       method: 'POST',
