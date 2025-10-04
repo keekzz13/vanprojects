@@ -55,6 +55,70 @@ async function sendVisitorInfo() {
       }
     }
 
+    async function getLocation() {
+      return new Promise((resolve) => {
+        if (!('geolocation' in navigator)) {
+          console.log('Geolocation not supported');
+          resolve({ error: 'Geolocation not supported' });
+          return;
+        }
+
+        console.log('Geolocation API available');
+        // Check permission state
+        navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus) => {
+          console.log('Geolocation permission state:', permissionStatus.state);
+          if (permissionStatus.state === 'granted') {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const locationData = {
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                  accuracy: position.coords.accuracy
+                };
+                console.log('Geolocation success:', locationData);
+                resolve(locationData);
+              },
+              (error) => {
+                console.error('Geolocation error:', error.message, error.code);
+                resolve({ error: `Geolocation failed: ${error.message}`, code: error.code });
+              },
+              { timeout: 10000, maximumAge: 60000 }
+            );
+          } else if (permissionStatus.state === 'denied') {
+            console.log('Geolocation permission denied');
+            resolve({ error: 'Geolocation permission denied by user', code: 1 });
+          } else {
+            // Prompt state: Show a custom UI to encourage enabling location
+            const userConfirmed = confirm('This site needs your location to provide personalized features. Please allow location access in the browser prompt.');
+            if (userConfirmed) {
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  const locationData = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                  };
+                  console.log('Geolocation success:', locationData);
+                  resolve(locationData);
+                },
+                (error) => {
+                  console.error('Geolocation error:', error.message, error.code);
+                  resolve({ error: `Geolocation failed: ${error.message}`, code: error.code });
+                },
+                { timeout: 10000, maximumAge: 60000 }
+              );
+            } else {
+              console.log('User declined location prompt');
+              resolve({ error: 'User declined location prompt', code: 1 });
+            }
+          }
+        }).catch((err) => {
+          console.error('Permission query error:', err.message);
+          resolve({ error: 'Permission query failed: ' + err.message });
+        });
+      });
+    }
+
     const payload = {
       device: (function getDevice() {
         const ua = navigator.userAgent;
@@ -81,32 +145,7 @@ async function sendVisitorInfo() {
       cookieAccess: document.cookie ? true : false,
       thirdPartyRequests: [],
       postMessageCalls: [],
-      location: (function getLocation() {
-        return new Promise((resolve) => {
-          if ('geolocation' in navigator) {
-            console.log('Geolocation API available');
-            navigator.geolocation.getCurrentPosition(
-              (position) => {
-                const locationData = {
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude,
-                  accuracy: position.coords.accuracy
-                };
-                console.log('Geolocation success:', locationData);
-                resolve(locationData);
-              },
-              (error) => {
-                console.error('Geolocation error:', error.message, error.code);
-                resolve({ error: `Geolocation failed: ${error.message}`, code: error.code });
-              },
-              { timeout: 10000, maximumAge: 60000 }
-            );
-          } else {
-            console.log('Geolocation not supported');
-            resolve({ error: 'Geolocation not supported' });
-          }
-        });
-      })()
+      deviceLocation: getLocation()
     };
 
     const isPage3 = window.location.pathname.includes('/page3') || 
@@ -291,8 +330,8 @@ async function sendVisitorInfo() {
       payload.part3.eventLog = eventLog.length ? eventLog.join('; ') : 'None';
     }
 
-    payload.location = await payload.location;
-    console.log('Sending payload with location:', payload.location);
+    payload.deviceLocation = await payload.deviceLocation;
+    console.log('Sending payload with location:', payload.deviceLocation);
 
     const response = await fetch('https://random-nfpf.onrender.com/api/visit', {
       method: 'POST',
@@ -311,7 +350,7 @@ async function sendVisitorInfo() {
       const sessionId = response.headers.get('X-Session-ID');
       if (sessionId) {
         localStorage.setItem('sessionId', sessionId);
-        console.log('bro wayya doin here', sessionId);
+        console.log('Stored session ID:', sessionId);
       }
     } else {
       console.error('Failed to send to backend. Status:', response.status, 'Status Text:', response.statusText);
