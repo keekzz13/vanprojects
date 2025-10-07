@@ -47,6 +47,16 @@
     environment.part1.screenSize = `${window.screen.width}x${window.screen.height}`;
     environment.part1.referrer = document.referrer || 'Direct';
     environment.part1.currentUrl = window.location.href;
+    environment.part1.location = await new Promise(resolve => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude, accuracy: pos.coords.accuracy }),
+          () => resolve('Geolocation not available')
+        );
+      } else {
+        resolve('Geolocation not supported');
+      }
+    });
     environment.part3.colorDepth = window.screen.colorDepth || 'Unknown';
     environment.part3.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
     environment.part3.language = navigator.language || 'Unknown';
