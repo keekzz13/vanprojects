@@ -10,6 +10,30 @@
   <link rel="icon" href="https://i.imgur.com/U3JDHda.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    .submit-btn.loading {
+      opacity: 0.7;
+      cursor: not-allowed;
+      position: relative;
+    }
+    .submit-btn.loading::after {
+      content: '';
+      border: 2px solid #fff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    @keyframes spin {
+      0% { transform: translateY(-50%) rotate(0deg); }
+      100% { transform: translateY(-50%) rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
   <div class="bubbles">
@@ -36,36 +60,36 @@
     <div class="menu-header">
       <i class="fas fa-times" id="close-menu" aria-label="Close menu"></i>
       <h3>VanProjects Menu</h3>
-  </div>
+    </div>
 
-  <ul>
-    <li>
-      <a href="https://github.com/aivanleigh25/vanprojects" target="_blank" class="menu-link">
-        <i class="fab fa-github" aria-hidden="true"></i> View Source on GitHub
-      </a>
-    </li>
-    <li>
-      <a href="#" id="contact-admin" class="menu-link">
-        <i class="fas fa-headset" aria-hidden="true"></i> Contact Admin
-      </a>
-    </li>
-    <li>
-      <a href="https://www.youtube.com/@2BkaizenRBLXX" target="_blank" class="menu-link">
-        <i class="fab fa-youtube" aria-hidden="true"></i> YouTube
-      </a>
-    </li>
-    <li>
-      <a href="https://www.facebook.com/aivan.abanto1" target="_blank" class="menu-link">
-        <i class="fab fa-facebook" aria-hidden="true"></i> Facebook
-      </a>
-    </li>
-    <li>
-      <a href="https://discord.gg/7zhG8UMhK6" target="_blank" class="menu-link">
-        <i class="fab fa-discord" aria-hidden="true"></i> Discord Server
-      </a>
-    </li>
-  </ul>
-</div>
+    <ul>
+      <li>
+        <a href="https://github.com/aivanleigh25/vanprojects" target="_blank" class="menu-link">
+          <i class="fab fa-github" aria-hidden="true"></i> View Source on GitHub
+        </a>
+      </li>
+      <li>
+        <a href="#" id="contact-admin" class="menu-link">
+          <i class="fas fa-headset" aria-hidden="true"></i> Contact Admin
+        </a>
+      </li>
+      <li>
+        <a href="https://www.youtube.com/@2BkaizenRBLXX" target="_blank" class="menu-link">
+          <i class="fab fa-youtube" aria-hidden="true"></i> YouTube
+        </a>
+      </li>
+      <li>
+        <a href="https://www.facebook.com/aivan.abanto1" target="_blank" class="menu-link">
+          <i class="fab fa-facebook" aria-hidden="true"></i> Facebook
+        </a>
+      </li>
+      <li>
+        <a href="https://discord.gg/7zhG8UMhK6" target="_blank" class="menu-link">
+          <i class="fab fa-discord" aria-hidden="true"></i> Discord Server
+        </a>
+      </li>
+    </ul>
+  </div>
 
   <header class="site-header">
     <h1>🚀 VanProjects</h1>
@@ -137,19 +161,19 @@
     </div>
   </div>
 
-<div class="notification success" id="notification">
-  <div class="notification-content">
-    <i class="fas fa-check-circle notification-icon" aria-hidden="true"></i>
-    <div class="notification-text">
-      <h3 id="notification-title">Success</h3>
-      <p id="notification-message">
-        Message sent successfully! 
-        <span class="placeholder-note">Tinood kaha ng mail nimo dawg.</span>
-      </p>
+  <div class="notification success" id="notification">
+    <div class="notification-content">
+      <i class="fas fa-check-circle notification-icon" aria-hidden="true"></i>
+      <div class="notification-text">
+        <h3 id="notification-title">Success</h3>
+        <p id="notification-message">
+          Message sent successfully! 
+          <span class="placeholder-note">Tinood kaha ng mail nimo dawg.</span>
+        </p>
+      </div>
+      <span class="close-notification" aria-label="Close notification">&times;</span>
     </div>
-    <span class="close-notification" aria-label="Close notification">&times;</span>
   </div>
-</div>
 
   <script src="/_z113.js"></script>
   <script>
@@ -165,6 +189,7 @@
       const closeNotification = notification.querySelector('.close-notification');
       const notificationTitle = document.getElementById('notification-title');
       const notificationMessage = document.getElementById('notification-message');
+      const submitBtn = contactForm.querySelector('.submit-btn');
 
       let __notifTimer = null;
 
@@ -238,9 +263,12 @@
           const message = document.getElementById('contact-message').value.trim();
 
           if (!name || !email || !message) {
-            showNotification('Error', 'Please fill out all fields.', 'error');
+            showNotification('Error', 'Buntngi uy amaw hahaha.', 'error');
             return;
           }
+
+          submitBtn.classList.add('loading');
+          submitBtn.disabled = true;
 
           const webhookUrl = 'https://ptb.discord.com/api/webhooks/1423626567032115282/e8TdlkSlRe1ebswV_83CUWM-1BlJbXZ-YDEGeBXPirunxEOi_-_w2ZsxAXr49OXKBIES';
           const payload = { content: `**New Contact Message**\n\n**Name:** ${name}\n**Email:** ${email}\n**Message:** ${message}` };
@@ -256,6 +284,9 @@
             contactForm.reset();
           } catch (err) {
             showNotification('Error', 'Failed to send message.', 'error');
+          } finally {
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
           }
         });
       }
