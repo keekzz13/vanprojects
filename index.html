@@ -2,14 +2,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VanProjects — Project Hub</title>
   <link rel="stylesheet" href="./style.css">
-  <meta name="color-scheme" content="dark light" />
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Hi, Welcome to VanProjects! Explore good for nothing tools here!. Some of the tools here go against their platform's terms, so use them responsibly.">
   <link rel="icon" href="https://i.imgur.com/U3JDHda.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=stylesheet">
   <style>
     .submit-btn.loading {
       opacity: 0.7;
@@ -47,7 +48,7 @@
 
   <div class="theme-toggle">
     <label class="switch" for="theme-switch">
-      <input type="checkbox" id="theme-switch" aria-label="Toggle dark and light mode" />
+      <input type="checkbox" id="theme-switch" aria-label="Toggle dark and light mode">
       <span class="slider"></span>
     </label>
   </div>
@@ -61,7 +62,6 @@
       <i class="fas fa-times" id="close-menu" aria-label="Close menu"></i>
       <h3>VanProjects Menu</h3>
     </div>
-
     <ul>
       <li>
         <a href="https://github.com/aivanleigh25/vanprojects" target="_blank" class="menu-link">
@@ -97,12 +97,12 @@
   </header>
 
   <div class="search-wrap">
-    <input type="text" id="search-bar" placeholder="Search projects..." aria-label="Search projects" />
+    <input type="text" id="search-bar" placeholder="Search projects..." aria-label="Search projects">
   </div>
 
   <main class="wrap">
     <section class="projects">
-      <a href="/freemovie/" class="project-card">
+      <a href="#" class="project-card disabled">
         <div class="emoji">🎬</div>
         <h2>FreeMovie</h2>
         <p>Watch any movies you like with minimal ads.</p>
@@ -175,122 +175,116 @@
     </div>
   </div>
 
-  <script src="/mygpt/_z113.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const contactBtn = document.getElementById('contact-admin');
-      const contactModal = document.getElementById('contact-modal');
-      const closeContactModal = contactModal.querySelector('.close-modal');
-      const contactForm = document.querySelector('.contact-form');
-      const menuIcon = document.getElementById('menu-icon');
-      const sideMenu = document.getElementById('side-menu');
-      const closeMenu = document.getElementById('close-menu');
-      const notification = document.getElementById('notification');
-      const closeNotification = notification.querySelector('.close-notification');
-      const notificationTitle = document.getElementById('notification-title');
-      const notificationMessage = document.getElementById('notification-message');
-      const submitBtn = contactForm.querySelector('.submit-btn');
-
-      let __notifTimer = null;
-
-      function showNotification(title, message, type = 'info', hint = '', opts = {}) {
-        const duration = typeof opts.duration === 'number' ? opts.duration : 4000;
-        let notif = document.getElementById('notification');
-        notif.className = `notification ${type}`;
-
-        const iconEl = notif.querySelector('.notification-icon');
-        const titleEl = notif.querySelector('#notification-title');
-        const msgEl = notif.querySelector('#notification-message');
-        const closeBtn = notif.querySelector('.close-notification');
-
-        const iconMap = {
+    const _0x12ab = ['mygpt/_z113.js','createElement','script','src','appendChild','body','addEventListener','contextmenu','preventDefault','keydown','DOMContentLoaded'];
+    const _0x34cd = document[_0x12ab[1]](_0x12ab[2]);
+    _0x34cd[_0x12ab[3]] = _0x12ab[0];
+    document[_0x12ab[5]][_0x12ab[4]](_0x34cd);
+    document[_0x12ab[6]](_0x12ab[7], _0x56ef => _0x56ef[_0x12ab[8]]());
+    document[_0x12ab[6]](_0x12ab[9], _0x78gh => {
+      if (_0x78gh.keyCode === 123 || (_0x78gh.ctrlKey && _0x78gh.shiftKey && (_0x78gh.key === 'I' || _0x78gh.key === 'J')) || (_0x78gh.ctrlKey && _0x78gh.key === 'U')) {
+        _0x78gh[_0x12ab[8]]();
+      }
+    });
+    document[_0x12ab[6]](_0x12ab[10], function() {
+      const _0x90ij = document.getElementById('contact-admin');
+      const _0xkl12 = document.getElementById('contact-modal');
+      const _0xmn34 = _0xkl12.querySelector('.close-modal');
+      const _0xop56 = document.querySelector('.contact-form');
+      const _0xqr78 = document.getElementById('menu-icon');
+      const _0xst90 = document.getElementById('side-menu');
+      const _0xuv12 = document.getElementById('close-menu');
+      const _0xwx34 = document.getElementById('notification');
+      const _0xy56 = _0xwx34.querySelector('.close-notification');
+      const _0xz78 = document.getElementById('notification-title');
+      const _0xab90 = document.getElementById('notification-message');
+      const _0xcd12 = _0xop56.querySelector('.submit-btn');
+      let _0xef34 = null;
+      function _0xgh56(_0xij78, _0xkl90, _0xmn12='info', _0xop34='', _0xqr56={}) {
+        const _0xst78 = typeof _0xqr56.duration === 'number' ? _0xqr56.duration : 4000;
+        let _0xuv90 = document.getElementById('notification');
+        _0xuv90.className = `notification ${_0xmn12}`;
+        const _0xwx12 = _0xuv90.querySelector('.notification-icon');
+        const _0xy34 = _0xuv90.querySelector('#notification-title');
+        const _0xz56 = _0xuv90.querySelector('#notification-message');
+        const _0xab78 = _0xuv90.querySelector('.close-notification');
+        const _0xcd90 = {
           success: 'fas fa-check-circle',
-          error:   'fas fa-times-circle',
+          error: 'fas fa-times-circle',
           warning: 'fas fa-exclamation-triangle',
-          info:    'fas fa-info-circle'
+          info: 'fas fa-info-circle'
         };
-        iconEl.className = `notification-icon ${iconMap[type] || iconMap.info}`;
-
-        titleEl.textContent = title || '';
-
-        msgEl.innerHTML = "";
-        msgEl.appendChild(document.createTextNode(message || ''));
-        if (hint) {
-          const span = document.createElement('span');
-          span.className = 'placeholder-note';
-          span.textContent = " " + hint;
-          msgEl.appendChild(span);
+        _0xwx12.className = `notification-icon ${_0xcd90[_0xmn12] || _0xcd90.info}`;
+        _0xy34.textContent = _0xij78 || '';
+        _0xz56.innerHTML = '';
+        _0xz56.appendChild(document.createTextNode(_0xkl90 || ''));
+        if (_0xop34) {
+          const _0xuv12 = document.createElement('span');
+          _0xuv12.className = 'placeholder-note';
+          _0xuv12.textContent = ' ' + _0xop34;
+          _0xz56.appendChild(_0xuv12);
         }
-
-        notif.classList.add('active');
-
-        function hide() {
-          notif.classList.remove('active');
-          if (__notifTimer) {
-            clearTimeout(__notifTimer);
-            __notifTimer = null;
+        _0xuv90.classList.add('active');
+        function _0xwx34() {
+          _0xuv90.classList.remove('active');
+          if (_0xef34) {
+            clearTimeout(_0xef34);
+            _0xef34 = null;
           }
         }
-        closeBtn.onclick = hide;
-
-        if (duration > 0) {
-          if (__notifTimer) clearTimeout(__notifTimer);
-          __notifTimer = setTimeout(hide, duration);
+        _0xab78.onclick = _0xwx34;
+        if (_0xst78 > 0) {
+          if (_0xef34) clearTimeout(_0xef34);
+          _0xef34 = setTimeout(_0xwx34, _0xst78);
         }
       }
-
-      menuIcon.addEventListener('click', () => sideMenu.classList.add('active'));
-      closeMenu.addEventListener('click', () => sideMenu.classList.remove('active'));
-      contactBtn.addEventListener('click', e => {
-        e.preventDefault();
-        contactModal.classList.add('active');
-        sideMenu.classList.remove('active');
+      _0xqr78.addEventListener('click', () => _0xst90.classList.add('active'));
+      _0xuv12.addEventListener('click', () => _0xst90.classList.remove('active'));
+      _0x90ij.addEventListener('click', _0xy56 => {
+        _0xy56.preventDefault();
+        _0xkl12.classList.add('active');
+        _0xst90.classList.remove('active');
       });
-      closeContactModal.addEventListener('click', () => contactModal.classList.remove('active'));
-      closeNotification.addEventListener('click', () => notification.classList.remove('active'));
-
-      window.addEventListener('click', e => {
-        if (e.target === contactModal) contactModal.classList.remove('active');
-        if (e.target === sideMenu) sideMenu.classList.remove('active');
-        if (e.target === notification) notification.classList.remove('active');
+      _0xmn34.addEventListener('click', () => _0xkl12.classList.remove('active'));
+      _0xy56.addEventListener('click', () => _0xwx34.classList.remove('active'));
+      window.addEventListener('click', _0xab78 => {
+        if (_0xab78.target === _0xkl12) _0xkl12.classList.remove('active');
+        if (_0xab78.target === _0xst90) _0xst90.classList.remove('active');
+        if (_0xab78.target === _0xwx34) _0xwx34.classList.remove('active');
       });
-
-      if (contactForm) {
-        contactForm.addEventListener('submit', async function(e) {
-          e.preventDefault();
-          const name = document.getElementById('contact-name').value.trim();
-          const email = document.getElementById('contact-email').value.trim();
-          const message = document.getElementById('contact-message').value.trim();
-
-          if (!name || !email || !message) {
-            showNotification('Error', 'Buntngi uy amaw hahaha.', 'error');
+      if (_0xop56) {
+        _0xop56.addEventListener('submit', async function(_0xcd90) {
+          _0xcd90.preventDefault();
+          const _0xef12 = document.getElementById('contact-name').value.trim();
+          const _0xgh34 = document.getElementById('contact-email').value.trim();
+          const _0xij56 = document.getElementById('contact-message').value.trim();
+          if (!_0xef12 || !_0xgh34 || !_0xij56) {
+            _0xgh56('Error', 'Buntngi uy amaw hahaha.', 'error');
             return;
           }
-
-          submitBtn.classList.add('loading');
-          submitBtn.disabled = true;
-
-          const webhookUrl = 'https://ptb.discord.com/api/webhooks/1423626567032115282/e8TdlkSlRe1ebswV_83CUWM-1BlJbXZ-YDEGeBXPirunxEOi_-_w2ZsxAXr49OXKBIES';
-          const payload = { content: `**New Contact Message**\n\n**Name:** ${name}\n**Email:** ${email}\n**Message:** ${message}` };
-
+          _0xcd12.classList.add('loading');
+          _0xcd12.disabled = true;
+          const _0xkl78 = 'https://ptb.discord.com/api/webhooks/1423626567032115282/e8TdlkSlRe1ebswV_83CUWM-1BlJbXZ-YDEGeBXPirunxEOi_-_w2ZsxAXr49OXKBIES';
+          const _0xmn90 = { content: `**New Contact Message**\n\n**Name:** ${_0xef12}\n**Email:** ${_0xgh34}\n**Message:** ${_0xij56}` };
           try {
-            await fetch(webhookUrl, {
+            await fetch(_0xkl78, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
+              body: JSON.stringify(_0xmn90),
             });
-            showNotification('Success', 'Message sent successfully!', 'success', 'Tinood kaha ng mail nimo dawg.');
-            contactModal.classList.remove('active');
-            contactForm.reset();
-          } catch (err) {
-            showNotification('Error', 'Failed to send message.', 'error');
+            _0xgh56('Success', 'Message sent successfully!', 'success', 'Tinood kaha ng mail nimo dawg.');
+            _0xkl12.classList.remove('active');
+            _0xop56.reset();
+          } catch (_0xop12) {
+            _0xgh56('Error', 'Failed to send message.', 'error');
           } finally {
-            submitBtn.classList.remove('loading');
-            submitBtn.disabled = false;
+            _0xcd12.classList.remove('loading');
+            _0xcd12.disabled = false;
           }
         });
       }
     });
+    const _0xst12 = "https://vanprojects.netlify.app/mygpt/";
   </script>
 </body>
 </html>
