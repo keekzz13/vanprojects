@@ -46,6 +46,7 @@ const templates = {
 function addEmbed(embedData = {}) {
     try {
         const container = document.getElementById('embedsContainer');
+        if (!container) throw new Error('Embeds container not found');
         const embedDiv = document.createElement('div');
         embedDiv.className = 'embed-item bg-gray-700 rounded-lg p-4 mb-4 relative animate-fadeIn';
         embedDiv.id = `embed-${embedCount}`;
@@ -116,22 +117,23 @@ function addEmbed(embedData = {}) {
         updatePreview();
         console.log('Added embed:', embedDiv.id);
     } catch (e) {
-        console.error('Error in addEmbed:', e);
-        showNotification('error', 'Failed to add embed. Check console for details.');
+        console.error('Error in addEmbed:', e.message);
+        showNotification('error', `Failed to add embed: ${e.message}`);
     }
 }
 
 function removeEmbed(index) {
     try {
         const embed = document.getElementById(`embed-${index}`);
-        if (embed) embed.remove();
+        if (!embed) throw new Error(`Embed ${index} not found`);
+        embed.remove();
         updateEmbedIndices();
         updatePreview();
         showNotification('success', 'Embed removed successfully!');
         console.log('Removed embed:', index);
     } catch (e) {
-        console.error('Error in removeEmbed:', e);
-        showNotification('error', 'Failed to remove embed. Check console for details.');
+        console.error('Error in removeEmbed:', e.message);
+        showNotification('error', `Failed to remove embed: ${e.message}`);
     }
 }
 
@@ -156,14 +158,15 @@ function updateEmbedIndices() {
         embedCount = embeds.length;
         console.log('Updated embed indices, count:', embedCount);
     } catch (e) {
-        console.error('Error in updateEmbedIndices:', e);
-        showNotification('error', 'Failed to update embed indices. Check console for details.');
+        console.error('Error in updateEmbedIndices:', e.message);
+        showNotification('error', `Failed to update embed indices: ${e.message}`);
     }
 }
 
 function addField(embedIndex, fieldData = {}) {
     try {
         const fieldsContainer = document.getElementById(`fields-${embedIndex}`);
+        if (!fieldsContainer) throw new Error(`Fields container for embed ${embedIndex} not found`);
         const fieldDiv = document.createElement('div');
         fieldDiv.className = 'field-item bg-gray-600 p-3 rounded flex flex-col space-y-2 animate-fadeIn';
         fieldDiv.innerHTML = `
@@ -180,16 +183,25 @@ function addField(embedIndex, fieldData = {}) {
         updatePreview();
         console.log('Added field to embed:', embedIndex);
     } catch (e) {
-        console.error('Error in addField:', e);
-        showNotification('error', 'Failed to add field. Check console for details.');
+        console.error('Error in addField:', e.message);
+        showNotification('error', `Failed to add field: ${e.message}`);
     }
 }
 
 function handleFiles() {
     try {
         const input = document.getElementById('fileInput');
-        files = Array.from(input.files).filter(file => file.type.startsWith('image/') || file.type.startsWith('video/'));
+        if (!input) throw new Error('File input not found');
+        files = Array.from(input.files).filter(file => {
+            if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) return false;
+            if (file.size > 8 * 1024 * 1024) {
+                showNotification('error', `File ${file.name} exceeds 8MB limit`);
+                return false;
+            }
+            return true;
+        });
         const attachmentsDiv = document.getElementById('attachments');
+        if (!attachmentsDiv) throw new Error('Attachments container not found');
         attachmentsDiv.innerHTML = '';
         files.forEach((file, i) => {
             const fileDiv = document.createElement('div');
@@ -204,8 +216,8 @@ function handleFiles() {
         showNotification('success', 'Files added successfully!');
         console.log('Handled files:', files.map(f => f.name));
     } catch (e) {
-        console.error('Error in handleFiles:', e);
-        showNotification('error', 'Failed to handle files. Check console for details.');
+        console.error('Error in handleFiles:', e.message);
+        showNotification('error', `Failed to handle files: ${e.message}`);
     }
 }
 
@@ -216,8 +228,8 @@ function removeFile(index) {
         showNotification('success', 'File removed successfully!');
         console.log('Removed file at index:', index);
     } catch (e) {
-        console.error('Error in removeFile:', e);
-        showNotification('error', 'Failed to remove file. Check console for details.');
+        console.error('Error in removeFile:', e.message);
+        showNotification('error', `Failed to remove file: ${e.message}`);
     }
 }
 
@@ -234,16 +246,16 @@ function loadTemplate() {
         updatePreview();
         console.log('Loaded template:', template);
     } catch (e) {
-        console.error('Error in loadTemplate:', e);
-        showNotification('error', 'Failed to load template. Check console for details.');
+        console.error('Error in loadTemplate:', e.message);
+        showNotification('error', `Failed to load template: ${e.message}`);
     }
 }
 
 function loadFromJSON() {
     try {
         const jsonInput = document.getElementById('jsonInput').value;
+        if (!jsonInput) throw new Error('JSON input is empty');
         const data = JSON.parse(jsonInput);
-        if (!data) throw new Error('Invalid JSON');
         document.getElementById('content').value = data.content || '';
         document.getElementById('embedsContainer').innerHTML = '';
         embedCount = 0;
@@ -254,8 +266,8 @@ function loadFromJSON() {
         updatePreview();
         console.log('Loaded JSON:', jsonInput);
     } catch (e) {
-        console.error('Error in loadFromJSON:', e);
-        showNotification('error', 'Invalid JSON format. Check console for details.');
+        console.error('Error in loadFromJSON:', e.message);
+        showNotification('error', `Invalid JSON format: ${e.message}`);
     }
 }
 
@@ -268,54 +280,50 @@ function generateJSON() {
         }
         const payload = {
             content: document.getElementById('content').value,
-            embeds: [],
-            attachments: []
+            embeds: []
         };
 
         const embedItems = document.querySelectorAll('.embed-item');
+        if (embedItems.length > 10) throw new Error('Maximum 10 embeds allowed');
         embedItems.forEach(item => {
             const embed = {};
-            embed.title = item.querySelector('input[placeholder="Embed title..."]').value;
-            embed.url = item.querySelector('input[placeholder="https://example.com"]').value;
+            embed.title = item.querySelector('input[placeholder="Embed title..."]').value || '';
+            embed.url = item.querySelector('input[placeholder="https://example.com"]').value || '';
             if (embed.title && embed.url && !/^https?:\/\//.test(embed.url)) {
-                showNotification('error', 'Embed URL must be a valid HTTP/HTTPS link!');
-                return;
+                throw new Error('Embed URL must be a valid HTTP/HTTPS link');
             }
-            embed.description = item.querySelector('textarea[placeholder="Embed description..."]').value;
-            embed.color = parseInt(item.querySelector('input[type="color"]').value.slice(1), 16);
+            embed.description = item.querySelector('textarea[placeholder="Embed description..."]').value || '';
+            embed.color = parseInt(item.querySelector('input[type="color"]').value.slice(1), 16) || 0x5865f2;
             const timestampInput = item.querySelector('input[type="datetime-local"]');
             if (timestampInput.value) embed.timestamp = new Date(timestampInput.value).toISOString();
-            embed.thumbnail = { url: item.querySelector('input[placeholder*="Thumbnail"]').value };
-            embed.image = { url: item.querySelector('input[placeholder*="Image"]').value };
-            const authorName = item.querySelector('input[placeholder="Author name"]').value;
+            embed.thumbnail = { url: item.querySelector('input[placeholder*="Thumbnail"]').value || '' };
+            embed.image = { url: item.querySelector('input[placeholder*="Image"]').value || '' };
+            const authorName = item.querySelector('input[placeholder="Author name"]').value || '';
             if (authorName) {
                 embed.author = { name: authorName };
-                const authorIcon = item.querySelector('input[placeholder="Author icon URL"]').value;
+                const authorIcon = item.querySelector('input[placeholder="Author icon URL"]').value || '';
                 if (authorIcon) embed.author.icon_url = authorIcon;
             }
-            const footerText = item.querySelector('input[placeholder="Footer text"]').value;
+            const footerText = item.querySelector('input[placeholder="Footer text"]').value || '';
             if (footerText) {
                 embed.footer = { text: footerText };
-                const footerIcon = item.querySelector('input[placeholder="Footer icon URL"]').value;
+                const footerIcon = item.querySelector('input[placeholder="Footer icon URL"]').value || '';
                 if (footerIcon) embed.footer.icon_url = footerIcon;
             }
             const fields = item.querySelectorAll('.field-item');
             if (fields.length > 0) {
+                if (fields.length > 25) throw new Error('Maximum 25 fields per embed allowed');
                 embed.fields = Array.from(fields).map(field => {
                     const inputs = field.querySelectorAll('input');
                     return {
-                        name: inputs[0].value,
-                        value: inputs[1].value,
+                        name: inputs[0].value || '',
+                        value: inputs[1].value || '',
                         inline: inputs[2].checked
                     };
                 }).filter(field => field.name && field.value);
             }
             if (embed.title || embed.description || embed.fields?.length) payload.embeds.push(embed);
         });
-
-        if (files.length > 0) {
-            payload.attachments = files.map((file, i) => ({ id: i, filename: file.name, description: '' }));
-        }
 
         const jsonString = JSON.stringify(payload, null, 2);
         document.getElementById('jsonOutput').value = jsonString;
@@ -324,8 +332,8 @@ function generateJSON() {
         console.log('Generated JSON:', jsonString);
         return payload;
     } catch (e) {
-        console.error('Error in generateJSON:', e);
-        showNotification('error', 'Failed to generate JSON. Check console for details.');
+        console.error('Error in generateJSON:', e.message);
+        showNotification('error', `Failed to generate JSON: ${e.message}`);
         return null;
     }
 }
@@ -342,8 +350,8 @@ function copyJSON() {
         setTimeout(() => { button.innerHTML = originalText; }, 2000);
         console.log('Copied JSON to clipboard');
     } catch (e) {
-        console.error('Error in copyJSON:', e);
-        showNotification('error', 'Failed to copy JSON. Check console for details.');
+        console.error('Error in copyJSON:', e.message);
+        showNotification('error', `Failed to copy JSON: ${e.message}`);
     }
 }
 
@@ -353,8 +361,8 @@ function closeModal() {
         showNotification('success', 'Modal closed!');
         console.log('Closed JSON modal');
     } catch (e) {
-        console.error('Error in closeModal:', e);
-        showNotification('error', 'Failed to close modal. Check console for details.');
+        console.error('Error in closeModal:', e.message);
+        showNotification('error', `Failed to close modal: ${e.message}`);
     }
 }
 
@@ -363,8 +371,8 @@ function showClearConfirm() {
         document.getElementById('clearConfirmModal').classList.remove('hidden');
         console.log('Opened clear confirm modal');
     } catch (e) {
-        console.error('Error in showClearConfirm:', e);
-        showNotification('error', 'Failed to open clear modal. Check console for details.');
+        console.error('Error in showClearConfirm:', e.message);
+        showNotification('error', `Failed to open clear modal: ${e.message}`);
     }
 }
 
@@ -378,8 +386,8 @@ function closeClearConfirm() {
             console.log('Closed clear confirm modal');
         }, 300);
     } catch (e) {
-        console.error('Error in closeClearConfirm:', e);
-        showNotification('error', 'Failed to close clear modal. Check console for details.');
+        console.error('Error in closeClearConfirm:', e.message);
+        showNotification('error', `Failed to close clear modal: ${e.message}`);
     }
 }
 
@@ -397,8 +405,8 @@ function clearAll() {
         showNotification('success', 'All fields cleared!');
         console.log('Cleared all fields');
     } catch (e) {
-        console.error('Error in clearAll:', e);
-        showNotification('error', 'Failed to clear fields. Check console for details.');
+        console.error('Error in clearAll:', e.message);
+        showNotification('error', `Failed to clear fields: ${e.message}`);
     }
 }
 
@@ -414,10 +422,20 @@ function sendToDiscord() {
         const payload = generateJSON();
         if (!payload) return;
 
+        if (files.length > 10) {
+            showNotification('error', 'Maximum 10 files allowed');
+            console.error('Too many files:', files.length);
+            return;
+        }
+
         const filePromises = files.map(file => new Promise((resolve, reject) => {
+            if (file.size > 8 * 1024 * 1024) {
+                reject(new Error(`File ${file.name} exceeds 8MB limit`));
+                return;
+            }
             const reader = new FileReader();
             reader.onload = () => resolve({ name: file.name, data: reader.result.split(',')[1] });
-            reader.onerror = reject;
+            reader.onerror = () => reject(new Error(`Failed to read file ${file.name}`));
             reader.readAsDataURL(file);
         }));
 
@@ -432,20 +450,36 @@ function sendToDiscord() {
                     .then(response => {
                         if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
                         showNotification('success', 'Message sent to Discord successfully!');
-                        console.log('Message sent to Discord via proxy');
+                        console.log('Message sent to Discord via proxy:', webhookUrl);
                     })
                     .catch(error => {
-                        console.error('Error sending to Discord:', error);
-                        showNotification('error', 'Failed to send to Discord. Check webhook URL or proxy setup.');
+                        console.error('Error sending to Discord:', error.message);
+                        showNotification('error', `Failed to send to Discord: ${error.message}`);
                     });
             })
             .catch(error => {
-                console.error('Error reading files:', error);
-                showNotification('error', 'Failed to process files. Try without attachments.');
+                console.error('Error reading files:', error.message);
+                showNotification('error', `Failed to process files: ${error.message}. Try without attachments.`);
+                // Fallback: Send without files
+                const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
+                fetch(proxyUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: [] }),
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
+                        showNotification('success', 'Message sent to Discord successfully (without files)!');
+                        console.log('Message sent to Discord via proxy (no files):', webhookUrl);
+                    })
+                    .catch(error => {
+                        console.error('Error sending to Discord (no files):', error.message);
+                        showNotification('error', `Failed to send to Discord: ${error.message}`);
+                    });
             });
     } catch (e) {
-        console.error('Error in sendToDiscord:', e);
-        showNotification('error', 'Failed to send to Discord. Check console for details.');
+        console.error('Error in sendToDiscord:', e.message);
+        showNotification('error', `Failed to send to Discord: ${e.message}`);
     }
 }
 
@@ -455,6 +489,7 @@ function togglePreview() {
         const hideBtn = document.getElementById('hidePreviewBtn');
         const viewBtn = document.getElementById('viewPreviewBtn');
         const builderPanel = document.getElementById('builderPanel');
+        if (!panel || !hideBtn || !viewBtn || !builderPanel) throw new Error('Preview panel or buttons not found');
         if (isPreviewVisible) {
             panel.classList.add('animate-fadeOut');
             setTimeout(() => {
@@ -479,8 +514,8 @@ function togglePreview() {
         isPreviewVisible = !isPreviewVisible;
         console.log('Toggled preview visibility:', isPreviewVisible);
     } catch (e) {
-        console.error('Error in togglePreview:', e);
-        showNotification('error', 'Failed to toggle preview. Check console for details.');
+        console.error('Error in togglePreview:', e.message);
+        showNotification('error', `Failed to toggle preview: ${e.message}`);
     }
 }
 
@@ -488,6 +523,7 @@ function showNotification(type, message) {
     try {
         const notification = document.getElementById('notification');
         const content = document.getElementById('notificationContent');
+        if (!notification || !content) throw new Error('Notification elements not found');
         content.innerHTML = `
             <i class="fas ${type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500'}"></i>
             <span>${message}</span>
@@ -503,15 +539,20 @@ function showNotification(type, message) {
         }, 3000);
         console.log('Notification shown:', type, message);
     } catch (e) {
-        console.error('Error in showNotification:', e);
+        console.error('Error in showNotification:', e.message);
     }
+}
+
+function isValidUrl(url) {
+    return !url || /^https?:\/\/[^\s$.?#].[^\s]*$/.test(url);
 }
 
 function updatePreview() {
     try {
         console.log('Updating preview...');
         const preview = document.getElementById('preview');
-        const content = document.getElementById('content').value;
+        if (!preview) throw new Error('Preview element not found');
+        const content = document.getElementById('content')?.value || '';
         let html = '';
 
         if (content) {
@@ -519,44 +560,62 @@ function updatePreview() {
         }
 
         const embedItems = document.querySelectorAll('.embed-item');
-        embedItems.forEach(item => {
+        embedItems.forEach((item, index) => {
             let embedHtml = '<div class="preview-embed rounded-lg p-4 mb-4">';
-            const title = item.querySelector('input[placeholder="Embed title..."]').value;
+            const titleInput = item.querySelector('input[placeholder="Embed title..."]');
+            const title = titleInput?.value || '';
             if (title) embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${title}</h3>`;
-            const description = item.querySelector('textarea[placeholder="Embed description..."]').value;
+            const descriptionInput = item.querySelector('textarea[placeholder="Embed description..."]');
+            const description = descriptionInput?.value || '';
             if (description) embedHtml += `<p class="text-gray-300 mb-3">${description}</p>`;
-            const thumbnail = item.querySelector('input[placeholder*="Thumbnail"]').value;
-            if (thumbnail) embedHtml += `<img src="${thumbnail}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right">`;
-            const image = item.querySelector('input[placeholder*="Image"]').value;
-            if (image) embedHtml += `<img src="${image}" alt="Image" class="w-full h-auto rounded mb-3">`;
-            const authorName = item.querySelector('input[placeholder="Author name"]').value;
-            const authorIcon = item.querySelector('input[placeholder="Author icon URL"]').value;
+            const thumbnailInput = item.querySelector('input[placeholder*="Thumbnail"]');
+            const thumbnail = thumbnailInput?.value || '';
+            if (thumbnail && isValidUrl(thumbnail)) {
+                embedHtml += `<img src="${thumbnail}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right" onerror="this.style.display='none'">`;
+            }
+            const imageInput = item.querySelector('input[placeholder*="Image"]');
+            const image = imageInput?.value || '';
+            if (image && isValidUrl(image)) {
+                embedHtml += `<img src="${image}" alt="Image" class="w-full h-auto rounded mb-3" onerror="this.style.display='none'">`;
+            }
+            const authorNameInput = item.querySelector('input[placeholder="Author name"]');
+            const authorName = authorNameInput?.value || '';
+            const authorIconInput = item.querySelector('input[placeholder="Author icon URL"]');
+            const authorIcon = authorIconInput?.value || '';
             if (authorName) {
                 embedHtml += `<div class="flex items-center mb-3">`;
-                if (authorIcon) embedHtml += `<img src="${authorIcon}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2">`;
+                if (authorIcon && isValidUrl(authorIcon)) {
+                    embedHtml += `<img src="${authorIcon}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2" onerror="this.style.display='none'">`;
+                }
                 embedHtml += `<span class="font-semibold">${authorName}</span></div>`;
             }
             const fields = item.querySelectorAll('.field-item');
             fields.forEach(field => {
                 const inputs = field.querySelectorAll('input');
-                const name = inputs[0].value;
-                const value = inputs[1].value;
+                const name = inputs[0]?.value || '';
+                const value = inputs[1]?.value || '';
                 if (name && value) {
-                    embedHtml += `<div class="mb-2 ${inputs[2].checked ? 'field-inline' : ''}">
+                    embedHtml += `<div class="mb-2 ${inputs[2]?.checked ? 'field-inline' : ''}">
                         <div class="font-semibold text-white mb-1">${name}</div>
                         <div class="text-gray-300">${value}</div>
                     </div>`;
                 }
             });
-            const footerText = item.querySelector('input[placeholder="Footer text"]').value;
-            const footerIcon = item.querySelector('input[placeholder="Footer icon URL"]').value;
-            const timestamp = item.querySelector('input[type="datetime-local"]').value;
+            const footerTextInput = item.querySelector('input[placeholder="Footer text"]');
+            const footerText = footerTextInput?.value || '';
+            const footerIconInput = item.querySelector('input[placeholder="Footer icon URL"]');
+            const footerIcon = footerIconInput?.value || '';
+            const timestampInput = item.querySelector('input[type="datetime-local"]');
+            const timestamp = timestampInput?.value || '';
             if (footerText || timestamp) {
                 embedHtml += `<div class="flex items-center mt-3 text-gray-400 text-sm">`;
-                if (footerIcon) embedHtml += `<img src="${footerIcon}" alt="Footer Icon" class="w-5 h-5 mr-2">`;
+                if (footerIcon && isValidUrl(footerIcon)) {
+                    embedHtml += `<img src="${footerIcon}" alt="Footer Icon" class="w-5 h-5 mr-2" onerror="this.style.display='none'">`;
+                }
                 embedHtml += `<span>${footerText}${footerText && timestamp ? ' | ' : ''}${timestamp ? new Date(timestamp).toLocaleString() : ''}</span></div>`;
             }
-            const color = item.querySelector('input[type="color"]').value;
+            const colorInput = item.querySelector('input[type="color"]');
+            const color = colorInput?.value || '#5865f2';
             embedHtml = embedHtml.replace('preview-embed', `preview-embed border-l-[4px] border-l-[${color}]`);
             embedHtml += '</div>';
             html += embedHtml;
@@ -577,18 +636,15 @@ function updatePreview() {
         preview.innerHTML = html || '<p class="text-gray-400 italic">Build your embed to see a live preview here...</p>';
         console.log('Preview updated with:', html);
     } catch (e) {
-        console.error('Error in updatePreview:', e);
-        showNotification('error', 'Failed to update preview. Check console for details.');
+        console.error('Error in updatePreview:', e.message);
+        showNotification('error', `Failed to update preview: ${e.message}`);
     }
 }
 
 function toggleEmojiPicker(pickerId) {
     try {
         const picker = document.getElementById(pickerId);
-        if (!picker) {
-            console.error(`Emoji picker ${pickerId} not found`);
-            return;
-        }
+        if (!picker) throw new Error(`Emoji picker ${pickerId} not found`);
         const isActive = picker.classList.contains('active');
         document.querySelectorAll('emoji-picker').forEach(p => p.classList.remove('active'));
         if (!isActive) {
@@ -596,19 +652,20 @@ function toggleEmojiPicker(pickerId) {
             console.log(`Toggled emoji picker ${pickerId} to active`);
         }
     } catch (e) {
-        console.error('Error in toggleEmojiPicker:', e);
-        showNotification('error', 'Failed to toggle emoji picker. Check console for details.');
+        console.error('Error in toggleEmojiPicker:', e.message);
+        showNotification('error', `Failed to toggle emoji picker: ${e.message}`);
     }
 }
 
 function setupEmojiPicker(pickerId) {
     try {
         const picker = document.getElementById(pickerId);
+        if (!picker) throw new Error(`Emoji picker ${pickerId} not found`);
         if (picker && !picker.dataset.listenerAdded) {
             console.log(`Setting up emoji picker: ${pickerId}`);
             picker.addEventListener('emoji-click', event => {
                 console.log(`Emoji clicked: ${event.detail.unicode}`);
-                const textarea = picker.closest('.emoji-picker-container').querySelector('textarea');
+                const textarea = picker.closest('.emoji-picker-container')?.querySelector('textarea');
                 if (textarea) {
                     textarea.value += event.detail.unicode;
                     updatePreview();
@@ -618,8 +675,8 @@ function setupEmojiPicker(pickerId) {
             picker.dataset.listenerAdded = true;
         }
     } catch (e) {
-        console.error('Error in setupEmojiPicker:', e);
-        showNotification('error', 'Failed to setup emoji picker. Check console for details.');
+        console.error('Error in setupEmojiPicker:', e.message);
+        showNotification('error', `Failed to setup emoji picker: ${e.message}`);
     }
 }
 
@@ -649,7 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updatePreview();
     } catch (e) {
-        console.error('Error in DOMContentLoaded:', e);
-        showNotification('error', 'Failed to initialize. Check console for details.');
+        console.error('Error in DOMContentLoaded:', e.message);
+        showNotification('error', `Failed to initialize: ${e.message}`);
     }
 });
