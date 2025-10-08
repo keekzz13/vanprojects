@@ -58,7 +58,7 @@
         .emoji-picker-container { position: relative; }
         .emoji-picker-container emoji-picker { display: none; position: absolute; z-index: 20; background: #2f3136; border-radius: 8px; padding: 10px; }
         .emoji-picker-container emoji-picker.active { display: block; animation: fadeIn 0.2s ease-out; }
-        .preview-panel { width: 100%; max-width: 400px; position: sticky; top: 1rem; }
+        .preview-panel { width: 100%; max-width: 400px; position: sticky; top: 1rem; align-self: start; }
         @media (max-width: 1024px) { .preview-panel { max-width: 100%; } }
         .main-grid { transition: grid-template-columns 0.3s ease; }
     </style>
@@ -67,11 +67,14 @@
     <div class="container mx-auto px-4 py-8 max-w-7xl">
         <header class="text-center mb-12">
             <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent mb-4 animate-fadeIn">EmbedForge</h1>
-            <p class="text-xl text-gray-300 max-w-2xl mx-auto">Craft stunning Discord embeds with ease. Fully featured, completely free. No limits, no signups. :) </p>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto">Craft stunning Discord embeds with ease. Fully featured, completely free. No limits, no signups.</p>
         </header>
 
         <div id="mainGrid" class="main-grid grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div id="builderPanel" class="lg:col-span-2 space-y-6">
+                <button id="viewPreviewBtn" onclick="togglePreview()" class="px-3 py-1 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors hidden mb-4">
+                    <i class="fas fa-expand-alt mr-2"></i>View Preview
+                </button>
                 <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
                     <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-link mr-2 text-blue-400"></i>Webhook URL</h2>
                     <input type="url" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required>
@@ -139,9 +142,6 @@
                     <div class="flex space-x-2">
                         <button id="hidePreviewBtn" onclick="togglePreview()" class="px-3 py-1 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
                             <i class="fas fa-compress-alt"></i> Hide
-                        </button>
-                        <button id="viewPreviewBtn" onclick="togglePreview()" class="px-3 py-1 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors hidden">
-                            <i class="fas fa-expand-alt"></i> View
                         </button>
                     </div>
                 </div>
