@@ -142,16 +142,23 @@ function updateEmbedIndices() {
         const embeds = document.querySelectorAll('.embed-item');
         embeds.forEach((embed, i) => {
             embed.id = `embed-${i}`;
-            embed.querySelector('h3').textContent = `Embed ${i + 1}`;
+            const header = embed.querySelector('h3');
+            if (header) header.textContent = `Embed ${i + 1}`;
+            
             const removeButton = embed.querySelector('button[onclick*="removeEmbed"]');
             if (removeButton) removeButton.setAttribute('onclick', `removeEmbed(${i})`);
+
             const addFieldButton = embed.querySelector('button[onclick*="addField"]');
             if (addFieldButton) addFieldButton.setAttribute('onclick', `addField(${i})`);
+
             const fieldsContainer = embed.querySelector(`div[id^="fields-"]`);
             if (fieldsContainer) fieldsContainer.id = `fields-${i}`;
+
             const emojiPicker = embed.querySelector('emoji-picker');
             if (emojiPicker) {
                 emojiPicker.id = `embedDescEmojiPicker-${i}`;
+                const emojiButton = embed.querySelector('button[onclick*="toggleEmojiPicker"]');
+                if (emojiButton) emojiButton.setAttribute('onclick', `toggleEmojiPicker('embedDescEmojiPicker-${i}')`);
                 setupEmojiPicker(`embedDescEmojiPicker-${i}`);
             }
         });
@@ -273,61 +280,96 @@ function loadFromJSON() {
 
 function generateJSON() {
     try {
-        const webhookUrl = document.getElementById('webhookUrl').value;
+        const webhookUrl = document.getElementById('webhookUrl')?.value;
         if (!webhookUrl) {
             showNotification('error', 'Webhook URL is required!');
             return null;
         }
         const payload = {
-            content: document.getElementById('content').value,
+            content: document.getElementById('content')?.value || '',
             embeds: []
         };
 
         const embedItems = document.querySelectorAll('.embed-item');
         if (embedItems.length > 10) throw new Error('Maximum 10 embeds allowed');
-        embedItems.forEach(item => {
+
+        embedItems.forEach((item, index) => {
             const embed = {};
-            embed.title = item.querySelector('input[placeholder="Embed title..."]').value || '';
-            embed.url = item.querySelector('input[placeholder="https://example.com"]').value || '';
+
+            // Use more robust selectors and add null checks
+            const titleInput = item.querySelector('input[placeholder="Embed title..."]');
+            embed.title = titleInput?.value || '';
+
+            const urlInput = item.querySelector('input[placeholder="https://example.com"]');
+            embed.url = urlInput?.value || '';
             if (embed.title && embed.url && !/^https?:\/\//.test(embed.url)) {
-                throw new Error('Embed URL must be a valid HTTP/HTTPS link');
+                throw new Error(`Embed ${index + 1} URL must be a valid HTTP/HTTPS link`);
             }
-            embed.description = item.querySelector('textarea[placeholder="Embed description..."]').value || '';
-            embed.color = parseInt(item.querySelector('input[type="color"]').value.slice(1), 16) || 0x5865f2;
+
+            const descriptionInput = item.querySelector('textarea[placeholder="Embed description..."]');
+            embed.description = descriptionInput?.value || '';
+
+            const colorInput = item.querySelector('input[type="color"]');
+            embed.color = colorInput ? parseInt(colorInput.value.slice(1), 16) || 0x5865f2 : 0x5865f2;
+
             const timestampInput = item.querySelector('input[type="datetime-local"]');
-            if (timestampInput.value) embed.timestamp = new Date(timestampInput.value).toISOString();
-            embed.thumbnail = { url: item.querySelector('input[placeholder*="Thumbnail"]').value || '' };
-            embed.image = { url: item.querySelector('input[placeholder*="Image"]').value || '' };
-            const authorName = item.querySelector('input[placeholder="Author name"]').value || '';
+            if (timestampInput?.value) embed.timestamp = new Date(timestampInput.value).toISOString();
+
+            const thumbnailInput = item.querySelector('input[placeholder*="Thumbnail"]');
+            embed.thumbnail = { url: thumbnailInput?.value || '' };
+
+            const imageInput = item.querySelector('input[placeholder*="Image"]');
+            embed.image = { url: imageInput?.value || '' };
+
+            const authorNameInput = item.querySelector('input[placeholder="Author name"]');
+            const authorName = authorNameInput?.value || '';
             if (authorName) {
                 embed.author = { name: authorName };
-                const authorIcon = item.querySelector('input[placeholder="Author icon URL"]').value || '';
-                if (authorIcon) embed.author.icon_url = authorIcon;
+                const authorIconInput = item.querySelector('input[placeholder="Author icon URL"]');
+                if (authorIconInput?.value) embed.author.icon_url = authorIconInput.value;
             }
-            const footerText = item.querySelector('input[placeholder="Footer text"]').value || '';
+
+            const footerTextInput = item.querySelector('input[placeholder="Footer text"]');
+            const footerText = footerTextInput?.value || '';
             if (footerText) {
                 embed.footer = { text: footerText };
-                const footerIcon = item.querySelector('input[placeholder="Footer icon URL"]').value || '';
-                if (footerIcon) embed.footer.icon_url = footerIcon;
+                const footerIconInput = item.querySelector('input[placeholder="Footer icon URL"]');
+                if (footerIconInput?.value) embed.footer.icon_url = footerIconInput.value;
             }
+
             const fields = item.querySelectorAll('.field-item');
             if (fields.length > 0) {
-                if (fields.length > 25) throw new Error('Maximum 25 fields per embed allowed');
-                embed.fields = Array.from(fields).map(field => {
-                    const inputs = field.querySelectorAll('input');
-                    return {
-                        name: inputs[0].value || '',
-                        value: inputs[1].value || '',
-                        inline: inputs[2].checked
-                    };
-                }).filter(field => field.name && field.value);
+                if (fields.length > 25) throw new Error(`Embed ${index + 1}: Maximum 25 fields per embed allowed`);
+                embed.fields = Array.from(fields)
+                    .map(field => {
+                        const inputs = field.querySelectorAll('input');
+                        if (!inputs[0] || !inputs[1] || !inputs[2]) return null;
+                        return {
+                            name: inputs[0].value || '',
+                            value: inputs[1].value || '',
+                            inline: inputs[2].checked
+                        };
+                    })
+                    .filter(field => field && field.name && field.value);
             }
-            if (embed.title || embed.description || embed.fields?.length) payload.embeds.push(embed);
+
+            // Only add embed if it has meaningful content
+            if (embed.title || embed.description || embed.fields?.length) {
+                payload.embeds.push(embed);
+            }
         });
 
+        // Validate that at least one embed or content exists
+        if (!payload.content && payload.embeds.length === 0 && files.length === 0) {
+            throw new Error('No content, embeds, or files to send');
+        }
+
         const jsonString = JSON.stringify(payload, null, 2);
-        document.getElementById('jsonOutput').value = jsonString;
-        document.getElementById('jsonModal').classList.remove('hidden');
+        const jsonOutput = document.getElementById('jsonOutput');
+        if (jsonOutput) {
+            jsonOutput.value = jsonString;
+            document.getElementById('jsonModal')?.classList.remove('hidden');
+        }
         showNotification('success', 'JSON generated successfully!');
         console.log('Generated JSON:', jsonString);
         return payload;
@@ -444,7 +486,7 @@ function sendToDiscord() {
                 const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
                 fetch(proxyUrl, {
                     method: 'POST',
-                    body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: fileData }),
+                    body: JSON.stringify accelerating({ webhookUrl, payload: JSON.stringify(payload), files: fileData }),
                     headers: { 'Content-Type': 'application/json' }
                 })
                     .then(response => {
