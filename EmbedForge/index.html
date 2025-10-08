@@ -58,20 +58,20 @@
         .emoji-picker-container { position: relative; }
         .emoji-picker-container emoji-picker { display: none; position: absolute; z-index: 20; background: #2f3136; border-radius: 8px; padding: 10px; }
         .emoji-picker-container emoji-picker.active { display: block; animation: fadeIn 0.2s ease-out; }
-        .preview-panel { width: 100%; max-width: 400px; }
+        .preview-panel { width: 100%; max-width: 400px; position: sticky; top: 1rem; }
         @media (max-width: 1024px) { .preview-panel { max-width: 100%; } }
+        .main-grid { transition: grid-template-columns 0.3s ease; }
     </style>
 </head>
 <body class="bg-gray-900 text-white font-sans min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-7xl">
         <header class="text-center mb-12">
             <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent mb-4 animate-fadeIn">EmbedForge</h1>
-            <p class="text-xl text-gray-300 max-w-2xl mx-auto">Craft stunning Discord embeds with ease. Fully featured, completely free. No limits, no signups.</p>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto">Craft stunning Discord embeds with ease. Fully featured, completely free. No limits, no signups. :) </p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Builder Panel -->
-            <div class="lg:col-span-2 space-y-6">
+        <div id="mainGrid" class="main-grid grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div id="builderPanel" class="lg:col-span-2 space-y-6">
                 <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
                     <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-link mr-2 text-blue-400"></i>Webhook URL</h2>
                     <input type="url" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required>
@@ -121,6 +121,9 @@
                 </div>
 
                 <div class="flex space-x-4">
+                    <button onclick="sendToDiscord()" class="flex-1 px-6 py-3 bg-discord-primary rounded-lg hover:bg-discord-primary/80 transition-colors font-semibold">
+                        <i class="fas fa-paper-plane mr-2"></i>Send to Discord
+                    </button>
                     <button onclick="generateJSON()" class="flex-1 px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
                         <i class="fas fa-copy mr-2"></i>Copy JSON
                     </button>
@@ -128,20 +131,19 @@
                         <i class="fas fa-trash mr-2"></i>Clear All
                     </button>
                 </div>
-
-                <div class="flex space-x-4">
-                    <button id="hidePreviewBtn" onclick="togglePreview()" class="flex-1 px-6 py-3 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors font-semibold">
-                        <i class="fas fa-compress-alt mr-2"></i>Hide Preview
-                    </button>
-                    <button id="viewPreviewBtn" onclick="togglePreview()" class="flex-1 px-6 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors font-semibold hidden">
-                        <i class="fas fa-expand-alt mr-2"></i>View Preview
-                    </button>
-                </div>
             </div>
 
             <div id="previewPanel" class="preview-panel bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold flex items-center"><i class="fas fa-eye mr-2 text-indigo-400"></i>Live Preview</h2>
+                    <div class="flex space-x-2">
+                        <button id="hidePreviewBtn" onclick="togglePreview()" class="px-3 py-1 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
+                            <i class="fas fa-compress-alt"></i> Hide
+                        </button>
+                        <button id="viewPreviewBtn" onclick="togglePreview()" class="px-3 py-1 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors hidden">
+                            <i class="fas fa-expand-alt"></i> View
+                        </button>
+                    </div>
                 </div>
                 <div id="preview" class="min-h-[400px] bg-discord-bg rounded-lg p-4 space-y-4 overflow-y-auto">
                     <p class="text-gray-400 italic">Build your embed to see a live preview here...</p>
