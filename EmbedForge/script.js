@@ -111,8 +111,6 @@ function addEmbed(embedData = {}) {
         embedData.fields.forEach(field => addField(embedCount, field));
     }
     setupEmojiPicker(`embedDescEmojiPicker-${embedCount}`);
-    setupInputListeners(embedDiv);
-    embedCount++;
     updatePreview();
 }
 
@@ -145,7 +143,6 @@ function addField(embedIndex, fieldData = {}) {
         </div>
     `;
     fieldsContainer.appendChild(fieldDiv);
-    setupInputListeners(fieldDiv);
     updatePreview();
 }
 
@@ -390,6 +387,7 @@ function showNotification(type, message) {
 function updatePreview() {
     if (previewUpdateTimeout) clearTimeout(previewUpdateTimeout);
     previewUpdateTimeout = setTimeout(() => {
+        console.log('Updating preview...');
         const preview = document.getElementById('preview');
         const content = document.getElementById('content').value;
         let html = '';
@@ -455,6 +453,7 @@ function updatePreview() {
         }
 
         preview.innerHTML = html || '<p class="text-gray-400 italic">Build your embed to see a live preview here...</p>';
+        console.log('Preview updated with:', html);
     }, 100);
 }
 
@@ -478,22 +477,28 @@ function setupEmojiPicker(pickerId) {
     }
 }
 
-function setupInputListeners(element) {
-    const inputs = element.querySelectorAll('input, textarea');
-    inputs.forEach(input => {
-        if (!input.dataset.listenerAdded) {
-            input.addEventListener('input', updatePreview);
-            if (input.type === 'checkbox') {
-                input.addEventListener('change', updatePreview);
-            }
-            input.dataset.listenerAdded = true;
-        }
-    });
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     addEmbed();
     setupEmojiPicker('contentEmojiPicker');
-    setupInputListeners(document);
     updatePreview();
+
+    // Event delegation for all inputs
+    document.addEventListener('input', (e) => {
+        if (e.target.matches('input, textarea')) {
+            console.log('Input detected on:', e.target);
+            updatePreview();
+        }
+    });
+    document.addEventListener('change', (e) => {
+        if (e.target.matches('input[type="checkbox"], input[type="color"], input[type="file"], input[type="datetime-local"]')) {
+            console.log('Change detected on:', e.target);
+            updatePreview();
+        }
+    });
+    document.addEventListener('keyup', (e) => {
+        if (e.target.matches('input, textarea')) {
+            console.log('Keyup detected on:', e.target);
+            updatePreview();
+        }
+    });
 });
