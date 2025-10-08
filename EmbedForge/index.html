@@ -78,13 +78,13 @@
                 </button>
                 <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
                     <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-link mr-2 text-blue-400"></i>Webhook URL</h2>
-                    <input type="url" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required>
+                    <input type="url" id="webhookUrl" class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none text-white" placeholder="https://discord.com/api/webhooks/...">
                 </div>
 
                 <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
                     <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-align-left mr-2 text-green-400"></i>Message Content</h2>
                     <div class="emoji-picker-container relative">
-                        <textarea id="content" rows="3" placeholder="Optional plain text message..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-green-500 focus:outline-none text-white resize-none"></textarea>
+                        <textarea id="content" rows="3" class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-green-500 focus:outline-none text-white resize-none" placeholder="Optional plain text message..."></textarea>
                         <button onclick="toggleEmojiPicker('contentEmojiPicker')" class="absolute top-3 right-3 text-gray-400 hover:text-green-500"><i class="fas fa-smile"></i></button>
                         <emoji-picker id="contentEmojiPicker" class="emoji-picker"></emoji-picker>
                     </div>
@@ -118,7 +118,7 @@
 
                 <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
                     <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-code mr-2 text-indigo-400"></i>JSON Input</h2>
-                    <textarea id="jsonInput" rows="5" placeholder="Paste your JSON here to load an embed..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-indigo-500 focus:outline-none text-white font-mono text-sm resize-none"></textarea>
+                    <textarea id="jsonInput" rows="5" class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-indigo-500 focus:outline-none text-white font-mono text-sm resize-none" placeholder="Paste your JSON here to load an embed..."></textarea>
                     <button onclick="loadFromJSON()" class="mt-4 px-4 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors w-full">
                         <i class="fas fa-file-import mr-2"></i>Load JSON
                     </button>
