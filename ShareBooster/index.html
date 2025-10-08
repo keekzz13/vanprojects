@@ -16,15 +16,15 @@
 <body>
     <div class="cyberpunk-bg"></div>
     <div class="grid-lines"></div>
-
+    
     <div class="theme-toggle">
         <i class="fas fa-moon" id="theme-icon"></i>
     </div>
-
+    
     <div class="menu-icon" id="menu-icon">
         <i class="fas fa-bars"></i>
     </div>
-
+    
     <div class="side-menu" id="side-menu">
         <div class="menu-header">
             <i class="fas fa-times" id="close-menu"></i>
@@ -36,7 +36,7 @@
             <li><a href="#" id="show-history"><i class="fas fa-clock-rotate-left"></i> Share History</a></li>
         </ul>
     </div>
-
+    
     <!-- Password Modal -->
     <div class="modal" id="password-modal">
         <div class="modal-content">
@@ -49,7 +49,7 @@
             <button type="button" id="submit-password" class="submit-btn"><i class="fas fa-key"></i> Submit</button>
         </div>
     </div>
-
+    
     <div class="wrapper-container">
         <!-- Welcome Section -->
         <div class="container welcome-container" id="welcome-section">
@@ -79,7 +79,7 @@
                 </button>
             </div>
         </div>
-
+        
         <!-- Main Content (initially hidden) -->
         <div class="main-content" id="main-content" style="display: none;">
             <div class="container intro-container">
@@ -89,7 +89,7 @@
                     <a href="https://www.facebook.com/aivan.abanto1/" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
                 </div>
             </div>
-
+            
             <div class="form-wrapper">
                 <form onsubmit="submitForm(event)" class="form-container">
                     <div class="form-item">
@@ -124,7 +124,7 @@
                     </div>
                 </form>
             </div>
-
+            
             <div class="container" id="process-container">
                 <h1 class="glow">ACTIVE SHARE PROCESSING</h1>
                 <div class="process-header">
@@ -133,7 +133,7 @@
                 </div>
                 <div class="process-list" id="processing"></div>
             </div>
-
+            
             <div class="container" id="history-container" style="display:none;">
                 <h1 class="glow">SHARE HISTORY</h1>
                 <div class="history-controls">
@@ -148,13 +148,13 @@
                 </div>
             </div>
         </div>
-
+        
         <footer>
             <div class="datetime" id="datetime"></div>
             <p>© Aurox Booster | All Rights Reserved</p>
         </footer>
     </div>
-
+    
     <!-- Contact Admin Modal -->
     <div class="modal" id="contact-modal">
         <div class="modal-content">
@@ -1082,24 +1082,24 @@
         h1 {
             font-size: 1.8rem;
         }
-
+        
         .container {
             padding: 15px;
         }
-
+        
         .theme-toggle, .menu-icon {
             position: fixed;
             top: 10px;
         }
-
+        
         .theme-toggle {
             right: 10px;
         }
-
+        
         .menu-icon {
             right: 60px;
         }
-
+        
         .side-menu {
             width: 260px;
         }
@@ -1167,20 +1167,19 @@
         event.preventDefault();
         const result = document.getElementById('result');
         const button = document.getElementById('submit-button');
-
+        
         try {
             result.style.display = 'block';
             button.disabled = true;
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
-
+            
             // Get user identifier (you can use cookies or generate a unique ID)
             let userId = localStorage.getItem('userId');
             if (!userId) {
                 userId = 'user-' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('userId', userId);
             }
-
-            const response = await fetch('/api/submit', {
+            
             const response = await fetch('https://auroxboost.onrender.com/api/submit', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -1194,14 +1193,14 @@
                     'Content-Type': 'application/json',
                 },
             });
-
+            
             const data = await response.json();
-
+        
             if (data.status === 200) {
                 result.style.backgroundColor = 'rgba(0, 200, 83, 0.28)';
                 result.style.color = '#fff';
                 result.innerHTML = 'Submitted successfully!';
-
+                
                 // Add to history with user identifier
                 addToHistory({
                     id: generateId(),
@@ -1211,7 +1210,7 @@
                     date: new Date().toISOString(),
                     userId: userId
                 });
-
+                
                 // Refresh processing
                 loadProcessing();
             } else {
@@ -1229,26 +1228,26 @@
             button.disabled = false;
         }
     }
-
+    
     function generateId() {
         return 'id-' + Math.random().toString(36).substr(2, 9);
     }
-
+    
     function addToHistory(item) {
         let history = JSON.parse(localStorage.getItem('shareHistory')) || [];
         history.unshift(item);
         localStorage.setItem('shareHistory', JSON.stringify(history));
     }
-
+    
     function renderHistory() {
         const historyList = document.getElementById('history-list');
         let history = JSON.parse(localStorage.getItem('shareHistory')) || [];
-
+        
         const userId = localStorage.getItem('userId');
         if (userId) {
             history = history.filter(item => item.userId === userId);
         }
-
+        
         if (history.length === 0) {
             historyList.innerHTML = `
                 <div class="history-placeholder">
@@ -1258,9 +1257,9 @@
             `;
             return;
         }
-
+        
         historyList.innerHTML = '';
-
+        
         history.forEach(item => {
             const historyItem = document.createElement('div');
             historyItem.className = 'history-item';
@@ -1278,43 +1277,42 @@
             historyList.appendChild(historyItem);
         });
     }
-
+    
     function formatDate(dateString) {
         const date = new Date(dateString);
         return date.toLocaleString();
     }
-
+    
     async function loadProcessing() {
         try {
             const container = document.getElementById('processing');
             const processContainer = document.getElementById('process-container');
             const activeCount = document.getElementById('active-count');
             const statsElement = document.getElementById('stats');
-
-            const response = await fetch('/total');
+            
             const response = await fetch('https://auroxboost.onrender.com/total');
-
+        
             if (!response.ok) {
                 throw new Error(`Failed to fetch: ${response.status} - ${response.statusText}`);
             }
-
+        
             const data = await response.json();
             if (!data || data.length === 0) {
                 processContainer.style.display = 'none';
                 return;
             }
-
+            
             processContainer.style.display = 'block';
             container.innerHTML = '';
-
+            
             let totalCompleted = 0;
             let totalTarget = 0;
-
+            
             data.forEach((item) => {
                 const progress = item.target ? Math.min(100, (item.count / item.target) * 100) : 0;
                 totalCompleted += item.count || 0;
                 totalTarget += item.target || 0;
-
+                
                 const processItem = document.createElement('div');
                 processItem.className = 'process-item';
                 processItem.innerHTML = `
@@ -1336,46 +1334,46 @@
                 `;
                 container.appendChild(processItem);
             });
-
+            
             activeCount.textContent = `${data.length} Active`;
             statsElement.textContent = `${totalCompleted}/${totalTarget} Shares Completed`;
-
+            
         } catch (error) {
             console.error(error);
         }
     }
-
+    
     function toggleInputField(checkboxId, inputId) {
         const checkbox = document.getElementById(checkboxId);
         const input = document.getElementById(inputId);
-
+        
         function updateInputState() {
             input.disabled = !checkbox.checked;
             input.required = checkbox.checked;
         }
-
+        
         checkbox.addEventListener('change', updateInputState);
         updateInputState();
     }
-
+    
     document.addEventListener('DOMContentLoaded', function() {
         loadProcessing();
-
+        
         toggleInputField('enable-link', 'urls');
         toggleInputField('enable-limit', 'amounts');
         toggleInputField('enable-delay', 'intervals');
-
+        
         const themeToggle = document.querySelector('.theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
         let currentTheme = localStorage.getItem('theme') || 'dark';
-
+        
         document.documentElement.setAttribute('data-theme', currentTheme);
-
+        
         if (currentTheme === 'light') {
             themeIcon.classList.remove('fa-moon');
             themeIcon.classList.add('fa-sun');
         }
-
+        
         themeToggle.addEventListener('click', function() {
             if (currentTheme === 'dark') {
                 currentTheme = 'light';
@@ -1389,7 +1387,7 @@
             document.documentElement.setAttribute('data-theme', currentTheme);
             localStorage.setItem('theme', currentTheme);
         });
-
+        
         function updateDateTime() {
             const now = new Date();
             const options = { 
@@ -1404,43 +1402,43 @@
             };
             document.getElementById('datetime').textContent = now.toLocaleDateString('en-US', options);
         }
-
+        
         updateDateTime();
         setInterval(updateDateTime, 1000);
-
+        
         const menuIcon = document.getElementById('menu-icon');
         const sideMenu = document.getElementById('side-menu');
         const closeMenu = document.getElementById('close-menu');
-
+        
         menuIcon.addEventListener('click', function() {
             sideMenu.classList.add('active');
         });
-
+        
         closeMenu.addEventListener('click', function() {
             sideMenu.classList.remove('active');
         });
-
+        
         const contactBtn = document.getElementById('contact-admin');
         const contactModal = document.getElementById('contact-modal');
         const closeContactModal = contactModal.querySelector('.close-modal');
-
+        
         contactBtn.addEventListener('click', function(e) {
             e.preventDefault();
             contactModal.classList.add('active');
             sideMenu.classList.remove('active');
         });
-
+        
         closeContactModal.addEventListener('click', function() {
             contactModal.classList.remove('active');
         });
-
+        
         const showHistoryBtn = document.getElementById('show-history');
         const passwordModal = document.getElementById('password-modal');
         const submitPasswordBtn = document.getElementById('submit-password');
         const passwordError = document.getElementById('password-error');
         const historyContainer = document.getElementById('history-container');
         const closePasswordModal = passwordModal.querySelector('.close-modal');
-
+        
         showHistoryBtn.addEventListener('click', function(e) {
             e.preventDefault();
             passwordModal.classList.add('active');
@@ -1448,11 +1446,11 @@
             document.getElementById('history-password').value = '';
             passwordError.style.display = 'none';
         });
-
+        
         closePasswordModal.addEventListener('click', function() {
             passwordModal.classList.remove('active');
         });
-
+        
         // password updated for Aurox Booster
         submitPasswordBtn.addEventListener('click', function() {
             const password = document.getElementById('history-password').value;
@@ -1465,13 +1463,13 @@
                 passwordError.style.display = 'block';
             }
         });
-
+        
         document.getElementById('history-password').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 submitPasswordBtn.click();
             }
         });
-
+        
         window.addEventListener('click', function(e) {
             if (e.target === contactModal) {
                 contactModal.classList.remove('active');
@@ -1480,7 +1478,7 @@
                 passwordModal.classList.remove('active');
             }
         });
-
+        
         const contactForm = document.querySelector('.contact-form');
         if (contactForm) {
             contactForm.addEventListener('submit', function(e) {
@@ -1490,27 +1488,27 @@
                 contactForm.reset();
             });
         }
-
+        
         document.getElementById('refresh-history').addEventListener('click', function(e) {
             e.preventDefault();
             renderHistory();
             loadProcessing();
         });
-
+        
         document.getElementById('clear-history').addEventListener('click', function(e) {
             e.preventDefault();
             if (confirm('Are you sure you want to clear all history?')) {
                 const userId = localStorage.getItem('userId');
                 let history = JSON.parse(localStorage.getItem('shareHistory')) || [];
-
+                
                 // Only clear history for current user
                 history = history.filter(item => item.userId !== userId);
                 localStorage.setItem('shareHistory', JSON.stringify(history));
-
+                
                 renderHistory();
             }
         });
-
+        
         setInterval(loadProcessing, 10000);
 
         document.getElementById('start-boosting').addEventListener('click', function() {
