@@ -1,6 +1,7 @@
 let embedCount = 0;
 let files = [];
 let isPreviewVisible = true;
+let previewUpdateTimeout = null;
 
 const templates = {
     welcome: {
@@ -112,13 +113,11 @@ function addEmbed(embedData = {}) {
     setupEmojiPicker(`embedDescEmojiPicker-${embedCount}`);
     setupInputListeners(embedDiv);
     embedCount++;
-    updateEmbedIndices();
     updatePreview();
 }
 
 function removeEmbed(index) {
-    const embed = document.getElementById(`embed-${index}`);
-    if (embed) embed.remove();
+    document.getElementById(`embed-${index}`).remove();
     updateEmbedIndices();
     updatePreview();
     showNotification('success', 'Embed removed successfully!');
@@ -127,21 +126,8 @@ function removeEmbed(index) {
 function updateEmbedIndices() {
     const embeds = document.querySelectorAll('.embed-item');
     embeds.forEach((embed, i) => {
-        embed.id = `embed-${i}`;
         embed.querySelector('h3').textContent = `Embed ${i + 1}`;
-        const removeButton = embed.querySelector('button[onclick*="removeEmbed"]');
-        if (removeButton) removeButton.setAttribute('onclick', `removeEmbed(${i})`);
-        const addFieldButton = embed.querySelector('button[onclick*="addField"]');
-        if (addFieldButton) addFieldButton.setAttribute('onclick', `addField(${i})`);
-        const fieldsContainer = embed.querySelector(`div[id^="fields-"]`);
-        if (fieldsContainer) fieldsContainer.id = `fields-${i}`;
-        const emojiPicker = embed.querySelector('emoji-picker');
-        if (emojiPicker) {
-            emojiPicker.id = `embedDescEmojiPicker-${i}`;
-            setupEmojiPicker(`embedDescEmojiPicker-${i}`);
-        }
     });
-    embedCount = embeds.length;
 }
 
 function addField(embedIndex, fieldData = {}) {
@@ -325,7 +311,7 @@ function clearAll() {
 
 function sendToDiscord() {
     const webhookUrl = document.getElementById('webhookUrl').value;
-    if (!webhookUrl || !/^https:\/\/(discord\.com|discordapp\.com)\/api\/webhooks\/[0-9]+\/[A-Za-z0-9_-]+/.test(webhookUrl)) {
+    if (!webhookUrl || !/^https:\/\/discord\.com\/api\/webhooks\//.test(webhookUrl)) {
         showNotification('error', 'Please provide a valid Discord webhook URL!');
         return;
     }
@@ -339,15 +325,10 @@ function sendToDiscord() {
         formData.append(`file${i}`, file, file.name);
     });
 
-    // Test webhook URL validity
-    fetch(webhookUrl, { method: 'HEAD' })
-        .then(response => {
-            if (!response.ok) throw new Error('Invalid webhook URL');
-            return fetch(webhookUrl, {
-                method: 'POST',
-                body: formData
-            });
-        })
+    fetch(webhookUrl, {
+        method: 'POST',
+        body: formData
+    })
         .then(response => {
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             showNotification('success', 'Message sent to Discord successfully!');
@@ -362,6 +343,7 @@ function togglePreview() {
     const panel = document.getElementById('previewPanel');
     const hideBtn = document.getElementById('hidePreviewBtn');
     const viewBtn = document.getElementById('viewPreviewBtn');
+    const mainGrid = document.getElementById('mainGrid');
     const builderPanel = document.getElementById('builderPanel');
     if (isPreviewVisible) {
         panel.classList.add('animate-fadeOut');
@@ -406,81 +388,78 @@ function showNotification(type, message) {
 }
 
 function updatePreview() {
-    console.log('Updating preview...');
-    const preview = document.getElementById('preview');
-    const content = document.getElementById('content').value;
-    let html = '';
+    if (previewUpdateTimeout) clearTimeout(previewUpdateTimeout);
+    previewUpdateTimeout = setTimeout(() => {
+        const preview = document.getElementById('preview');
+        const content = document.getElementById('content').value;
+        let html = '';
 
-    if (content) {
-        html += `<div class="bg-discord-bg p-4 rounded-lg mb-4">${content}</div>`;
-    }
-
-    const embedItems = document.querySelectorAll('.embed-item');
-    embedItems.forEach(item => {
-        let embedHtml = '<div class="preview-embed rounded-lg p-4 mb-4">';
-        const title = item.querySelector('input[placeholder="Embed title..."]').value;
-        if (title) embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${title}</h3>`;
-        const description = item.querySelector('textarea[placeholder="Embed description..."]').value;
-        if (description) embedHtml += `<p class="text-gray-300 mb-3">${description}</p>`;
-        const thumbnail = item.querySelector('input[placeholder*="Thumbnail"]').value;
-        if (thumbnail) embedHtml += `<img src="${thumbnail}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right">`;
-        const image = item.querySelector('input[placeholder*="Image"]').value;
-        if (image) embedHtml += `<img src="${image}" alt="Image" class="w-full h-auto rounded mb-3">`;
-        const authorName = item.querySelector('input[placeholder="Author name"]').value;
-        const authorIcon = item.querySelector('input[placeholder="Author icon URL"]').value;
-        if (authorName) {
-            embedHtml += `<div class="flex items-center mb-3">`;
-            if (authorIcon) embedHtml += `<img src="${authorIcon}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2">`;
-            embedHtml += `<span class="font-semibold">${authorName}</span></div>`;
+        if (content) {
+            html += `<div class="bg-discord-bg p-4 rounded-lg mb-4">${content}</div>`;
         }
-        const fields = item.querySelectorAll('.field-item');
-        fields.forEach(field => {
-            const inputs = field.querySelectorAll('input');
-            const name = inputs[0].value;
-            const value = inputs[1].value;
-            if (name && value) {
-                embedHtml += `<div class="mb-2 ${inputs[2].checked ? 'field-inline' : ''}">
-                    <div class="font-semibold text-white mb-1">${name}</div>
-                    <div class="text-gray-300">${value}</div>
-                </div>`;
+
+        const embedItems = document.querySelectorAll('.embed-item');
+        embedItems.forEach(item => {
+            let embedHtml = '<div class="preview-embed rounded-lg p-4 mb-4">';
+            const title = item.querySelector('input[placeholder="Embed title..."]').value;
+            if (title) embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${title}</h3>`;
+            const description = item.querySelector('textarea[placeholder="Embed description..."]').value;
+            if (description) embedHtml += `<p class="text-gray-300 mb-3">${description}</p>`;
+            const thumbnail = item.querySelector('input[placeholder*="Thumbnail"]').value;
+            if (thumbnail) embedHtml += `<img src="${thumbnail}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right">`;
+            const image = item.querySelector('input[placeholder*="Image"]').value;
+            if (image) embedHtml += `<img src="${image}" alt="Image" class="w-full h-auto rounded mb-3">`;
+            const authorName = item.querySelector('input[placeholder="Author name"]').value;
+            const authorIcon = item.querySelector('input[placeholder="Author icon URL"]').value;
+            if (authorName) {
+                embedHtml += `<div class="flex items-center mb-3">`;
+                if (authorIcon) embedHtml += `<img src="${authorIcon}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2">`;
+                embedHtml += `<span class="font-semibold">${authorName}</span></div>`;
             }
+            const fields = item.querySelectorAll('.field-item');
+            fields.forEach(field => {
+                const inputs = field.querySelectorAll('input');
+                const name = inputs[0].value;
+                const value = inputs[1].value;
+                if (name && value) {
+                    embedHtml += `<div class="mb-2 ${inputs[2].checked ? 'field-inline' : ''}">
+                        <div class="font-semibold text-white mb-1">${name}</div>
+                        <div class="text-gray-300">${value}</div>
+                    </div>`;
+                }
+            });
+            const footerText = item.querySelector('input[placeholder="Footer text"]').value;
+            const footerIcon = item.querySelector('input[placeholder="Footer icon URL"]').value;
+            const timestamp = item.querySelector('input[type="datetime-local"]').value;
+            if (footerText || timestamp) {
+                embedHtml += `<div class="flex items-center mt-3 text-gray-400 text-sm">`;
+                if (footerIcon) embedHtml += `<img src="${footerIcon}" alt="Footer Icon" class="w-5 h-5 mr-2">`;
+                embedHtml += `<span>${footerText}${footerText && timestamp ? ' | ' : ''}${timestamp ? new Date(timestamp).toLocaleString() : ''}</span></div>`;
+            }
+            const color = item.querySelector('input[type="color"]').value;
+            embedHtml = embedHtml.replace('preview-embed', `preview-embed border-l-[4px] border-l-[${color}]`);
+            embedHtml += '</div>';
+            html += embedHtml;
         });
-        const footerText = item.querySelector('input[placeholder="Footer text"]').value;
-        const footerIcon = item.querySelector('input[placeholder="Footer icon URL"]').value;
-        const timestamp = item.querySelector('input[type="datetime-local"]').value;
-        if (footerText || timestamp) {
-            embedHtml += `<div class="flex items-center mt-3 text-gray-400 text-sm">`;
-            if (footerIcon) embedHtml += `<img src="${footerIcon}" alt="Footer Icon" class="w-5 h-5 mr-2">`;
-            embedHtml += `<span>${footerText}${footerText && timestamp ? ' | ' : ''}${timestamp ? new Date(timestamp).toLocaleString() : ''}</span></div>`;
+
+        if (files.length > 0) {
+            html += '<div class="space-y-2"><p class="text-gray-400">Attachments:</p>';
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    html += `<img src="${URL.createObjectURL(file)}" alt="${file.name}" class="w-full h-auto rounded mb-3">`;
+                } else if (file.type.startsWith('video/')) {
+                    html += `<video src="${URL.createObjectURL(file)}" controls class="w-full h-auto rounded mb-3"></video>`;
+                }
+            });
+            html += '</div>';
         }
-        const color = item.querySelector('input[type="color"]').value;
-        embedHtml = embedHtml.replace('preview-embed', `preview-embed border-l-[4px] border-l-[${color}]`);
-        embedHtml += '</div>';
-        html += embedHtml;
-    });
 
-    if (files.length > 0) {
-        html += '<div class="space-y-2"><p class="text-gray-400">Attachments:</p>';
-        files.forEach(file => {
-            if (file.type.startsWith('image/')) {
-                html += `<img src="${URL.createObjectURL(file)}" alt="${file.name}" class="w-full h-auto rounded mb-3">`;
-            } else if (file.type.startsWith('video/')) {
-                html += `<video src="${URL.createObjectURL(file)}" controls class="w-full h-auto rounded mb-3"></video>`;
-            }
-        });
-        html += '</div>';
-    }
-
-    preview.innerHTML = html || '<p class="text-gray-400 italic">Build your embed to see a live preview here...</p>';
-    console.log('Preview updated with:', html);
+        preview.innerHTML = html || '<p class="text-gray-400 italic">Build your embed to see a live preview here...</p>';
+    }, 100);
 }
 
 function toggleEmojiPicker(pickerId) {
     const picker = document.getElementById(pickerId);
-    if (!picker) {
-        console.error(`Emoji picker ${pickerId} not found`);
-        return;
-    }
     const isActive = picker.classList.contains('active');
     document.querySelectorAll('emoji-picker').forEach(p => p.classList.remove('active'));
     if (!isActive) picker.classList.add('active');
@@ -489,14 +468,10 @@ function toggleEmojiPicker(pickerId) {
 function setupEmojiPicker(pickerId) {
     const picker = document.getElementById(pickerId);
     if (picker && !picker.dataset.listenerAdded) {
-        console.log(`Setting up emoji picker: ${pickerId}`);
         picker.addEventListener('emoji-click', event => {
-            console.log(`Emoji clicked: ${event.detail.unicode}`);
-            const textarea = picker.closest('.emoji-picker-container').querySelector('textarea');
-            if (textarea) {
-                textarea.value += event.detail.unicode;
-                updatePreview();
-            }
+            const textarea = picker.previousElementSibling.previousElementSibling;
+            textarea.value += event.detail.unicode;
+            updatePreview();
             picker.classList.remove('active');
         });
         picker.dataset.listenerAdded = true;
@@ -507,15 +482,9 @@ function setupInputListeners(element) {
     const inputs = element.querySelectorAll('input, textarea');
     inputs.forEach(input => {
         if (!input.dataset.listenerAdded) {
-            input.addEventListener('input', () => {
-                console.log('Input event on:', input);
-                updatePreview();
-            });
-            if (input.type === 'checkbox' || input.type === 'color' || input.type === 'datetime-local') {
-                input.addEventListener('change', () => {
-                    console.log('Change event on:', input);
-                    updatePreview();
-                });
+            input.addEventListener('input', updatePreview);
+            if (input.type === 'checkbox') {
+                input.addEventListener('change', updatePreview);
             }
             input.dataset.listenerAdded = true;
         }
@@ -523,44 +492,8 @@ function setupInputListeners(element) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing...');
     addEmbed();
     setupEmojiPicker('contentEmojiPicker');
-
-    // Static input listeners
-    const staticInputs = document.querySelectorAll('#webhookUrl, #content, #jsonInput');
-    staticInputs.forEach(input => {
-        input.addEventListener('input', () => {
-            console.log('Static input event on:', input);
-            updatePreview();
-        });
-        if (input.type === 'checkbox' || input.type === 'color' || input.type === 'datetime-local') {
-            input.addEventListener('change', () => {
-                console.log('Static change event on:', input);
-                updatePreview();
-            });
-        }
-    });
-
-    // File input listener
-    document.getElementById('fileInput').addEventListener('change', () => {
-        console.log('File input changed');
-        handleFiles();
-    });
-
-    // Dynamic input delegation
-    document.addEventListener('input', e => {
-        if (e.target.matches('.embed-item input, .embed-item textarea')) {
-            console.log('Dynamic input event on:', e.target);
-            updatePreview();
-        }
-    });
-    document.addEventListener('change', e => {
-        if (e.target.matches('.embed-item input[type="checkbox"], .embed-item input[type="color"], .embed-item input[type="datetime-local"]')) {
-            console.log('Dynamic change event on:', e.target);
-            updatePreview();
-        }
-    });
-
+    setupInputListeners(document);
     updatePreview();
 });
