@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EmbedForge is a free, feature-rich Discord webhook builder. Create stunning embeds with JSON support, emoji picker, GIFs, templates, and live preview. No signups, no limits.">
+    <title>EmbedForge - Free Discord Webhook Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/dist/index.js" rel="modulepreload">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/dist/index.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        discord: {
+                            bg: '#36393f',
+                            primary: '#5865f2',
+                            secondary: '#4f545c',
+                            accent: '#b9bbbe',
+                            success: '#57f287',
+                            error: '#ed4245',
+                        }
+                    },
+                    animation: {
+                        slideIn: 'slideIn 0.3s ease-out',
+                        slideOut: 'slideOut 0.3s ease-in',
+                        fadeIn: 'fadeIn 0.3s ease-out',
+                        fadeOut: 'fadeOut 0.3s ease-in',
+                    },
+                    keyframes: {
+                        slideIn: {
+                            '0%': { transform: 'translateX(100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        slideOut: {
+                            '0%': { transform: 'translateX(0)', opacity: '1' },
+                            '100%': { transform: 'translateX(100%)', opacity: '0' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        fadeOut: {
+                            '0%': { opacity: '1', transform: 'translateY(0)' },
+                            '100%': { opacity: '0', transform: 'translateY(10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .preview-embed {
+            background: linear-gradient(135deg, #36393f 0%, #2f3136 100%);
+            border-left: 4px solid #5865f2;
+        }
+        .field-inline { display: inline-block; width: 48%; margin-right: 4%; }
+        .field-inline:last-child { margin-right: 0; }
+        @media (max-width: 768px) { .field-inline { width: 100%; margin-right: 0; margin-bottom: 0.5rem; } }
+        emoji-picker { --emoji-size: 1.5rem; --category-icon-size: 1.2rem; width: 100%; max-height: 300px; }
+        .emoji-picker-container { position: relative; }
+        .emoji-picker-container emoji-picker { display: none; position: absolute; z-index: 20; background: #2f3136; border-radius: 8px; padding: 10px; }
+        .emoji-picker-container emoji-picker.active { display: block; animation: fadeIn 0.2s ease-out; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent mb-4 animate-fadeIn">EmbedForge</h1>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto">Craft stunning Discord embeds with ease. Fully featured, completely free. No limits, no signups.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Builder Panel -->
+            <div class="space-y-6">
+                <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-link mr-2 text-blue-400"></i>Webhook URL</h2>
+                    <input type="url" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required>
+                </div>
+
+                <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-align-left mr-2 text-green-400"></i>Message Content</h2>
+                    <div class="emoji-picker-container relative">
+                        <textarea id="content" rows="3" placeholder="Optional plain text message..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-green-500 focus:outline-none text-white resize-none"></textarea>
+                        <button onclick="toggleEmojiPicker('contentEmojiPicker')" class="absolute top-3 right-3 text-gray-400 hover:text-green-500"><i class="fas fa-smile"></i></button>
+                        <emoji-picker id="contentEmojiPicker" class="emoji-picker"></emoji-picker>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-gem mr-2 text-purple-400"></i>Embeds</h2>
+                    <div class="flex space-x-4 mb-4">
+                        <select id="templateSelect" onchange="loadTemplate()" class="w-full p-2 bg-gray-700 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none text-white">
+                            <option value="">Select a Template</option>
+                            <option value="welcome">Welcome Message</option>
+                            <option value="announcement">Announcement</option>
+                            <option value="event">Event Notification</option>
+                        </select>
+                        <button onclick="loadTemplate()" class="px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors">Load</button>
+                    </div>
+                    <div id="embedsContainer"></div>
+                    <button onclick="addEmbed()" class="mt-4 px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center mx-auto">
+                        <i class="fas fa-plus mr-2"></i>Add Embed
+                    </button>
+                </div>
+
+                <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-file-upload mr-2 text-orange-400"></i>Attachments</h2>
+                    <div id="attachments" class="space-y-2"></div>
+                    <input type="file" id="fileInput" accept="image/*,video/*,.gif" multiple class="hidden" onchange="handleFiles()">
+                    <button onclick="document.getElementById('fileInput').click()" class="px-4 py-2 bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center mx-auto">
+                        <i class="fas fa-upload mr-2"></i>Add Files (Images, GIFs, Videos)
+                    </button>
+                </div>
+
+                <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-code mr-2 text-indigo-400"></i>JSON Input</h2>
+                    <textarea id="jsonInput" rows="5" placeholder="Paste your JSON here to load an embed..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-indigo-500 focus:outline-none text-white font-mono text-sm resize-none"></textarea>
+                    <button onclick="loadFromJSON()" class="mt-4 px-4 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors w-full">
+                        <i class="fas fa-file-import mr-2"></i>Load JSON
+                    </button>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button onclick="generateJSON()" class="flex-1 px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                        <i class="fas fa-copy mr-2"></i>Copy JSON
+                    </button>
+                    <button onclick="clearAll()" class="flex-1 px-6 py-3 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors font-semibold">
+                        <i class="fas fa-trash mr-2"></i>Clear All
+                    </button>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button id="hidePreviewBtn" onclick="togglePreview()" class="flex-1 px-6 py-3 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors font-semibold">
+                        <i class="fas fa-compress-alt mr-2"></i>Hide Preview
+                    </button>
+                    <button id="viewPreviewBtn" onclick="togglePreview()" class="flex-1 px-6 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors font-semibold hidden">
+                        <i class="fas fa-expand-alt mr-2"></i>View Preview
+                    </button>
+                </div>
+            </div>
+
+            <!-- Floating Preview Panel -->
+            <div id="previewPanel" class="fixed right-0 top-20 w-96 max-h-[80vh] bg-gray-800 rounded-l-xl p-6 shadow-xl transition-all duration-300 ease-in-out z-50 overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold flex items-center"><i class="fas fa-eye mr-2 text-indigo-400"></i>Live Preview</h2>
+                    <div class="flex space-x-2">
+                        <button onclick="closePreview()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div id="preview" class="min-h-[200px] bg-discord-bg rounded-lg p-4 space-y-4 overflow-y-auto">
+                    <p class="text-gray-400 italic">Build your embed to see a live preview here...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- JSON Output Modal -->
+        <div id="jsonModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-gray-800 rounded-xl p-6 w-11/12 max-w-4xl max-h-96 overflow-hidden animate-fadeIn">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold">Generated JSON</h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-white">&times;</button>
+                </div>
+                <textarea id="jsonOutput" rows="20" class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:outline-none text-white font-mono text-sm resize-none"></textarea>
+                <div class="flex space-x-4 mt-4">
+                    <button onclick="copyJSON()" class="flex-1 px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-copy mr-2"></i>Copy to Clipboard
+                    </button>
+                    <button onclick="closeModal()" class="flex-1 px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-times mr-2"></i>Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Notifications -->
+        <div id="notification" class="fixed top-4 right-4 w-80 hidden">
+            <div id="notificationContent" class="p-4 rounded-lg shadow-lg flex items-center space-x-3 animate-fadeIn"></div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
+</html>
