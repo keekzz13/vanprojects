@@ -272,7 +272,7 @@ function loadFromJSON() {
     }
 }
 
-function generateJSON() {
+function generateJSON(skipModal = false) {
     try {
         const webhookUrl = document.getElementById('webhookUrl')?.value;
         if (!webhookUrl) {
@@ -366,11 +366,13 @@ function generateJSON() {
             }
         });
 
-        const jsonString = JSON.stringify(payload, null, 2);
-        document.getElementById('jsonOutput').value = jsonString;
-        document.getElementById('jsonModal').classList.remove('hidden');
-        showNotification('success', 'JSON generated successfully!');
-        console.log('Generated JSON:', jsonString);
+        if (!skipModal) {
+            const jsonString = JSON.stringify(payload, null, 2);
+            document.getElementById('jsonOutput').value = jsonString;
+            document.getElementById('jsonModal').classList.remove('hidden');
+            showNotification('success', 'JSON generated successfully!');
+            console.log('Generated JSON:', jsonString);
+        }
         return payload;
     } catch (e) {
         console.error('Error in generateJSON:', e.message);
@@ -462,7 +464,7 @@ function sendToDiscord() {
             return;
         }
 
-        const payload = generateJSON();
+        const payload = generateJSON(true); // Skip modal
         if (!payload) return;
 
         if (files.length > 10) {
@@ -490,13 +492,16 @@ function sendToDiscord() {
                     body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: fileData }),
                     headers: { 'Content-Type': 'application/json' }
                 })
-                    .then(response => {
-                        if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
+                    .then(async response => {
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(`Proxy error: ${response.status} - ${errorText}`);
+                        }
                         showNotification('success', 'Message sent to Discord successfully!');
                         console.log('Message sent to Discord via proxy:', webhookUrl);
                     })
                     .catch(error => {
-                        console.error('Error sending to Discord:', error.message);
+                        console.error('Fetch error in sendToDiscord:', error.message);
                         showNotification('error', `Failed to send to Discord: ${error.message}`);
                     });
             })
@@ -509,13 +514,16 @@ function sendToDiscord() {
                     body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: [] }),
                     headers: { 'Content-Type': 'application/json' }
                 })
-                    .then(response => {
-                        if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
+                    .then(async response => {
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(`Proxy error: ${response.status} - ${errorText}`);
+                        }
                         showNotification('success', 'Message sent to Discord successfully (without files)!');
                         console.log('Message sent to Discord via proxy (no files):', webhookUrl);
                     })
                     .catch(error => {
-                        console.error('Error sending to Discord (no files):', error.message);
+                        console.error('Fetch error in sendToDiscord (no files):', error.message);
                         showNotification('error', `Failed to send to Discord: ${error.message}`);
                     });
             });
