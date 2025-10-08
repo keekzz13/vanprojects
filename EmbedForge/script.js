@@ -193,7 +193,8 @@ function handleFiles() {
     try {
         const input = document.getElementById('fileInput');
         if (!input) throw new Error('File input not found');
-        files = Array.from(input.files).filter(file => {
+        // Only append new files to existing files array, don't overwrite
+        const newFiles = Array.from(input.files).filter(file => {
             if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) return false;
             if (file.size > 8 * 1024 * 1024) {
                 showNotification('error', `File ${file.name} exceeds 8MB limit`);
@@ -201,6 +202,11 @@ function handleFiles() {
             }
             return true;
         });
+        files = [...files, ...newFiles]; // Append new files
+        if (files.length > 10) {
+            files = files.slice(0, 10); // Limit to 10 files
+            showNotification('error', 'Maximum 10 files allowed, extra files ignored');
+        }
         const attachmentsDiv = document.getElementById('attachments');
         if (!attachmentsDiv) throw new Error('Attachments container not found');
         attachmentsDiv.innerHTML = '';
@@ -224,10 +230,25 @@ function handleFiles() {
 
 function removeFile(index) {
     try {
+        if (index < 0 || index >= files.length) throw new Error(`Invalid file index: ${index}`);
         files.splice(index, 1);
-        handleFiles();
+        const input = document.getElementById('fileInput');
+        if (input) input.value = ''; // Clear file input
+        const attachmentsDiv = document.getElementById('attachments');
+        if (!attachmentsDiv) throw new Error('Attachments container not found');
+        attachmentsDiv.innerHTML = '';
+        files.forEach((file, i) => {
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'flex items-center justify-between p-2 bg-gray-700 rounded animate-fadeIn';
+            fileDiv.innerHTML = `
+                <span class="text-sm">${file.name}</span>
+                <button onclick="removeFile(${i})" class="text-red-400 hover:text-red-300">&times;</button>
+            `;
+            attachmentsDiv.appendChild(fileDiv);
+        });
+        updatePreview();
         showNotification('success', 'File removed successfully!');
-        console.log('Removed file at index:', index);
+        console.log('Removed file at index:', index, 'Remaining files:', files.map(f => f.name));
     } catch (e) {
         console.error('Error in removeFile:', e.message);
         showNotification('error', `Failed to remove file: ${e.message}`);
@@ -363,6 +384,9 @@ function generateJSON(skipModal = false) {
             }
             if (embed.title || embed.description || embed.fields?.length) {
                 payload.embeds.push(embed);
+                console.log(`Added embed ${index} to payload`);
+            } else {
+                console.warn(`Skipped embed ${index}: no title, description, or fields`);
             }
         });
 
@@ -373,6 +397,7 @@ function generateJSON(skipModal = false) {
             showNotification('success', 'JSON generated successfully!');
             console.log('Generated JSON:', jsonString);
         }
+        console.log('Generated payload:', payload);
         return payload;
     } catch (e) {
         console.error('Error in generateJSON:', e.message);
@@ -444,6 +469,8 @@ function clearAll() {
         document.getElementById('attachments').innerHTML = '';
         document.getElementById('jsonInput').value = '';
         files = [];
+        const input = document.getElementById('fileInput');
+        if (input) input.value = ''; // Clear file input
         embedCount = 0;
         updatePreview();
         closeClearConfirm();
@@ -467,6 +494,13 @@ function sendToDiscord() {
         const payload = generateJSON(true); // Skip modal
         if (!payload) return;
 
+        // Validate payload has content, embeds, or files
+        if (!payload.content && (!payload.embeds || payload.embeds.length === 0) && (!files || files.length === 0)) {
+            showNotification('error', 'Please add content, embeds, or files before sending!');
+            console.error('Empty payload: no content, embeds, or files');
+            return;
+        }
+
         if (files.length > 10) {
             showNotification('error', 'Maximum 10 files allowed');
             console.error('Too many files:', files.length);
@@ -487,6 +521,7 @@ function sendToDiscord() {
         Promise.all(filePromises)
             .then(fileData => {
                 const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
+                console.log('Sending payload to proxy:', payload, 'Files:', fileData.map(f => f.name));
                 fetch(proxyUrl, {
                     method: 'POST',
                     body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: fileData }),
@@ -509,6 +544,7 @@ function sendToDiscord() {
                 console.error('Error reading files:', error.message);
                 showNotification('error', `Failed to process files: ${error.message}. Trying without attachments.`);
                 const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
+                console.log('Sending payload to proxy (no files):', payload);
                 fetch(proxyUrl, {
                     method: 'POST',
                     body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: [] }),
@@ -605,6 +641,19 @@ function updatePreview() {
         const content = document.getElementById('content')?.value || '';
         let html = '';
 
+        // Attachments first to match Discord's rendering order
+        if (files.length > 0) {
+            html += '<div class="space-y-2 mb-4"><p class="text-gray-400">Attachments:</p>';
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    html += `<img src="${URL.createObjectURL(file)}" alt="${file.name}" class="w-full h-auto rounded mb-3">`;
+                } else if (file.type.startsWith('video/')) {
+                    html += `<video src="${URL.createObjectURL(file)}" controls class="w-full h-auto rounded mb-3"></video>`;
+                }
+            });
+            html += '</div>';
+        }
+
         if (content) {
             html += `<div class="bg-discord-bg p-4 rounded-lg mb-4">${content}</div>`;
         }
@@ -680,20 +729,8 @@ function updatePreview() {
             html += embedHtml;
         });
 
-        if (files.length > 0) {
-            html += '<div class="space-y-2"><p class="text-gray-400">Attachments:</p>';
-            files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    html += `<img src="${URL.createObjectURL(file)}" alt="${file.name}" class="w-full h-auto rounded mb-3">`;
-                } else if (file.type.startsWith('video/')) {
-                    html += `<video src="${URL.createObjectURL(file)}" controls class="w-full h-auto rounded mb-3"></video>`;
-                }
-            });
-            html += '</div>';
-        }
-
         preview.innerHTML = html || '<p class="text-gray-400 italic">Build your embed to see a live preview here...</p>';
-        console.log('Preview updated with:', html);
+        console.log('Preview updated with order: attachments, content, embeds', html);
     } catch (e) {
         console.error('Error in updatePreview:', e.message);
         showNotification('error', `Failed to update preview: ${e.message}`);
