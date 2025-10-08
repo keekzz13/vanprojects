@@ -1,7 +1,6 @@
 let embedCount = 0;
 let files = [];
 let isPreviewVisible = true;
-let previewUpdateTimeout = null;
 
 const templates = {
     welcome: {
@@ -45,144 +44,199 @@ const templates = {
 };
 
 function addEmbed(embedData = {}) {
-    const container = document.getElementById('embedsContainer');
-    const embedDiv = document.createElement('div');
-    embedDiv.className = 'embed-item bg-gray-700 rounded-lg p-4 mb-4 relative animate-fadeIn';
-    embedDiv.id = `embed-${embedCount}`;
-    embedDiv.innerHTML = `
-        <div class="flex justify-between items-center mb-3">
-            <h3 class="font-semibold text-purple-300">Embed ${embedCount + 1}</h3>
-            <button onclick="removeEmbed(${embedCount})" class="text-red-400 hover:text-red-300">&times;</button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium mb-2">Title</label>
-                <input type="text" value="${embedData.title || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Embed title...">
+    try {
+        const container = document.getElementById('embedsContainer');
+        const embedDiv = document.createElement('div');
+        embedDiv.className = 'embed-item bg-gray-700 rounded-lg p-4 mb-4 relative animate-fadeIn';
+        embedDiv.id = `embed-${embedCount}`;
+        embedDiv.innerHTML = `
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-semibold text-purple-300">Embed ${embedCount + 1}</h3>
+                <button onclick="removeEmbed(${embedCount})" class="text-red-400 hover:text-red-300">&times;</button>
             </div>
-            <div>
-                <label class="block text-sm font-medium mb-2">URL</label>
-                <input type="url" value="${embedData.url || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Title</label>
+                    <input type="text" value="${embedData.title || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Embed title..." oninput="updatePreview()">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">URL</label>
+                    <input type="url" value="${embedData.url || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com" oninput="updatePreview()">
+                </div>
             </div>
-        </div>
-        <div class="mb-4 emoji-picker-container relative">
-            <label class="block text-sm font-medium mb-2">Description</label>
-            <textarea rows="3" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white resize-none" placeholder="Embed description...">${embedData.description || ''}</textarea>
-            <button onclick="toggleEmojiPicker('embedDescEmojiPicker-${embedCount}')" class="absolute top-10 right-3 text-gray-400 hover:text-purple-500"><i class="fas fa-smile"></i></button>
-            <emoji-picker id="embedDescEmojiPicker-${embedCount}" class="emoji-picker"></emoji-picker>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium mb-2">Color</label>
-                <input type="color" value="${embedData.color ? '#' + embedData.color.toString(16).padStart(6, '0') : '#5865f2'}" class="w-full h-10 p-1 bg-gray-600 rounded border border-gray-500 cursor-pointer">
+            <div class="mb-4 emoji-picker-container relative">
+                <label class="block text-sm font-medium mb-2">Description</label>
+                <textarea rows="3" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white resize-none" placeholder="Embed description..." oninput="updatePreview()">${embedData.description || ''}</textarea>
+                <button onclick="toggleEmojiPicker('embedDescEmojiPicker-${embedCount}')" class="absolute top-10 right-3 text-gray-400 hover:text-purple-500"><i class="fas fa-smile"></i></button>
+                <emoji-picker id="embedDescEmojiPicker-${embedCount}" class="emoji-picker"></emoji-picker>
             </div>
-            <div>
-                <label class="block text-sm font-medium mb-2">Timestamp</label>
-                <input type="datetime-local" value="${embedData.timestamp ? embedData.timestamp.slice(0, 16) : ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Color</label>
+                    <input type="color" value="${embedData.color ? '#' + embedData.color.toString(16).padStart(6, '0') : '#5865f2'}" class="w-full h-10 p-1 bg-gray-600 rounded border border-gray-500 cursor-pointer" onchange="updatePreview()">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Timestamp</label>
+                    <input type="datetime-local" value="${embedData.timestamp ? embedData.timestamp.slice(0, 16) : ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" onchange="updatePreview()">
+                </div>
             </div>
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Thumbnail URL</label>
-            <input type="url" value="${embedData.thumbnail?.url || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com/thumbnail.png">
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Image URL</label>
-            <input type="url" value="${embedData.image?.url || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com/image.png">
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Author Name</label>
-            <input type="text" value="${embedData.author?.name || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Author name">
-            <input type="url" value="${embedData.author?.icon_url || ''}" class="w-full p-2 mt-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Author icon URL">
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Footer Text</label>
-            <input type="text" value="${embedData.footer?.text || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Footer text">
-            <input type="url" value="${embedData.footer?.icon_url || ''}" class="w-full p-2 mt-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Footer icon URL">
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Fields</label>
-            <div id="fields-${embedCount}" class="space-y-2 mt-2"></div>
-            <button onclick="addField(${embedCount})" class="mt-2 px-3 py-1 bg-green-600 rounded hover:bg-green-700 transition-colors text-sm">
-                <i class="fas fa-plus mr-1"></i>Add Field
-            </button>
-        </div>
-    `;
-    container.appendChild(embedDiv);
-    if (embedData.fields) {
-        embedData.fields.forEach(field => addField(embedCount, field));
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Thumbnail URL</label>
+                <input type="url" value="${embedData.thumbnail?.url || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com/thumbnail.png" oninput="updatePreview()">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Image URL</label>
+                <input type="url" value="${embedData.image?.url || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com/image.png" oninput="updatePreview()">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Author Name</label>
+                <input type="text" value="${embedData.author?.name || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Author name" oninput="updatePreview()">
+                <input type="url" value="${embedData.author?.icon_url || ''}" class="w-full p-2 mt-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Author icon URL" oninput="updatePreview()">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Footer Text</label>
+                <input type="text" value="${embedData.footer?.text || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Footer text" oninput="updatePreview()">
+                <input type="url" value="${embedData.footer?.icon_url || ''}" class="w-full p-2 mt-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Footer icon URL" oninput="updatePreview()">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Fields</label>
+                <div id="fields-${embedCount}" class="space-y-2 mt-2"></div>
+                <button onclick="addField(${embedCount})" class="mt-2 px-3 py-1 bg-green-600 rounded hover:bg-green-700 transition-colors text-sm">
+                    <i class="fas fa-plus mr-1"></i>Add Field
+                </button>
+            </div>
+        `;
+        container.appendChild(embedDiv);
+        if (embedData.fields) {
+            embedData.fields.forEach(field => addField(embedCount, field));
+        }
+        setupEmojiPicker(`embedDescEmojiPicker-${embedCount}`);
+        embedCount++;
+        updateEmbedIndices();
+        updatePreview();
+        console.log('Added embed:', embedDiv.id);
+    } catch (e) {
+        console.error('Error in addEmbed:', e);
+        showNotification('error', 'Failed to add embed. Check console for details.');
     }
-    setupEmojiPicker(`embedDescEmojiPicker-${embedCount}`);
-    setupInputListeners(embedDiv);
-    embedCount++;
-    updatePreview();
 }
 
 function removeEmbed(index) {
-    document.getElementById(`embed-${index}`).remove();
-    updateEmbedIndices();
-    updatePreview();
-    showNotification('success', 'Embed removed successfully!');
+    try {
+        const embed = document.getElementById(`embed-${index}`);
+        if (embed) embed.remove();
+        updateEmbedIndices();
+        updatePreview();
+        showNotification('success', 'Embed removed successfully!');
+        console.log('Removed embed:', index);
+    } catch (e) {
+        console.error('Error in removeEmbed:', e);
+        showNotification('error', 'Failed to remove embed. Check console for details.');
+    }
 }
 
 function updateEmbedIndices() {
-    const embeds = document.querySelectorAll('.embed-item');
-    embeds.forEach((embed, i) => {
-        embed.querySelector('h3').textContent = `Embed ${i + 1}`;
-    });
+    try {
+        const embeds = document.querySelectorAll('.embed-item');
+        embeds.forEach((embed, i) => {
+            embed.id = `embed-${i}`;
+            embed.querySelector('h3').textContent = `Embed ${i + 1}`;
+            const removeButton = embed.querySelector('button[onclick*="removeEmbed"]');
+            if (removeButton) removeButton.setAttribute('onclick', `removeEmbed(${i})`);
+            const addFieldButton = embed.querySelector('button[onclick*="addField"]');
+            if (addFieldButton) addFieldButton.setAttribute('onclick', `addField(${i})`);
+            const fieldsContainer = embed.querySelector(`div[id^="fields-"]`);
+            if (fieldsContainer) fieldsContainer.id = `fields-${i}`;
+            const emojiPicker = embed.querySelector('emoji-picker');
+            if (emojiPicker) {
+                emojiPicker.id = `embedDescEmojiPicker-${i}`;
+                setupEmojiPicker(`embedDescEmojiPicker-${i}`);
+            }
+        });
+        embedCount = embeds.length;
+        console.log('Updated embed indices, count:', embedCount);
+    } catch (e) {
+        console.error('Error in updateEmbedIndices:', e);
+        showNotification('error', 'Failed to update embed indices. Check console for details.');
+    }
 }
 
 function addField(embedIndex, fieldData = {}) {
-    const fieldsContainer = document.getElementById(`fields-${embedIndex}`);
-    const fieldDiv = document.createElement('div');
-    fieldDiv.className = 'field-item bg-gray-600 p-3 rounded flex flex-col space-y-2 animate-fadeIn';
-    fieldDiv.innerHTML = `
-        <div class="flex space-x-2">
-            <input type="text" value="${fieldData.name || ''}" placeholder="Field name" class="flex-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-green-500 focus:outline-none text-white">
-            <input type="text" value="${fieldData.value || ''}" placeholder="Field value" class="flex-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-green-500 focus:outline-none text-white">
-            <label class="flex items-center space-x-1 cursor-pointer">
-                <input type="checkbox" ${fieldData.inline ? 'checked' : ''} class="accent-green-500"> <span class="text-sm">Inline</span>
-            </label>
-            <button onclick="this.parentElement.parentElement.remove(); updatePreview()" class="text-red-400 hover:text-red-300 p-1">&times;</button>
-        </div>
-    `;
-    fieldsContainer.appendChild(fieldDiv);
-    setupInputListeners(fieldDiv);
-    updatePreview();
+    try {
+        const fieldsContainer = document.getElementById(`fields-${embedIndex}`);
+        const fieldDiv = document.createElement('div');
+        fieldDiv.className = 'field-item bg-gray-600 p-3 rounded flex flex-col space-y-2 animate-fadeIn';
+        fieldDiv.innerHTML = `
+            <div class="flex space-x-2">
+                <input type="text" value="${fieldData.name || ''}" placeholder="Field name" class="flex-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-green-500 focus:outline-none text-white" oninput="updatePreview()">
+                <input type="text" value="${fieldData.value || ''}" placeholder="Field value" class="flex-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-green-500 focus:outline-none text-white" oninput="updatePreview()">
+                <label class="flex items-center space-x-1 cursor-pointer">
+                    <input type="checkbox" ${fieldData.inline ? 'checked' : ''} class="accent-green-500" onchange="updatePreview()"> <span class="text-sm">Inline</span>
+                </label>
+                <button onclick="this.parentElement.parentElement.remove(); updatePreview()" class="text-red-400 hover:text-red-300 p-1">&times;</button>
+            </div>
+        `;
+        fieldsContainer.appendChild(fieldDiv);
+        updatePreview();
+        console.log('Added field to embed:', embedIndex);
+    } catch (e) {
+        console.error('Error in addField:', e);
+        showNotification('error', 'Failed to add field. Check console for details.');
+    }
 }
 
 function handleFiles() {
-    const input = document.getElementById('fileInput');
-    files = Array.from(input.files).filter(file => file.type.startsWith('image/') || file.type.startsWith('video/'));
-    const attachmentsDiv = document.getElementById('attachments');
-    attachmentsDiv.innerHTML = '';
-    files.forEach((file, i) => {
-        const fileDiv = document.createElement('div');
-        fileDiv.className = 'flex items-center justify-between p-2 bg-gray-700 rounded animate-fadeIn';
-        fileDiv.innerHTML = `
-            <span class="text-sm">${file.name}</span>
-            <button onclick="removeFile(${i})" class="text-red-400 hover:text-red-300">&times;</button>
-        `;
-        attachmentsDiv.appendChild(fileDiv);
-    });
-    updatePreview();
-    showNotification('success', 'Files added successfully!');
+    try {
+        const input = document.getElementById('fileInput');
+        files = Array.from(input.files).filter(file => file.type.startsWith('image/') || file.type.startsWith('video/'));
+        const attachmentsDiv = document.getElementById('attachments');
+        attachmentsDiv.innerHTML = '';
+        files.forEach((file, i) => {
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'flex items-center justify-between p-2 bg-gray-700 rounded animate-fadeIn';
+            fileDiv.innerHTML = `
+                <span class="text-sm">${file.name}</span>
+                <button onclick="removeFile(${i})" class="text-red-400 hover:text-red-300">&times;</button>
+            `;
+            attachmentsDiv.appendChild(fileDiv);
+        });
+        updatePreview();
+        showNotification('success', 'Files added successfully!');
+        console.log('Handled files:', files.map(f => f.name));
+    } catch (e) {
+        console.error('Error in handleFiles:', e);
+        showNotification('error', 'Failed to handle files. Check console for details.');
+    }
 }
 
 function removeFile(index) {
-    files.splice(index, 1);
-    handleFiles();
-    showNotification('success', 'File removed successfully!');
+    try {
+        files.splice(index, 1);
+        handleFiles();
+        showNotification('success', 'File removed successfully!');
+        console.log('Removed file at index:', index);
+    } catch (e) {
+        console.error('Error in removeFile:', e);
+        showNotification('error', 'Failed to remove file. Check console for details.');
+    }
 }
 
 function loadTemplate() {
-    const template = document.getElementById('templateSelect').value;
-    if (!template) return;
-    const data = templates[template];
-    document.getElementById('content').value = data.content || '';
-    document.getElementById('embedsContainer').innerHTML = '';
-    embedCount = 0;
-    data.embeds.forEach(embed => addEmbed(embed));
-    showNotification('success', 'Template loaded successfully!');
-    updatePreview();
+    try {
+        const template = document.getElementById('templateSelect').value;
+        if (!template) return;
+        const data = templates[template];
+        document.getElementById('content').value = data.content || '';
+        document.getElementById('embedsContainer').innerHTML = '';
+        embedCount = 0;
+        data.embeds.forEach(embed => addEmbed(embed));
+        showNotification('success', 'Template loaded successfully!');
+        updatePreview();
+        console.log('Loaded template:', template);
+    } catch (e) {
+        console.error('Error in loadTemplate:', e);
+        showNotification('error', 'Failed to load template. Check console for details.');
+    }
 }
 
 function loadFromJSON() {
@@ -198,198 +252,264 @@ function loadFromJSON() {
         }
         showNotification('success', 'JSON loaded successfully!');
         updatePreview();
+        console.log('Loaded JSON:', jsonInput);
     } catch (e) {
-        showNotification('error', 'Invalid JSON format. Please check and try again.');
+        console.error('Error in loadFromJSON:', e);
+        showNotification('error', 'Invalid JSON format. Check console for details.');
     }
 }
 
 function generateJSON() {
-    const webhookUrl = document.getElementById('webhookUrl').value;
-    if (!webhookUrl) {
-        showNotification('error', 'Webhook URL is required!');
+    try {
+        const webhookUrl = document.getElementById('webhookUrl').value;
+        if (!webhookUrl) {
+            showNotification('error', 'Webhook URL is required!');
+            return null;
+        }
+        const payload = {
+            content: document.getElementById('content').value,
+            embeds: [],
+            attachments: []
+        };
+
+        const embedItems = document.querySelectorAll('.embed-item');
+        embedItems.forEach(item => {
+            const embed = {};
+            embed.title = item.querySelector('input[placeholder="Embed title..."]').value;
+            embed.url = item.querySelector('input[placeholder="https://example.com"]').value;
+            if (embed.title && embed.url && !/^https?:\/\//.test(embed.url)) {
+                showNotification('error', 'Embed URL must be a valid HTTP/HTTPS link!');
+                return;
+            }
+            embed.description = item.querySelector('textarea[placeholder="Embed description..."]').value;
+            embed.color = parseInt(item.querySelector('input[type="color"]').value.slice(1), 16);
+            const timestampInput = item.querySelector('input[type="datetime-local"]');
+            if (timestampInput.value) embed.timestamp = new Date(timestampInput.value).toISOString();
+            embed.thumbnail = { url: item.querySelector('input[placeholder*="Thumbnail"]').value };
+            embed.image = { url: item.querySelector('input[placeholder*="Image"]').value };
+            const authorName = item.querySelector('input[placeholder="Author name"]').value;
+            if (authorName) {
+                embed.author = { name: authorName };
+                const authorIcon = item.querySelector('input[placeholder="Author icon URL"]').value;
+                if (authorIcon) embed.author.icon_url = authorIcon;
+            }
+            const footerText = item.querySelector('input[placeholder="Footer text"]').value;
+            if (footerText) {
+                embed.footer = { text: footerText };
+                const footerIcon = item.querySelector('input[placeholder="Footer icon URL"]').value;
+                if (footerIcon) embed.footer.icon_url = footerIcon;
+            }
+            const fields = item.querySelectorAll('.field-item');
+            if (fields.length > 0) {
+                embed.fields = Array.from(fields).map(field => {
+                    const inputs = field.querySelectorAll('input');
+                    return {
+                        name: inputs[0].value,
+                        value: inputs[1].value,
+                        inline: inputs[2].checked
+                    };
+                }).filter(field => field.name && field.value);
+            }
+            if (embed.title || embed.description || embed.fields?.length) payload.embeds.push(embed);
+        });
+
+        if (files.length > 0) {
+            payload.attachments = files.map((file, i) => ({ id: i, filename: file.name, description: '' }));
+        }
+
+        const jsonString = JSON.stringify(payload, null, 2);
+        document.getElementById('jsonOutput').value = jsonString;
+        document.getElementById('jsonModal').classList.remove('hidden');
+        showNotification('success', 'JSON generated successfully!');
+        console.log('Generated JSON:', jsonString);
+        return payload;
+    } catch (e) {
+        console.error('Error in generateJSON:', e);
+        showNotification('error', 'Failed to generate JSON. Check console for details.');
         return null;
     }
-    const payload = {
-        content: document.getElementById('content').value,
-        embeds: [],
-        attachments: []
-    };
-
-    const embedItems = document.querySelectorAll('.embed-item');
-    embedItems.forEach(item => {
-        const embed = {};
-        embed.title = item.querySelector('input[placeholder="Embed title..."]').value;
-        embed.url = item.querySelector('input[placeholder="https://example.com"]').value;
-        if (embed.title && embed.url && !/^https?:\/\//.test(embed.url)) {
-            showNotification('error', 'Embed URL must be a valid HTTP/HTTPS link!');
-            return;
-        }
-        embed.description = item.querySelector('textarea[placeholder="Embed description..."]').value;
-        embed.color = parseInt(item.querySelector('input[type="color"]').value.slice(1), 16);
-        const timestampInput = item.querySelector('input[type="datetime-local"]');
-        if (timestampInput.value) embed.timestamp = new Date(timestampInput.value).toISOString();
-        embed.thumbnail = { url: item.querySelector('input[placeholder*="Thumbnail"]').value };
-        embed.image = { url: item.querySelector('input[placeholder*="Image"]').value };
-        const authorName = item.querySelector('input[placeholder="Author name"]').value;
-        if (authorName) {
-            embed.author = { name: authorName };
-            const authorIcon = item.querySelector('input[placeholder="Author icon URL"]').value;
-            if (authorIcon) embed.author.icon_url = authorIcon;
-        }
-        const footerText = item.querySelector('input[placeholder="Footer text"]').value;
-        if (footerText) {
-            embed.footer = { text: footerText };
-            const footerIcon = item.querySelector('input[placeholder="Footer icon URL"]').value;
-            if (footerIcon) embed.footer.icon_url = footerIcon;
-        }
-        const fields = item.querySelectorAll('.field-item');
-        if (fields.length > 0) {
-            embed.fields = Array.from(fields).map(field => {
-                const inputs = field.querySelectorAll('input');
-                return {
-                    name: inputs[0].value,
-                    value: inputs[1].value,
-                    inline: inputs[2].checked
-                };
-            }).filter(field => field.name && field.value);
-        }
-        if (embed.title || embed.description || embed.fields?.length) payload.embeds.push(embed);
-    });
-
-    if (files.length > 0) {
-        payload.attachments = files.map((file, i) => ({ id: i, filename: file.name, description: '' }));
-    }
-
-    const jsonString = JSON.stringify(payload, null, 2);
-    document.getElementById('jsonOutput').value = jsonString;
-    document.getElementById('jsonModal').classList.remove('hidden');
-    showNotification('success', 'JSON generated successfully!');
-    return payload;
 }
 
 function copyJSON() {
-    const textarea = document.getElementById('jsonOutput');
-    textarea.select();
-    document.execCommand('copy');
-    showNotification('success', 'JSON copied to clipboard!');
-    const button = event.target;
-    const originalText = button.innerHTML;
-    button.innerHTML = '<i class="fas fa-check mr-2"></i>Copied!';
-    setTimeout(() => { button.innerHTML = originalText; }, 2000);
+    try {
+        const textarea = document.getElementById('jsonOutput');
+        textarea.select();
+        document.execCommand('copy');
+        showNotification('success', 'JSON copied to clipboard!');
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check mr-2"></i>Copied!';
+        setTimeout(() => { button.innerHTML = originalText; }, 2000);
+        console.log('Copied JSON to clipboard');
+    } catch (e) {
+        console.error('Error in copyJSON:', e);
+        showNotification('error', 'Failed to copy JSON. Check console for details.');
+    }
 }
 
 function closeModal() {
-    document.getElementById('jsonModal').classList.add('hidden');
-    showNotification('success', 'Modal closed!');
+    try {
+        document.getElementById('jsonModal').classList.add('hidden');
+        showNotification('success', 'Modal closed!');
+        console.log('Closed JSON modal');
+    } catch (e) {
+        console.error('Error in closeModal:', e);
+        showNotification('error', 'Failed to close modal. Check console for details.');
+    }
 }
 
 function showClearConfirm() {
-    document.getElementById('clearConfirmModal').classList.remove('hidden');
+    try {
+        document.getElementById('clearConfirmModal').classList.remove('hidden');
+        console.log('Opened clear confirm modal');
+    } catch (e) {
+        console.error('Error in showClearConfirm:', e);
+        showNotification('error', 'Failed to open clear modal. Check console for details.');
+    }
 }
 
 function closeClearConfirm() {
-    const modal = document.getElementById('clearConfirmModal');
-    modal.classList.add('animate-fadeOut');
-    setTimeout(() => {
-        modal.classList.add('hidden');
-        modal.classList.remove('animate-fadeOut');
-    }, 300);
+    try {
+        const modal = document.getElementById('clearConfirmModal');
+        modal.classList.add('animate-fadeOut');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('animate-fadeOut');
+            console.log('Closed clear confirm modal');
+        }, 300);
+    } catch (e) {
+        console.error('Error in closeClearConfirm:', e);
+        showNotification('error', 'Failed to close clear modal. Check console for details.');
+    }
 }
 
 function clearAll() {
-    document.getElementById('content').value = '';
-    document.getElementById('webhookUrl').value = '';
-    document.getElementById('embedsContainer').innerHTML = '';
-    document.getElementById('attachments').innerHTML = '';
-    document.getElementById('jsonInput').value = '';
-    files = [];
-    embedCount = 0;
-    updatePreview();
-    closeClearConfirm();
-    showNotification('success', 'All fields cleared!');
+    try {
+        document.getElementById('content').value = '';
+        document.getElementById('webhookUrl').value = '';
+        document.getElementById('embedsContainer').innerHTML = '';
+        document.getElementById('attachments').innerHTML = '';
+        document.getElementById('jsonInput').value = '';
+        files = [];
+        embedCount = 0;
+        updatePreview();
+        closeClearConfirm();
+        showNotification('success', 'All fields cleared!');
+        console.log('Cleared all fields');
+    } catch (e) {
+        console.error('Error in clearAll:', e);
+        showNotification('error', 'Failed to clear fields. Check console for details.');
+    }
 }
 
 function sendToDiscord() {
-    const webhookUrl = document.getElementById('webhookUrl').value;
-    if (!webhookUrl || !/^https:\/\/discord\.com\/api\/webhooks\//.test(webhookUrl)) {
-        showNotification('error', 'Please provide a valid Discord webhook URL!');
-        return;
+    try {
+        const webhookUrl = document.getElementById('webhookUrl').value;
+        if (!webhookUrl || !/^https:\/\/(discord\.com|discordapp\.com|ptb\.discord\.com)\/api\/webhooks\/[0-9]+\/[A-Za-z0-9_-]+/.test(webhookUrl)) {
+            showNotification('error', 'Please provide a valid Discord webhook URL (e.g., discord.com, discordapp.com, or ptb.discord.com)!');
+            console.error('Invalid webhook URL:', webhookUrl);
+            return;
+        }
+
+        const payload = generateJSON();
+        if (!payload) return;
+
+        const filePromises = files.map(file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve({ name: file.name, data: reader.result.split(',')[1] });
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        }));
+
+        Promise.all(filePromises)
+            .then(fileData => {
+                const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
+                fetch(proxyUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: fileData }),
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
+                        showNotification('success', 'Message sent to Discord successfully!');
+                        console.log('Message sent to Discord via proxy');
+                    })
+                    .catch(error => {
+                        console.error('Error sending to Discord:', error);
+                        showNotification('error', 'Failed to send to Discord. Check webhook URL or proxy setup.');
+                    });
+            })
+            .catch(error => {
+                console.error('Error reading files:', error);
+                showNotification('error', 'Failed to process files. Try without attachments.');
+            });
+    } catch (e) {
+        console.error('Error in sendToDiscord:', e);
+        showNotification('error', 'Failed to send to Discord. Check console for details.');
     }
-
-    const payload = generateJSON();
-    if (!payload) return;
-
-    const formData = new FormData();
-    formData.append('payload_json', JSON.stringify(payload));
-    files.forEach((file, i) => {
-        formData.append(`file${i}`, file, file.name);
-    });
-
-    fetch(webhookUrl, {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            showNotification('success', 'Message sent to Discord successfully!');
-        })
-        .catch(error => {
-            console.error('Error sending to Discord:', error);
-            showNotification('error', 'Failed to send to Discord. Check webhook URL or try again.');
-        });
 }
 
 function togglePreview() {
-    const panel = document.getElementById('previewPanel');
-    const hideBtn = document.getElementById('hidePreviewBtn');
-    const viewBtn = document.getElementById('viewPreviewBtn');
-    const mainGrid = document.getElementById('mainGrid');
-    const builderPanel = document.getElementById('builderPanel');
-    if (isPreviewVisible) {
-        panel.classList.add('animate-fadeOut');
-        setTimeout(() => {
-            panel.classList.add('hidden');
-            panel.classList.remove('animate-fadeOut');
-            hideBtn.classList.add('hidden');
-            viewBtn.classList.remove('hidden');
-            builderPanel.classList.remove('lg:col-span-2');
-            builderPanel.classList.add('lg:col-span-3');
-        }, 300);
-    } else {
-        panel.classList.remove('hidden');
-        panel.classList.add('animate-fadeIn');
-        setTimeout(() => {
-            panel.classList.remove('animate-fadeIn');
-            hideBtn.classList.remove('hidden');
-            viewBtn.classList.add('hidden');
-            builderPanel.classList.remove('lg:col-span-3');
-            builderPanel.classList.add('lg:col-span-2');
-        }, 300);
+    try {
+        const panel = document.getElementById('previewPanel');
+        const hideBtn = document.getElementById('hidePreviewBtn');
+        const viewBtn = document.getElementById('viewPreviewBtn');
+        const builderPanel = document.getElementById('builderPanel');
+        if (isPreviewVisible) {
+            panel.classList.add('animate-fadeOut');
+            setTimeout(() => {
+                panel.classList.add('hidden');
+                panel.classList.remove('animate-fadeOut');
+                hideBtn.classList.add('hidden');
+                viewBtn.classList.remove('hidden');
+                builderPanel.classList.remove('lg:col-span-2');
+                builderPanel.classList.add('lg:col-span-3');
+            }, 300);
+        } else {
+            panel.classList.remove('hidden');
+            panel.classList.add('animate-fadeIn');
+            setTimeout(() => {
+                panel.classList.remove('animate-fadeIn');
+                hideBtn.classList.remove('hidden');
+                viewBtn.classList.add('hidden');
+                builderPanel.classList.remove('lg:col-span-3');
+                builderPanel.classList.add('lg:col-span-2');
+            }, 300);
+        }
+        isPreviewVisible = !isPreviewVisible;
+        console.log('Toggled preview visibility:', isPreviewVisible);
+    } catch (e) {
+        console.error('Error in togglePreview:', e);
+        showNotification('error', 'Failed to toggle preview. Check console for details.');
     }
-    isPreviewVisible = !isPreviewVisible;
 }
 
 function showNotification(type, message) {
-    const notification = document.getElementById('notification');
-    const content = document.getElementById('notificationContent');
-    content.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500'}"></i>
-        <span>${message}</span>
-    `;
-    content.className = `p-4 rounded-lg shadow-lg flex items-center space-x-3 ${type === 'success' ? 'bg-green-900' : 'bg-red-900'} animate-fadeIn`;
-    notification.classList.remove('hidden');
-    setTimeout(() => {
-        notification.classList.add('animate-fadeOut');
+    try {
+        const notification = document.getElementById('notification');
+        const content = document.getElementById('notificationContent');
+        content.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500'}"></i>
+            <span>${message}</span>
+        `;
+        content.className = `p-4 rounded-lg shadow-lg flex items-center space-x-3 ${type === 'success' ? 'bg-green-900' : 'bg-red-900'} animate-fadeIn`;
+        notification.classList.remove('hidden');
         setTimeout(() => {
-            notification.classList.add('hidden');
-            notification.classList.remove('animate-fadeOut');
-        }, 300);
-    }, 3000);
+            notification.classList.add('animate-fadeOut');
+            setTimeout(() => {
+                notification.classList.add('hidden');
+                notification.classList.remove('animate-fadeOut');
+            }, 300);
+        }, 3000);
+        console.log('Notification shown:', type, message);
+    } catch (e) {
+        console.error('Error in showNotification:', e);
+    }
 }
 
 function updatePreview() {
-    if (previewUpdateTimeout) clearTimeout(previewUpdateTimeout);
-    previewUpdateTimeout = setTimeout(() => {
+    try {
+        console.log('Updating preview...');
         const preview = document.getElementById('preview');
         const content = document.getElementById('content').value;
         let html = '';
@@ -455,45 +575,81 @@ function updatePreview() {
         }
 
         preview.innerHTML = html || '<p class="text-gray-400 italic">Build your embed to see a live preview here...</p>';
-    }, 100);
-}
-
-function toggleEmojiPicker(pickerId) {
-    const picker = document.getElementById(pickerId);
-    const isActive = picker.classList.contains('active');
-    document.querySelectorAll('emoji-picker').forEach(p => p.classList.remove('active'));
-    if (!isActive) picker.classList.add('active');
-}
-
-function setupEmojiPicker(pickerId) {
-    const picker = document.getElementById(pickerId);
-    if (picker && !picker.dataset.listenerAdded) {
-        picker.addEventListener('emoji-click', event => {
-            const textarea = picker.previousElementSibling.previousElementSibling;
-            textarea.value += event.detail.unicode;
-            updatePreview();
-            picker.classList.remove('active');
-        });
-        picker.dataset.listenerAdded = true;
+        console.log('Preview updated with:', html);
+    } catch (e) {
+        console.error('Error in updatePreview:', e);
+        showNotification('error', 'Failed to update preview. Check console for details.');
     }
 }
 
-function setupInputListeners(element) {
-    const inputs = element.querySelectorAll('input, textarea');
-    inputs.forEach(input => {
-        if (!input.dataset.listenerAdded) {
-            input.addEventListener('input', updatePreview);
-            if (input.type === 'checkbox') {
-                input.addEventListener('change', updatePreview);
-            }
-            input.dataset.listenerAdded = true;
+function toggleEmojiPicker(pickerId) {
+    try {
+        const picker = document.getElementById(pickerId);
+        if (!picker) {
+            console.error(`Emoji picker ${pickerId} not found`);
+            return;
         }
-    });
+        const isActive = picker.classList.contains('active');
+        document.querySelectorAll('emoji-picker').forEach(p => p.classList.remove('active'));
+        if (!isActive) {
+            picker.classList.add('active');
+            console.log(`Toggled emoji picker ${pickerId} to active`);
+        }
+    } catch (e) {
+        console.error('Error in toggleEmojiPicker:', e);
+        showNotification('error', 'Failed to toggle emoji picker. Check console for details.');
+    }
+}
+
+function setupEmojiPicker(pickerId) {
+    try {
+        const picker = document.getElementById(pickerId);
+        if (picker && !picker.dataset.listenerAdded) {
+            console.log(`Setting up emoji picker: ${pickerId}`);
+            picker.addEventListener('emoji-click', event => {
+                console.log(`Emoji clicked: ${event.detail.unicode}`);
+                const textarea = picker.closest('.emoji-picker-container').querySelector('textarea');
+                if (textarea) {
+                    textarea.value += event.detail.unicode;
+                    updatePreview();
+                }
+                picker.classList.remove('active');
+            });
+            picker.dataset.listenerAdded = true;
+        }
+    } catch (e) {
+        console.error('Error in setupEmojiPicker:', e);
+        showNotification('error', 'Failed to setup emoji picker. Check console for details.');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    addEmbed();
-    setupEmojiPicker('contentEmojiPicker');
-    setupInputListeners(document);
-    updatePreview();
+    try {
+        console.log('DOM loaded, initializing...');
+        addEmbed();
+        setupEmojiPicker('contentEmojiPicker');
+
+        // Static input listeners
+        document.getElementById('webhookUrl').oninput = () => {
+            console.log('Webhook URL input');
+            updatePreview();
+        };
+        document.getElementById('content').oninput = () => {
+            console.log('Content input');
+            updatePreview();
+        };
+        document.getElementById('jsonInput').oninput = () => {
+            console.log('JSON input');
+            updatePreview();
+        };
+        document.getElementById('fileInput').onchange = () => {
+            console.log('File input changed');
+            handleFiles();
+        };
+
+        updatePreview();
+    } catch (e) {
+        console.error('Error in DOMContentLoaded:', e);
+        showNotification('error', 'Failed to initialize. Check console for details.');
+    }
 });
