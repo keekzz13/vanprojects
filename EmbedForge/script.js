@@ -58,46 +58,46 @@ function addEmbed(embedData = {}) {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-medium mb-2">Title</label>
-                    <input type="text" value="${embedData.title || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Embed title..." oninput="updatePreview()">
+                    <input type="text" class="embed-title w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Embed title..." value="${embedData.title || ''}" oninput="updatePreview()">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">URL</label>
-                    <input type="url" value="${embedData.url || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com" oninput="updatePreview()">
+                    <input type="url" class="embed-url w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com" value="${embedData.url || ''}" oninput="updatePreview()">
                 </div>
             </div>
             <div class="mb-4 emoji-picker-container relative">
                 <label class="block text-sm font-medium mb-2">Description</label>
-                <textarea rows="3" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white resize-none" placeholder="Embed description..." oninput="updatePreview()">${embedData.description || ''}</textarea>
+                <textarea rows="3" class="embed-description w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white resize-none" placeholder="Embed description..." oninput="updatePreview()">${embedData.description || ''}</textarea>
                 <button onclick="toggleEmojiPicker('embedDescEmojiPicker-${embedCount}')" class="absolute top-10 right-3 text-gray-400 hover:text-purple-500"><i class="fas fa-smile"></i></button>
                 <emoji-picker id="embedDescEmojiPicker-${embedCount}" class="emoji-picker"></emoji-picker>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-medium mb-2">Color</label>
-                    <input type="color" value="${embedData.color ? '#' + embedData.color.toString(16).padStart(6, '0') : '#5865f2'}" class="w-full h-10 p-1 bg-gray-600 rounded border border-gray-500 cursor-pointer" onchange="updatePreview()">
+                    <input type="color" class="embed-color w-full h-10 p-1 bg-gray-600 rounded border border-gray-500 cursor-pointer" value="${embedData.color ? '#' + embedData.color.toString(16).padStart(6, '0') : '#5865f2'}" onchange="updatePreview()">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Timestamp</label>
-                    <input type="datetime-local" value="${embedData.timestamp ? embedData.timestamp.slice(0, 16) : ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" onchange="updatePreview()">
+                    <input type="datetime-local" class="embed-timestamp w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" value="${embedData.timestamp ? embedData.timestamp.slice(0, 16) : ''}" onchange="updatePreview()">
                 </div>
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-2">Thumbnail URL</label>
-                <input type="url" value="${embedData.thumbnail?.url || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com/thumbnail.png" oninput="updatePreview()">
+                <input type="url" class="embed-thumbnail w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com/thumbnail.png" value="${embedData.thumbnail?.url || ''}" oninput="updatePreview()">
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-2">Image URL</label>
-                <input type="url" value="${embedData.image?.url || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com/image.png" oninput="updatePreview()">
+                <input type="url" class="embed-image w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com/image.png" value="${embedData.image?.url || ''}" oninput="updatePreview()">
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-2">Author Name</label>
-                <input type="text" value="${embedData.author?.name || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Author name" oninput="updatePreview()">
-                <input type="url" value="${embedData.author?.icon_url || ''}" class="w-full p-2 mt-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Author icon URL" oninput="updatePreview()">
+                <input type="text" class="embed-author-name w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Author name" value="${embedData.author?.name || ''}" oninput="updatePreview()">
+                <input type="url" class="embed-author-icon w-full p-2 mt-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Author icon URL" value="${embedData.author?.icon_url || ''}" oninput="updatePreview()">
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-2">Footer Text</label>
-                <input type="text" value="${embedData.footer?.text || ''}" class="w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Footer text" oninput="updatePreview()">
-                <input type="url" value="${embedData.footer?.icon_url || ''}" class="w-full p-2 mt-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Footer icon URL" oninput="updatePreview()">
+                <input type="text" class="embed-footer-text w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Footer text" value="${embedData.footer?.text || ''}" oninput="updatePreview()">
+                <input type="url" class="embed-footer-icon w-full p-2 mt-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="Footer icon URL" value="${embedData.footer?.icon_url || ''}" oninput="updatePreview()">
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-2">Fields</label>
@@ -144,21 +144,15 @@ function updateEmbedIndices() {
             embed.id = `embed-${i}`;
             const header = embed.querySelector('h3');
             if (header) header.textContent = `Embed ${i + 1}`;
-            
             const removeButton = embed.querySelector('button[onclick*="removeEmbed"]');
             if (removeButton) removeButton.setAttribute('onclick', `removeEmbed(${i})`);
-
             const addFieldButton = embed.querySelector('button[onclick*="addField"]');
             if (addFieldButton) addFieldButton.setAttribute('onclick', `addField(${i})`);
-
             const fieldsContainer = embed.querySelector(`div[id^="fields-"]`);
             if (fieldsContainer) fieldsContainer.id = `fields-${i}`;
-
             const emojiPicker = embed.querySelector('emoji-picker');
             if (emojiPicker) {
                 emojiPicker.id = `embedDescEmojiPicker-${i}`;
-                const emojiButton = embed.querySelector('button[onclick*="toggleEmojiPicker"]');
-                if (emojiButton) emojiButton.setAttribute('onclick', `toggleEmojiPicker('embedDescEmojiPicker-${i}')`);
                 setupEmojiPicker(`embedDescEmojiPicker-${i}`);
             }
         });
@@ -178,10 +172,10 @@ function addField(embedIndex, fieldData = {}) {
         fieldDiv.className = 'field-item bg-gray-600 p-3 rounded flex flex-col space-y-2 animate-fadeIn';
         fieldDiv.innerHTML = `
             <div class="flex space-x-2">
-                <input type="text" value="${fieldData.name || ''}" placeholder="Field name" class="flex-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-green-500 focus:outline-none text-white" oninput="updatePreview()">
-                <input type="text" value="${fieldData.value || ''}" placeholder="Field value" class="flex-1 p-2 bg-gray-700 rounded border border-gray-600 focus:border-green-500 focus:outline-none text-white" oninput="updatePreview()">
+                <input type="text" class="field-name w-full p-2 bg-gray-700 rounded border border-gray-600 focus:border-green-500 focus:outline-none text-white" placeholder="Field name" value="${fieldData.name || ''}" oninput="updatePreview()">
+                <input type="text" class="field-value w-full p-2 bg-gray-700 rounded border border-gray-600 focus:border-green-500 focus:outline-none text-white" placeholder="Field value" value="${fieldData.value || ''}" oninput="updatePreview()">
                 <label class="flex items-center space-x-1 cursor-pointer">
-                    <input type="checkbox" ${fieldData.inline ? 'checked' : ''} class="accent-green-500" onchange="updatePreview()"> <span class="text-sm">Inline</span>
+                    <input type="checkbox" class="field-inline accent-green-500" ${fieldData.inline ? 'checked' : ''} onchange="updatePreview()"> <span class="text-sm">Inline</span>
                 </label>
                 <button onclick="this.parentElement.parentElement.remove(); updatePreview()" class="text-red-400 hover:text-red-300 p-1">&times;</button>
             </div>
@@ -242,7 +236,7 @@ function removeFile(index) {
 
 function loadTemplate() {
     try {
-        const template = document.getElementById('templateSelect').value;
+        const template = document.getElementById('templateSelect')?.value;
         if (!template) return;
         const data = templates[template];
         document.getElementById('content').value = data.content || '';
@@ -260,7 +254,7 @@ function loadTemplate() {
 
 function loadFromJSON() {
     try {
-        const jsonInput = document.getElementById('jsonInput').value;
+        const jsonInput = document.getElementById('jsonInput')?.value;
         if (!jsonInput) throw new Error('JSON input is empty');
         const data = JSON.parse(jsonInput);
         document.getElementById('content').value = data.content || '';
@@ -292,84 +286,89 @@ function generateJSON() {
 
         const embedItems = document.querySelectorAll('.embed-item');
         if (embedItems.length > 10) throw new Error('Maximum 10 embeds allowed');
-
         embedItems.forEach((item, index) => {
             const embed = {};
-
-            // Use more robust selectors and add null checks
-            const titleInput = item.querySelector('input[placeholder="Embed title..."]');
-            embed.title = titleInput?.value || '';
-
-            const urlInput = item.querySelector('input[placeholder="https://example.com"]');
-            embed.url = urlInput?.value || '';
+            const titleInput = item.querySelector('.embed-title');
+            if (!titleInput) {
+                console.error(`Title input not found for embed ${index}`);
+                return;
+            }
+            embed.title = titleInput.value || '';
+            const urlInput = item.querySelector('.embed-url');
+            if (!urlInput) {
+                console.error(`URL input not found for embed ${index}`);
+                return;
+            }
+            embed.url = urlInput.value || '';
             if (embed.title && embed.url && !/^https?:\/\//.test(embed.url)) {
-                throw new Error(`Embed ${index + 1} URL must be a valid HTTP/HTTPS link`);
+                throw new Error(`Invalid URL for embed ${index + 1}`);
             }
-
-            const descriptionInput = item.querySelector('textarea[placeholder="Embed description..."]');
-            embed.description = descriptionInput?.value || '';
-
-            const colorInput = item.querySelector('input[type="color"]');
-            embed.color = colorInput ? parseInt(colorInput.value.slice(1), 16) || 0x5865f2 : 0x5865f2;
-
-            const timestampInput = item.querySelector('input[type="datetime-local"]');
-            if (timestampInput?.value) embed.timestamp = new Date(timestampInput.value).toISOString();
-
-            const thumbnailInput = item.querySelector('input[placeholder*="Thumbnail"]');
-            embed.thumbnail = { url: thumbnailInput?.value || '' };
-
-            const imageInput = item.querySelector('input[placeholder*="Image"]');
-            embed.image = { url: imageInput?.value || '' };
-
-            const authorNameInput = item.querySelector('input[placeholder="Author name"]');
-            const authorName = authorNameInput?.value || '';
-            if (authorName) {
-                embed.author = { name: authorName };
-                const authorIconInput = item.querySelector('input[placeholder="Author icon URL"]');
-                if (authorIconInput?.value) embed.author.icon_url = authorIconInput.value;
+            const descriptionInput = item.querySelector('.embed-description');
+            if (!descriptionInput) {
+                console.error(`Description input not found for embed ${index}`);
+                return;
             }
-
-            const footerTextInput = item.querySelector('input[placeholder="Footer text"]');
-            const footerText = footerTextInput?.value || '';
-            if (footerText) {
-                embed.footer = { text: footerText };
-                const footerIconInput = item.querySelector('input[placeholder="Footer icon URL"]');
-                if (footerIconInput?.value) embed.footer.icon_url = footerIconInput.value;
+            embed.description = descriptionInput.value || '';
+            const colorInput = item.querySelector('.embed-color');
+            if (!colorInput) {
+                console.error(`Color input not found for embed ${index}`);
+                return;
             }
-
+            embed.color = parseInt(colorInput.value.slice(1), 16) || 0x5865f2;
+            const timestampInput = item.querySelector('.embed-timestamp');
+            if (timestampInput && timestampInput.value) {
+                embed.timestamp = new Date(timestampInput.value).toISOString();
+            }
+            const thumbnailInput = item.querySelector('.embed-thumbnail');
+            if (thumbnailInput && thumbnailInput.value) {
+                embed.thumbnail = { url: thumbnailInput.value };
+            }
+            const imageInput = item.querySelector('.embed-image');
+            if (imageInput && imageInput.value) {
+                embed.image = { url: imageInput.value };
+            }
+            const authorNameInput = item.querySelector('.embed-author-name');
+            if (authorNameInput && authorNameInput.value) {
+                embed.author = { name: authorNameInput.value };
+                const authorIconInput = item.querySelector('.embed-author-icon');
+                if (authorIconInput && authorIconInput.value) {
+                    embed.author.icon_url = authorIconInput.value;
+                }
+            }
+            const footerTextInput = item.querySelector('.embed-footer-text');
+            if (footerTextInput && footerTextInput.value) {
+                embed.footer = { text: footerTextInput.value };
+                const footerIconInput = item.querySelector('.embed-footer-icon');
+                if (footerIconInput && footerIconInput.value) {
+                    embed.footer.icon_url = footerIconInput.value;
+                }
+            }
             const fields = item.querySelectorAll('.field-item');
             if (fields.length > 0) {
-                if (fields.length > 25) throw new Error(`Embed ${index + 1}: Maximum 25 fields per embed allowed`);
-                embed.fields = Array.from(fields)
-                    .map(field => {
-                        const inputs = field.querySelectorAll('input');
-                        if (!inputs[0] || !inputs[1] || !inputs[2]) return null;
-                        return {
-                            name: inputs[0].value || '',
-                            value: inputs[1].value || '',
-                            inline: inputs[2].checked
-                        };
-                    })
-                    .filter(field => field && field.name && field.value);
+                if (fields.length > 25) throw new Error(`Maximum 25 fields per embed allowed for embed ${index + 1}`);
+                embed.fields = Array.from(fields).map(field => {
+                    const nameInput = field.querySelector('.field-name');
+                    const valueInput = field.querySelector('.field-value');
+                    const inlineInput = field.querySelector('.field-inline');
+                    if (!nameInput || !valueInput || !inlineInput) {
+                        console.error(`Field inputs missing for embed ${index}`);
+                        return null;
+                    }
+                    return {
+                        name: nameInput.value || '',
+                        value: valueInput.value || '',
+                        inline: inlineInput.checked
+                    };
+                }).filter(field => field && field.name && field.value);
             }
-
-            // Only add embed if it has meaningful content
             if (embed.title || embed.description || embed.fields?.length) {
                 payload.embeds.push(embed);
             }
         });
 
-        // Validate that at least one embed or content exists
-        if (!payload.content && payload.embeds.length === 0 && files.length === 0) {
-            throw new Error('No content, embeds, or files to send');
-        }
-
         const jsonString = JSON.stringify(payload, null, 2);
-        const jsonOutput = document.getElementById('jsonOutput');
-        if (jsonOutput) {
-            jsonOutput.value = jsonString;
-            document.getElementById('jsonModal')?.classList.remove('hidden');
-        }
+        document.getElementById('jsonOutput').value = jsonString;
+        document.getElementById('jsonModal').classList.remove('hidden');
         showNotification('success', 'JSON generated successfully!');
         console.log('Generated JSON:', jsonString);
         return payload;
@@ -383,6 +382,7 @@ function generateJSON() {
 function copyJSON() {
     try {
         const textarea = document.getElementById('jsonOutput');
+        if (!textarea) throw new Error('JSON output textarea not found');
         textarea.select();
         document.execCommand('copy');
         showNotification('success', 'JSON copied to clipboard!');
@@ -421,6 +421,7 @@ function showClearConfirm() {
 function closeClearConfirm() {
     try {
         const modal = document.getElementById('clearConfirmModal');
+        if (!modal) throw new Error('Clear confirm modal not found');
         modal.classList.add('animate-fadeOut');
         setTimeout(() => {
             modal.classList.add('hidden');
@@ -454,7 +455,7 @@ function clearAll() {
 
 function sendToDiscord() {
     try {
-        const webhookUrl = document.getElementById('webhookUrl').value;
+        const webhookUrl = document.getElementById('webhookUrl')?.value;
         if (!webhookUrl || !/^https:\/\/(discord\.com|discordapp\.com|ptb\.discord\.com)\/api\/webhooks\/[0-9]+\/[A-Za-z0-9_-]+/.test(webhookUrl)) {
             showNotification('error', 'Please provide a valid Discord webhook URL (e.g., discord.com, discordapp.com, or ptb.discord.com)!');
             console.error('Invalid webhook URL:', webhookUrl);
@@ -486,7 +487,7 @@ function sendToDiscord() {
                 const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
                 fetch(proxyUrl, {
                     method: 'POST',
-                    body: JSON.stringify accelerating({ webhookUrl, payload: JSON.stringify(payload), files: fileData }),
+                    body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: fileData }),
                     headers: { 'Content-Type': 'application/json' }
                 })
                     .then(response => {
@@ -501,8 +502,7 @@ function sendToDiscord() {
             })
             .catch(error => {
                 console.error('Error reading files:', error.message);
-                showNotification('error', `Failed to process files: ${error.message}. Try without attachments.`);
-                // Fallback: Send without files
+                showNotification('error', `Failed to process files: ${error.message}. Trying without attachments.`);
                 const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
                 fetch(proxyUrl, {
                     method: 'POST',
@@ -604,59 +604,68 @@ function updatePreview() {
         const embedItems = document.querySelectorAll('.embed-item');
         embedItems.forEach((item, index) => {
             let embedHtml = '<div class="preview-embed rounded-lg p-4 mb-4">';
-            const titleInput = item.querySelector('input[placeholder="Embed title..."]');
-            const title = titleInput?.value || '';
-            if (title) embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${title}</h3>`;
-            const descriptionInput = item.querySelector('textarea[placeholder="Embed description..."]');
-            const description = descriptionInput?.value || '';
-            if (description) embedHtml += `<p class="text-gray-300 mb-3">${description}</p>`;
-            const thumbnailInput = item.querySelector('input[placeholder*="Thumbnail"]');
-            const thumbnail = thumbnailInput?.value || '';
-            if (thumbnail && isValidUrl(thumbnail)) {
-                embedHtml += `<img src="${thumbnail}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right" onerror="this.style.display='none'">`;
+            const titleInput = item.querySelector('.embed-title');
+            if (titleInput && titleInput.value) {
+                embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${titleInput.value}</h3>`;
+            } else {
+                console.warn(`Title input missing or empty for embed ${index}`);
             }
-            const imageInput = item.querySelector('input[placeholder*="Image"]');
-            const image = imageInput?.value || '';
-            if (image && isValidUrl(image)) {
-                embedHtml += `<img src="${image}" alt="Image" class="w-full h-auto rounded mb-3" onerror="this.style.display='none'">`;
+            const descriptionInput = item.querySelector('.embed-description');
+            if (descriptionInput && descriptionInput.value) {
+                embedHtml += `<p class="text-gray-300 mb-3">${descriptionInput.value}</p>`;
+            } else {
+                console.warn(`Description input missing or empty for embed ${index}`);
             }
-            const authorNameInput = item.querySelector('input[placeholder="Author name"]');
-            const authorName = authorNameInput?.value || '';
-            const authorIconInput = item.querySelector('input[placeholder="Author icon URL"]');
-            const authorIcon = authorIconInput?.value || '';
-            if (authorName) {
+            const thumbnailInput = item.querySelector('.embed-thumbnail');
+            if (thumbnailInput && thumbnailInput.value && isValidUrl(thumbnailInput.value)) {
+                embedHtml += `<img src="${thumbnailInput.value}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right" onerror="this.style.display='none'">`;
+            } else if (thumbnailInput) {
+                console.warn(`Invalid or empty thumbnail URL for embed ${index}`);
+            }
+            const imageInput = item.querySelector('.embed-image');
+            if (imageInput && imageInput.value && isValidUrl(imageInput.value)) {
+                embedHtml += `<img src="${imageInput.value}" alt="Image" class="w-full h-auto rounded mb-3" onerror="this.style.display='none'">`;
+            } else if (imageInput) {
+                console.warn(`Invalid or empty image URL for embed ${index}`);
+            }
+            const authorNameInput = item.querySelector('.embed-author-name');
+            const authorIconInput = item.querySelector('.embed-author-icon');
+            if (authorNameInput && authorNameInput.value) {
                 embedHtml += `<div class="flex items-center mb-3">`;
-                if (authorIcon && isValidUrl(authorIcon)) {
-                    embedHtml += `<img src="${authorIcon}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2" onerror="this.style.display='none'">`;
+                if (authorIconInput && authorIconInput.value && isValidUrl(authorIconInput.value)) {
+                    embedHtml += `<img src="${authorIconInput.value}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2" onerror="this.style.display='none'">`;
                 }
-                embedHtml += `<span class="font-semibold">${authorName}</span></div>`;
+                embedHtml += `<span class="font-semibold">${authorNameInput.value}</span></div>`;
+            } else if (authorNameInput) {
+                console.warn(`Author name input missing or empty for embed ${index}`);
             }
             const fields = item.querySelectorAll('.field-item');
-            fields.forEach(field => {
-                const inputs = field.querySelectorAll('input');
-                const name = inputs[0]?.value || '';
-                const value = inputs[1]?.value || '';
-                if (name && value) {
-                    embedHtml += `<div class="mb-2 ${inputs[2]?.checked ? 'field-inline' : ''}">
-                        <div class="font-semibold text-white mb-1">${name}</div>
-                        <div class="text-gray-300">${value}</div>
+            fields.forEach((field, fieldIndex) => {
+                const nameInput = field.querySelector('.field-name');
+                const valueInput = field.querySelector('.field-value');
+                const inlineInput = field.querySelector('.field-inline');
+                if (nameInput && valueInput && nameInput.value && valueInput.value) {
+                    embedHtml += `<div class="mb-2 ${inlineInput?.checked ? 'field-inline' : ''}">
+                        <div class="font-semibold text-white mb-1">${nameInput.value}</div>
+                        <div class="text-gray-300">${valueInput.value}</div>
                     </div>`;
+                } else {
+                    console.warn(`Field ${fieldIndex} missing name or value for embed ${index}`);
                 }
             });
-            const footerTextInput = item.querySelector('input[placeholder="Footer text"]');
-            const footerText = footerTextInput?.value || '';
-            const footerIconInput = item.querySelector('input[placeholder="Footer icon URL"]');
-            const footerIcon = footerIconInput?.value || '';
-            const timestampInput = item.querySelector('input[type="datetime-local"]');
-            const timestamp = timestampInput?.value || '';
-            if (footerText || timestamp) {
+            const footerTextInput = item.querySelector('.embed-footer-text');
+            const footerIconInput = item.querySelector('.embed-footer-icon');
+            const timestampInput = item.querySelector('.embed-timestamp');
+            if ((footerTextInput && footerTextInput.value) || (timestampInput && timestampInput.value)) {
                 embedHtml += `<div class="flex items-center mt-3 text-gray-400 text-sm">`;
-                if (footerIcon && isValidUrl(footerIcon)) {
-                    embedHtml += `<img src="${footerIcon}" alt="Footer Icon" class="w-5 h-5 mr-2" onerror="this.style.display='none'">`;
+                if (footerIconInput && footerIconInput.value && isValidUrl(footerIconInput.value)) {
+                    embedHtml += `<img src="${footerIconInput.value}" alt="Footer Icon" class="w-5 h-5 mr-2" onerror="this.style.display='none'">`;
                 }
-                embedHtml += `<span>${footerText}${footerText && timestamp ? ' | ' : ''}${timestamp ? new Date(timestamp).toLocaleString() : ''}</span></div>`;
+                const footerText = footerTextInput?.value || '';
+                const timestamp = timestampInput?.value ? new Date(timestampInput.value).toLocaleString() : '';
+                embedHtml += `<span>${footerText}${footerText && timestamp ? ' | ' : ''}${timestamp}</span></div>`;
             }
-            const colorInput = item.querySelector('input[type="color"]');
+            const colorInput = item.querySelector('.embed-color');
             const color = colorInput?.value || '#5865f2';
             embedHtml = embedHtml.replace('preview-embed', `preview-embed border-l-[4px] border-l-[${color}]`);
             embedHtml += '</div>';
@@ -703,7 +712,7 @@ function setupEmojiPicker(pickerId) {
     try {
         const picker = document.getElementById(pickerId);
         if (!picker) throw new Error(`Emoji picker ${pickerId} not found`);
-        if (picker && !picker.dataset.listenerAdded) {
+        if (!picker.dataset.listenerAdded) {
             console.log(`Setting up emoji picker: ${pickerId}`);
             picker.addEventListener('emoji-click', event => {
                 console.log(`Emoji clicked: ${event.detail.unicode}`);
@@ -728,20 +737,23 @@ document.addEventListener('DOMContentLoaded', () => {
         addEmbed();
         setupEmojiPicker('contentEmojiPicker');
 
-        // Static input listeners
-        document.getElementById('webhookUrl').oninput = () => {
+        const webhookUrl = document.getElementById('webhookUrl');
+        if (webhookUrl) webhookUrl.oninput = () => {
             console.log('Webhook URL input');
             updatePreview();
         };
-        document.getElementById('content').oninput = () => {
+        const content = document.getElementById('content');
+        if (content) content.oninput = () => {
             console.log('Content input');
             updatePreview();
         };
-        document.getElementById('jsonInput').oninput = () => {
+        const jsonInput = document.getElementById('jsonInput');
+        if (jsonInput) jsonInput.oninput = () => {
             console.log('JSON input');
             updatePreview();
         };
-        document.getElementById('fileInput').onchange = () => {
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) fileInput.onchange = () => {
             console.log('File input changed');
             handleFiles();
         };
