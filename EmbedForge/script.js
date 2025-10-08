@@ -1,6 +1,7 @@
 let embedCount = 0;
 let files = [];
 let isPreviewVisible = true;
+let previewUpdateTimeout = null;
 
 const templates = {
     welcome: {
@@ -206,7 +207,7 @@ function generateJSON() {
     const webhookUrl = document.getElementById('webhookUrl').value;
     if (!webhookUrl) {
         showNotification('error', 'Webhook URL is required!');
-        return;
+        return null;
     }
     const payload = {
         content: document.getElementById('content').value,
@@ -263,6 +264,7 @@ function generateJSON() {
     document.getElementById('jsonOutput').value = jsonString;
     document.getElementById('jsonModal').classList.remove('hidden');
     showNotification('success', 'JSON generated successfully!');
+    return payload;
 }
 
 function copyJSON() {
@@ -307,10 +309,42 @@ function clearAll() {
     showNotification('success', 'All fields cleared!');
 }
 
+function sendToDiscord() {
+    const webhookUrl = document.getElementById('webhookUrl').value;
+    if (!webhookUrl || !/^https:\/\/discord\.com\/api\/webhooks\//.test(webhookUrl)) {
+        showNotification('error', 'Please provide a valid Discord webhook URL!');
+        return;
+    }
+
+    const payload = generateJSON();
+    if (!payload) return;
+
+    const formData = new FormData();
+    formData.append('payload_json', JSON.stringify(payload));
+    files.forEach((file, i) => {
+        formData.append(`file${i}`, file, file.name);
+    });
+
+    fetch(webhookUrl, {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            showNotification('success', 'Message sent to Discord successfully!');
+        })
+        .catch(error => {
+            console.error('Error sending to Discord:', error);
+            showNotification('error', 'Failed to send to Discord. Check webhook URL or try again.');
+        });
+}
+
 function togglePreview() {
     const panel = document.getElementById('previewPanel');
     const hideBtn = document.getElementById('hidePreviewBtn');
     const viewBtn = document.getElementById('viewPreviewBtn');
+    const mainGrid = document.getElementById('mainGrid');
+    const builderPanel = document.getElementById('builderPanel');
     if (isPreviewVisible) {
         panel.classList.add('animate-fadeOut');
         setTimeout(() => {
@@ -318,6 +352,8 @@ function togglePreview() {
             panel.classList.remove('animate-fadeOut');
             hideBtn.classList.add('hidden');
             viewBtn.classList.remove('hidden');
+            builderPanel.classList.remove('lg:col-span-2');
+            builderPanel.classList.add('lg:col-span-3');
         }, 300);
     } else {
         panel.classList.remove('hidden');
@@ -326,6 +362,8 @@ function togglePreview() {
             panel.classList.remove('animate-fadeIn');
             hideBtn.classList.remove('hidden');
             viewBtn.classList.add('hidden');
+            builderPanel.classList.remove('lg:col-span-3');
+            builderPanel.classList.add('lg:col-span-2');
         }, 300);
     }
     isPreviewVisible = !isPreviewVisible;
@@ -350,71 +388,74 @@ function showNotification(type, message) {
 }
 
 function updatePreview() {
-    const preview = document.getElementById('preview');
-    const content = document.getElementById('content').value;
-    let html = '';
+    if (previewUpdateTimeout) clearTimeout(previewUpdateTimeout);
+    previewUpdateTimeout = setTimeout(() => {
+        const preview = document.getElementById('preview');
+        const content = document.getElementById('content').value;
+        let html = '';
 
-    if (content) {
-        html += `<div class="bg-discord-bg p-4 rounded-lg mb-4">${content}</div>`;
-    }
-
-    const embedItems = document.querySelectorAll('.embed-item');
-    embedItems.forEach(item => {
-        let embedHtml = '<div class="preview-embed rounded-lg p-4 mb-4">';
-        const title = item.querySelector('input[placeholder="Embed title..."]').value;
-        if (title) embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${title}</h3>`;
-        const description = item.querySelector('textarea[placeholder="Embed description..."]').value;
-        if (description) embedHtml += `<p class="text-gray-300 mb-3">${description}</p>`;
-        const thumbnail = item.querySelector('input[placeholder*="Thumbnail"]').value;
-        if (thumbnail) embedHtml += `<img src="${thumbnail}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right">`;
-        const image = item.querySelector('input[placeholder*="Image"]').value;
-        if (image) embedHtml += `<img src="${image}" alt="Image" class="w-full h-auto rounded mb-3">`;
-        const authorName = item.querySelector('input[placeholder="Author name"]').value;
-        const authorIcon = item.querySelector('input[placeholder="Author icon URL"]').value;
-        if (authorName) {
-            embedHtml += `<div class="flex items-center mb-3">`;
-            if (authorIcon) embedHtml += `<img src="${authorIcon}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2">`;
-            embedHtml += `<span class="font-semibold">${authorName}</span></div>`;
+        if (content) {
+            html += `<div class="bg-discord-bg p-4 rounded-lg mb-4">${content}</div>`;
         }
-        const fields = item.querySelectorAll('.field-item');
-        fields.forEach(field => {
-            const inputs = field.querySelectorAll('input');
-            const name = inputs[0].value;
-            const value = inputs[1].value;
-            if (name && value) {
-                embedHtml += `<div class="mb-2 ${inputs[2].checked ? 'field-inline' : ''}">
-                    <div class="font-semibold text-white mb-1">${name}</div>
-                    <div class="text-gray-300">${value}</div>
-                </div>`;
+
+        const embedItems = document.querySelectorAll('.embed-item');
+        embedItems.forEach(item => {
+            let embedHtml = '<div class="preview-embed rounded-lg p-4 mb-4">';
+            const title = item.querySelector('input[placeholder="Embed title..."]').value;
+            if (title) embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${title}</h3>`;
+            const description = item.querySelector('textarea[placeholder="Embed description..."]').value;
+            if (description) embedHtml += `<p class="text-gray-300 mb-3">${description}</p>`;
+            const thumbnail = item.querySelector('input[placeholder*="Thumbnail"]').value;
+            if (thumbnail) embedHtml += `<img src="${thumbnail}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right">`;
+            const image = item.querySelector('input[placeholder*="Image"]').value;
+            if (image) embedHtml += `<img src="${image}" alt="Image" class="w-full h-auto rounded mb-3">`;
+            const authorName = item.querySelector('input[placeholder="Author name"]').value;
+            const authorIcon = item.querySelector('input[placeholder="Author icon URL"]').value;
+            if (authorName) {
+                embedHtml += `<div class="flex items-center mb-3">`;
+                if (authorIcon) embedHtml += `<img src="${authorIcon}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2">`;
+                embedHtml += `<span class="font-semibold">${authorName}</span></div>`;
             }
+            const fields = item.querySelectorAll('.field-item');
+            fields.forEach(field => {
+                const inputs = field.querySelectorAll('input');
+                const name = inputs[0].value;
+                const value = inputs[1].value;
+                if (name && value) {
+                    embedHtml += `<div class="mb-2 ${inputs[2].checked ? 'field-inline' : ''}">
+                        <div class="font-semibold text-white mb-1">${name}</div>
+                        <div class="text-gray-300">${value}</div>
+                    </div>`;
+                }
+            });
+            const footerText = item.querySelector('input[placeholder="Footer text"]').value;
+            const footerIcon = item.querySelector('input[placeholder="Footer icon URL"]').value;
+            const timestamp = item.querySelector('input[type="datetime-local"]').value;
+            if (footerText || timestamp) {
+                embedHtml += `<div class="flex items-center mt-3 text-gray-400 text-sm">`;
+                if (footerIcon) embedHtml += `<img src="${footerIcon}" alt="Footer Icon" class="w-5 h-5 mr-2">`;
+                embedHtml += `<span>${footerText}${footerText && timestamp ? ' | ' : ''}${timestamp ? new Date(timestamp).toLocaleString() : ''}</span></div>`;
+            }
+            const color = item.querySelector('input[type="color"]').value;
+            embedHtml = embedHtml.replace('preview-embed', `preview-embed border-l-[4px] border-l-[${color}]`);
+            embedHtml += '</div>';
+            html += embedHtml;
         });
-        const footerText = item.querySelector('input[placeholder="Footer text"]').value;
-        const footerIcon = item.querySelector('input[placeholder="Footer icon URL"]').value;
-        const timestamp = item.querySelector('input[type="datetime-local"]').value;
-        if (footerText || timestamp) {
-            embedHtml += `<div class="flex items-center mt-3 text-gray-400 text-sm">`;
-            if (footerIcon) embedHtml += `<img src="${footerIcon}" alt="Footer Icon" class="w-5 h-5 mr-2">`;
-            embedHtml += `<span>${footerText}${footerText && timestamp ? ' | ' : ''}${timestamp ? new Date(timestamp).toLocaleString() : ''}</span></div>`;
+
+        if (files.length > 0) {
+            html += '<div class="space-y-2"><p class="text-gray-400">Attachments:</p>';
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    html += `<img src="${URL.createObjectURL(file)}" alt="${file.name}" class="w-full h-auto rounded mb-3">`;
+                } else if (file.type.startsWith('video/')) {
+                    html += `<video src="${URL.createObjectURL(file)}" controls class="w-full h-auto rounded mb-3"></video>`;
+                }
+            });
+            html += '</div>';
         }
-        const color = item.querySelector('input[type="color"]').value;
-        embedHtml = embedHtml.replace('preview-embed', `preview-embed border-l-[4px] border-l-[${color}]`);
-        embedHtml += '</div>';
-        html += embedHtml;
-    });
 
-    if (files.length > 0) {
-        html += '<div class="space-y-2"><p class="text-gray-400">Attachments:</p>';
-        files.forEach(file => {
-            if (file.type.startsWith('image/')) {
-                html += `<img src="${URL.createObjectURL(file)}" alt="${file.name}" class="w-full h-auto rounded mb-3">`;
-            } else if (file.type.startsWith('video/')) {
-                html += `<video src="${URL.createObjectURL(file)}" controls class="w-full h-auto rounded mb-3"></video>`;
-            }
-        });
-        html += '</div>';
-    }
-
-    preview.innerHTML = html || '<p class="text-gray-400 italic">Build your embed to see a live preview here...</p>';
+        preview.innerHTML = html || '<p class="text-gray-400 italic">Build your embed to see a live preview here...</p>';
+    }, 100);
 }
 
 function toggleEmojiPicker(pickerId) {
@@ -426,22 +467,26 @@ function toggleEmojiPicker(pickerId) {
 
 function setupEmojiPicker(pickerId) {
     const picker = document.getElementById(pickerId);
-    if (picker) {
+    if (picker && !picker.dataset.listenerAdded) {
         picker.addEventListener('emoji-click', event => {
             const textarea = picker.previousElementSibling.previousElementSibling;
             textarea.value += event.detail.unicode;
             updatePreview();
             picker.classList.remove('active');
         });
+        picker.dataset.listenerAdded = true;
     }
 }
 
 function setupInputListeners(element) {
     const inputs = element.querySelectorAll('input, textarea');
     inputs.forEach(input => {
-        input.addEventListener('input', updatePreview);
-        if (input.type === 'checkbox') {
-            input.addEventListener('change', updatePreview);
+        if (!input.dataset.listenerAdded) {
+            input.addEventListener('input', updatePreview);
+            if (input.type === 'checkbox') {
+                input.addEventListener('change', updatePreview);
+            }
+            input.dataset.listenerAdded = true;
         }
     });
 }
