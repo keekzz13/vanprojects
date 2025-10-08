@@ -18,21 +18,21 @@ const templates = {
         }]
     },
     announcement: {
-        content: "📢 New Announcement!",
+        content: "📢 **New Announcement!**",
         embeds: [{
-            title: "Big Update Released!",
+            title: "**Big Update Released!**",
             url: "https://example.com/update",
             description: "Check out the latest features and improvements in our newest update.",
             color: 0x5865f2,
-            image: { url: "https://i.imgur.com/sample-update.png" },
+            image: { url: "https://i.imgur.com/sample-update.gif" },
             author: { name: "EmbedForge Team", icon_url: "https://i.imgur.com/sample-author.png" }
         }]
     },
     event: {
-        content: "🗓 Upcoming Event!",
+        content: "🗓 **Upcoming Event!**",
         embeds: [{
-            title: "Community Game Night",
-            description: "Join us for a fun game night this Friday at 8 PM!",
+            title: "**Community Game Night**",
+            description: "Join us for a fun game night this **Friday** at *8 PM*!",
             color: 0xffb800,
             timestamp: new Date(Date.now() + 86400000).toISOString(),
             fields: [
@@ -42,6 +42,27 @@ const templates = {
         }]
     }
 };
+
+function parseDiscordMarkdown(text) {
+    try {
+        if (!text) return '';
+        // Escape HTML to prevent XSS
+        let result = text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        // Handle Discord Markdown
+        result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Bold
+        result = result.replace(/(?:\*|_)(.*?)(?:\*|_)/g, '<em>$1</em>'); // Italic
+        result = result.replace(/__(.*?)__/g, '<u>$1</u>'); // Underline
+        result = result.replace(/~~(.*?)~~/g, '<s>$1</s>'); // Strikethrough
+        result = result.replace(/`(.*?)`/g, '<code>$1</code>'); // Inline code
+        result = result.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>'); // Code block
+        result = result.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" class="text-blue-400 hover:underline" target="_blank">$1</a>'); // Links
+        console.log('Parsed Markdown:', text, '→', result);
+        return result;
+    } catch (e) {
+        console.error('Error in parseDiscordMarkdown:', e.message);
+        return text; // Fallback to raw text
+    }
+}
 
 function addEmbed(embedData = {}) {
     try {
@@ -87,7 +108,7 @@ function addEmbed(embedData = {}) {
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-2">Image URL</label>
-                <input type="url" class="embed-image w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com/image.png" value="${embedData.image?.url || ''}" oninput="updatePreview()">
+                <input type="url" class="embed-image w-full p-2 bg-gray-600 rounded border border-gray-500 focus:border-purple-500 focus:outline-none text-white" placeholder="https://example.com/image.gif" value="${embedData.image?.url || ''}" oninput="updatePreview()">
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-2">Author Name</label>
@@ -193,7 +214,6 @@ function handleFiles() {
     try {
         const input = document.getElementById('fileInput');
         if (!input) throw new Error('File input not found');
-        // Only append new files to existing files array, don't overwrite
         const newFiles = Array.from(input.files).filter(file => {
             if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) return false;
             if (file.size > 8 * 1024 * 1024) {
@@ -202,9 +222,9 @@ function handleFiles() {
             }
             return true;
         });
-        files = [...files, ...newFiles]; // Append new files
+        files = [...files, ...newFiles];
         if (files.length > 10) {
-            files = files.slice(0, 10); // Limit to 10 files
+            files = files.slice(0, 10);
             showNotification('error', 'Maximum 10 files allowed, extra files ignored');
         }
         const attachmentsDiv = document.getElementById('attachments');
@@ -233,7 +253,7 @@ function removeFile(index) {
         if (index < 0 || index >= files.length) throw new Error(`Invalid file index: ${index}`);
         files.splice(index, 1);
         const input = document.getElementById('fileInput');
-        if (input) input.value = ''; // Clear file input
+        if (input) input.value = '';
         const attachmentsDiv = document.getElementById('attachments');
         if (!attachmentsDiv) throw new Error('Attachments container not found');
         attachmentsDiv.innerHTML = '';
@@ -293,6 +313,10 @@ function loadFromJSON() {
     }
 }
 
+function isValidImageUrl(url) {
+    return !url || /\.(png|jpg|jpeg|gif)$/i.test(url);
+}
+
 function generateJSON(skipModal = false) {
     try {
         const webhookUrl = document.getElementById('webhookUrl')?.value;
@@ -342,18 +366,33 @@ function generateJSON(skipModal = false) {
             }
             const thumbnailInput = item.querySelector('.embed-thumbnail');
             if (thumbnailInput && thumbnailInput.value) {
-                embed.thumbnail = { url: thumbnailInput.value };
+                if (!isValidImageUrl(thumbnailInput.value)) {
+                    showNotification('error', `Invalid thumbnail URL for embed ${index + 1}: must end in .png, .jpg, .jpeg, or .gif`);
+                    console.error(`Invalid thumbnail URL for embed ${index}: ${thumbnailInput.value}`);
+                } else {
+                    embed.thumbnail = { url: thumbnailInput.value };
+                }
             }
             const imageInput = item.querySelector('.embed-image');
             if (imageInput && imageInput.value) {
-                embed.image = { url: imageInput.value };
+                if (!isValidImageUrl(imageInput.value)) {
+                    showNotification('error', `Invalid image URL for embed ${index + 1}: must end in .png, .jpg, .jpeg, or .gif`);
+                    console.error(`Invalid image URL for embed ${index}: ${imageInput.value}`);
+                } else {
+                    embed.image = { url: imageInput.value };
+                }
             }
             const authorNameInput = item.querySelector('.embed-author-name');
             if (authorNameInput && authorNameInput.value) {
                 embed.author = { name: authorNameInput.value };
                 const authorIconInput = item.querySelector('.embed-author-icon');
                 if (authorIconInput && authorIconInput.value) {
-                    embed.author.icon_url = authorIconInput.value;
+                    if (!isValidImageUrl(authorIconInput.value)) {
+                        showNotification('error', `Invalid author icon URL for embed ${index + 1}: must end in .png, .jpg, .jpeg, or .gif`);
+                        console.error(`Invalid author icon URL for embed ${index}: ${authorIconInput.value}`);
+                    } else {
+                        embed.author.icon_url = authorIconInput.value;
+                    }
                 }
             }
             const footerTextInput = item.querySelector('.embed-footer-text');
@@ -361,7 +400,12 @@ function generateJSON(skipModal = false) {
                 embed.footer = { text: footerTextInput.value };
                 const footerIconInput = item.querySelector('.embed-footer-icon');
                 if (footerIconInput && footerIconInput.value) {
-                    embed.footer.icon_url = footerIconInput.value;
+                    if (!isValidImageUrl(footerIconInput.value)) {
+                        showNotification('error', `Invalid footer icon URL for embed ${index + 1}: must end in .png, .jpg, .jpeg, or .gif`);
+                        console.error(`Invalid footer icon URL for embed ${index}: ${footerIconInput.value}`);
+                    } else {
+                        embed.footer.icon_url = footerIconInput.value;
+                    }
                 }
             }
             const fields = item.querySelectorAll('.field-item');
@@ -470,7 +514,7 @@ function clearAll() {
         document.getElementById('jsonInput').value = '';
         files = [];
         const input = document.getElementById('fileInput');
-        if (input) input.value = ''; // Clear file input
+        if (input) input.value = '';
         embedCount = 0;
         updatePreview();
         closeClearConfirm();
@@ -491,10 +535,9 @@ function sendToDiscord() {
             return;
         }
 
-        const payload = generateJSON(true); // Skip modal
+        const payload = generateJSON(true);
         if (!payload) return;
 
-        // Validate payload has content, embeds, or files
         if (!payload.content && (!payload.embeds || payload.embeds.length === 0) && (!files || files.length === 0)) {
             showNotification('error', 'Please add content, embeds, or files before sending!');
             console.error('Empty payload: no content, embeds, or files');
@@ -655,7 +698,7 @@ function updatePreview() {
         }
 
         if (content) {
-            html += `<div class="bg-discord-bg p-4 rounded-lg mb-4">${content}</div>`;
+            html += `<div class="bg-discord-bg p-4 rounded-lg mb-4">${parseDiscordMarkdown(content)}</div>`;
         }
 
         const embedItems = document.querySelectorAll('.embed-item');
@@ -663,24 +706,24 @@ function updatePreview() {
             let embedHtml = '<div class="preview-embed rounded-lg p-4 mb-4">';
             const titleInput = item.querySelector('.embed-title');
             if (titleInput && titleInput.value) {
-                embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${titleInput.value}</h3>`;
+                embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${parseDiscordMarkdown(titleInput.value)}</h3>`;
             } else {
                 console.warn(`Title input missing or empty for embed ${index}`);
             }
             const descriptionInput = item.querySelector('.embed-description');
             if (descriptionInput && descriptionInput.value) {
-                embedHtml += `<p class="text-gray-300 mb-3">${descriptionInput.value}</p>`;
+                embedHtml += `<p class="text-gray-300 mb-3">${parseDiscordMarkdown(descriptionInput.value)}</p>`;
             } else {
                 console.warn(`Description input missing or empty for embed ${index}`);
             }
             const thumbnailInput = item.querySelector('.embed-thumbnail');
-            if (thumbnailInput && thumbnailInput.value && isValidUrl(thumbnailInput.value)) {
+            if (thumbnailInput && thumbnailInput.value && isValidUrl(thumbnailInput.value) && isValidImageUrl(thumbnailInput.value)) {
                 embedHtml += `<img src="${thumbnailInput.value}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right" onerror="this.style.display='none'">`;
             } else if (thumbnailInput) {
                 console.warn(`Invalid or empty thumbnail URL for embed ${index}`);
             }
             const imageInput = item.querySelector('.embed-image');
-            if (imageInput && imageInput.value && isValidUrl(imageInput.value)) {
+            if (imageInput && imageInput.value && isValidUrl(imageInput.value) && isValidImageUrl(imageInput.value)) {
                 embedHtml += `<img src="${imageInput.value}" alt="Image" class="w-full h-auto rounded mb-3" onerror="this.style.display='none'">`;
             } else if (imageInput) {
                 console.warn(`Invalid or empty image URL for embed ${index}`);
@@ -689,10 +732,10 @@ function updatePreview() {
             const authorIconInput = item.querySelector('.embed-author-icon');
             if (authorNameInput && authorNameInput.value) {
                 embedHtml += `<div class="flex items-center mb-3">`;
-                if (authorIconInput && authorIconInput.value && isValidUrl(authorIconInput.value)) {
+                if (authorIconInput && authorIconInput.value && isValidUrl(authorIconInput.value) && isValidImageUrl(authorIconInput.value)) {
                     embedHtml += `<img src="${authorIconInput.value}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2" onerror="this.style.display='none'">`;
                 }
-                embedHtml += `<span class="font-semibold">${authorNameInput.value}</span></div>`;
+                embedHtml += `<span class="font-semibold">${parseDiscordMarkdown(authorNameInput.value)}</span></div>`;
             } else if (authorNameInput) {
                 console.warn(`Author name input missing or empty for embed ${index}`);
             }
@@ -703,8 +746,8 @@ function updatePreview() {
                 const inlineInput = field.querySelector('.field-inline');
                 if (nameInput && valueInput && nameInput.value && valueInput.value) {
                     embedHtml += `<div class="mb-2 ${inlineInput?.checked ? 'field-inline' : ''}">
-                        <div class="font-semibold text-white mb-1">${nameInput.value}</div>
-                        <div class="text-gray-300">${valueInput.value}</div>
+                        <div class="font-semibold text-white mb-1">${parseDiscordMarkdown(nameInput.value)}</div>
+                        <div class="text-gray-300">${parseDiscordMarkdown(valueInput.value)}</div>
                     </div>`;
                 } else {
                     console.warn(`Field ${fieldIndex} missing name or value for embed ${index}`);
@@ -715,10 +758,10 @@ function updatePreview() {
             const timestampInput = item.querySelector('.embed-timestamp');
             if ((footerTextInput && footerTextInput.value) || (timestampInput && timestampInput.value)) {
                 embedHtml += `<div class="flex items-center mt-3 text-gray-400 text-sm">`;
-                if (footerIconInput && footerIconInput.value && isValidUrl(footerIconInput.value)) {
+                if (footerIconInput && footerIconInput.value && isValidUrl(footerIconInput.value) && isValidImageUrl(footerIconInput.value)) {
                     embedHtml += `<img src="${footerIconInput.value}" alt="Footer Icon" class="w-5 h-5 mr-2" onerror="this.style.display='none'">`;
                 }
-                const footerText = footerTextInput?.value || '';
+                const footerText = footerTextInput?.value ? parseDiscordMarkdown(footerTextInput.value) : '';
                 const timestamp = timestampInput?.value ? new Date(timestampInput.value).toLocaleString() : '';
                 embedHtml += `<span>${footerText}${footerText && timestamp ? ' | ' : ''}${timestamp}</span></div>`;
             }
