@@ -20,7 +20,7 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.8);
-      z-index: 1002; /* Highest layer */
+      z-index: 1002;
       align-items: center;
       justify-content: center;
       backdrop-filter: blur(6px);
@@ -52,6 +52,13 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    .welcome-modal-content .tos-note {
+      opacity: 0.5;
+      font-style: italic;
+      font-size: 0.9em;
+      margin: 10px 0;
+    }
+
     .welcome-modal-content img.emoji {
       width: 50px;
       height: 50px;
@@ -69,13 +76,20 @@
       letter-spacing: 1px;
       transition: all 0.3s ease;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       font-family: 'Orbitron', sans-serif;
-      margin: 5px;
-      cursor: pointer;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 200px;
+      animation: buttonFadeIn 0.5s ease-out;
+    }
+
+    @keyframes buttonFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .welcome-modal-content button:hover,
@@ -240,8 +254,7 @@
   <div class="welcome-modal" id="welcome-modal">
     <div class="welcome-modal-content">
       <h2>Welcome to VanProjects! Explore our fun tools and projects.</h2>
-      <p>Some tools here may against their ToS so use them with responsibility.</p>
-      <img src="https://i.imgur.com/VOrIsWz.png" alt="VanProjects Emoji" class="emoji">
+      <p class="tos-note">Some tools here may against their ToS so use them with responsibility.</p>
       <button id="welcome-close">Ge<img src="https://i.imgur.com/VOrIsWz.png" alt="Ge Emoji" class="emoji" style="width: 20px; height: 20px; vertical-align: middle;"></button>
       <button id="diko-btn" class="diko-btn">Diko uy<img src="https://i.imgur.com/T1CQbVE.png" alt="Diko Emoji" class="emoji" style="width: 20px; height: 20px; vertical-align: middle;"></button>
     </div>
