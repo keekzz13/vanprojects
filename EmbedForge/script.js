@@ -110,6 +110,7 @@ function addEmbed(embedData = {}) {
         embedData.fields.forEach(field => addField(embedCount, field));
     }
     setupEmojiPicker(`embedDescEmojiPicker-${embedCount}`);
+    setupInputListeners(embedDiv);
     embedCount++;
     updatePreview();
 }
@@ -143,6 +144,7 @@ function addField(embedIndex, fieldData = {}) {
         </div>
     `;
     fieldsContainer.appendChild(fieldDiv);
+    setupInputListeners(fieldDiv);
     updatePreview();
 }
 
@@ -217,6 +219,10 @@ function generateJSON() {
         const embed = {};
         embed.title = item.querySelector('input[placeholder="Embed title..."]').value;
         embed.url = item.querySelector('input[placeholder="https://example.com"]').value;
+        if (embed.title && embed.url && !/^https?:\/\//.test(embed.url)) {
+            showNotification('error', 'Embed URL must be a valid HTTP/HTTPS link!');
+            return;
+        }
         embed.description = item.querySelector('textarea[placeholder="Embed description..."]').value;
         embed.color = parseInt(item.querySelector('input[type="color"]').value.slice(1), 16);
         const timestampInput = item.querySelector('input[type="datetime-local"]');
@@ -275,18 +281,30 @@ function closeModal() {
     showNotification('success', 'Modal closed!');
 }
 
+function showClearConfirm() {
+    document.getElementById('clearConfirmModal').classList.remove('hidden');
+}
+
+function closeClearConfirm() {
+    const modal = document.getElementById('clearConfirmModal');
+    modal.classList.add('animate-fadeOut');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('animate-fadeOut');
+    }, 300);
+}
+
 function clearAll() {
-    if (confirm('Clear everything?')) {
-        document.getElementById('content').value = '';
-        document.getElementById('webhookUrl').value = '';
-        document.getElementById('embedsContainer').innerHTML = '';
-        document.getElementById('attachments').innerHTML = '';
-        document.getElementById('jsonInput').value = '';
-        files = [];
-        embedCount = 0;
-        updatePreview();
-        showNotification('success', 'All fields cleared!');
-    }
+    document.getElementById('content').value = '';
+    document.getElementById('webhookUrl').value = '';
+    document.getElementById('embedsContainer').innerHTML = '';
+    document.getElementById('attachments').innerHTML = '';
+    document.getElementById('jsonInput').value = '';
+    files = [];
+    embedCount = 0;
+    updatePreview();
+    closeClearConfirm();
+    showNotification('success', 'All fields cleared!');
 }
 
 function togglePreview() {
@@ -294,37 +312,23 @@ function togglePreview() {
     const hideBtn = document.getElementById('hidePreviewBtn');
     const viewBtn = document.getElementById('viewPreviewBtn');
     if (isPreviewVisible) {
-        panel.classList.add('animate-slideOut');
+        panel.classList.add('animate-fadeOut');
         setTimeout(() => {
             panel.classList.add('hidden');
-            panel.classList.remove('animate-slideOut');
+            panel.classList.remove('animate-fadeOut');
             hideBtn.classList.add('hidden');
             viewBtn.classList.remove('hidden');
         }, 300);
     } else {
         panel.classList.remove('hidden');
-        panel.classList.add('animate-slideIn');
+        panel.classList.add('animate-fadeIn');
         setTimeout(() => {
-            panel.classList.remove('animate-slideIn');
+            panel.classList.remove('animate-fadeIn');
             hideBtn.classList.remove('hidden');
             viewBtn.classList.add('hidden');
         }, 300);
     }
     isPreviewVisible = !isPreviewVisible;
-}
-
-function closePreview() {
-    const panel = document.getElementById('previewPanel');
-    const hideBtn = document.getElementById('hidePreviewBtn');
-    const viewBtn = document.getElementById('viewPreviewBtn');
-    panel.classList.add('animate-slideOut');
-    setTimeout(() => {
-        panel.classList.add('hidden');
-        panel.classList.remove('animate-slideOut');
-        hideBtn.classList.add('hidden');
-        viewBtn.classList.remove('hidden');
-        isPreviewVisible = false;
-    }, 300);
 }
 
 function showNotification(type, message) {
@@ -432,15 +436,19 @@ function setupEmojiPicker(pickerId) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    addEmbed();
-    setupEmojiPicker('contentEmojiPicker');
-    const inputs = document.querySelectorAll('input, textarea');
+function setupInputListeners(element) {
+    const inputs = element.querySelectorAll('input, textarea');
     inputs.forEach(input => {
         input.addEventListener('input', updatePreview);
         if (input.type === 'checkbox') {
             input.addEventListener('change', updatePreview);
         }
     });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    addEmbed();
+    setupEmojiPicker('contentEmojiPicker');
+    setupInputListeners(document);
     updatePreview();
 });
