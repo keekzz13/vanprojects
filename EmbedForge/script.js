@@ -57,10 +57,10 @@ async function fetchLiveUses() {
             ? embeds.map(embed => `
                 <div class="bg-gray-700 rounded-lg p-4 animate-fadeIn">
                     <p class="text-gray-400 text-sm mb-2">Posted ${new Date(embed.created_at).toLocaleString()}</p>
-                    <div class="preview-embed p-4 mb-2">
+                    <div class="preview-embed p-4 mb-2" style="border-left: 4px solid ${embed.payload.embeds[0]?.color ? '#' + embed.payload.embeds[0].color.toString(16).padStart(6, '0') : '#5865f2'};">
                         ${embed.payload.content ? `<p class="text-gray-300 mb-3 embed-content">${parseDiscordMarkdown(embed.payload.content)}</p>` : ''}
                         ${embed.payload.embeds?.map((e, i) => `
-                            <div class="embed-content" style="border-left: 4px solid ${e.color ? '#' + e.color.toString(16).padStart(6, '0') : '#5865f2'};">
+                            <div class="embed-content">
                                 ${e.author?.name ? `
                                     <div class="flex items-center mb-3">
                                         ${e.author.icon_url ? `<img src="${e.author.icon_url}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2" onerror="this.style.display='none'">` : ''}
@@ -91,7 +91,7 @@ async function fetchLiveUses() {
             `).join('')
             : '<p class="text-gray-400 italic">No recent embeds yet...</p>';
     } catch (e) {
-        console.error('Error in fetchLiveUses:', e.message);
+        console.error('Error fetching Live Uses:', e.message);
         document.getElementById('liveUses').innerHTML = '<p class="text-gray-400 italic">Live Uses not available. Deploying Netlify function...</p>';
     }
 }
@@ -113,7 +113,7 @@ async function useTemplate(embedId) {
         showNotification('success', 'Template loaded successfully!');
         updatePreview();
     } catch (e) {
-        console.error('Error in useTemplate:', e.message);
+        console.error('Error loading template:', e.message);
         showNotification('error', `Failed to load template: ${e.message}`);
     }
 }
@@ -420,7 +420,7 @@ function generateJSON(returnPayload = false) {
         }
         return null;
     } catch (e) {
-        console.error('Error in generateJSON:', e.message);
+        console.error('Error generating JSON:', e.message);
         showNotification('error', `Failed to generate JSON: ${e.message}`);
         return null;
     }
@@ -443,27 +443,43 @@ function closeModal() {
     const jsonModal = document.getElementById('jsonModal');
     if (jsonModal) {
         jsonModal.classList.add('hidden');
-        showNotification('success', 'Modal closed!');
     }
 }
 
-function clearAll() {
-    if (confirm('Clear everything?')) {
-        const content = document.getElementById('content');
-        const webhookUrl = document.getElementById('webhookUrl');
-        const embedsContainer = document.getElementById('embedsContainer');
-        const attachments = document.getElementById('attachments');
-        const jsonInput = document.getElementById('jsonInput');
-        if (content) content.value = '';
-        if (webhookUrl) webhookUrl.value = '';
-        if (embedsContainer) embedsContainer.innerHTML = '';
-        if (attachments) attachments.innerHTML = '';
-        if (jsonInput) jsonInput.value = '';
-        files = [];
-        embedCount = 0;
-        updatePreview();
-        showNotification('success', 'All fields cleared!');
+function showClearModal() {
+    const clearModal = document.getElementById('clearModal');
+    if (clearModal) {
+        clearModal.classList.remove('hidden');
     }
+}
+
+function closeClearModal() {
+    const clearModal = document.getElementById('clearModal');
+    if (clearModal) {
+        clearModal.classList.add('animate-fadeOut');
+        setTimeout(() => {
+            clearModal.classList.add('hidden');
+            clearModal.classList.remove('animate-fadeOut');
+        }, 300);
+    }
+}
+
+function confirmClear() {
+    const content = document.getElementById('content');
+    const webhookUrl = document.getElementById('webhookUrl');
+    const embedsContainer = document.getElementById('embedsContainer');
+    const attachments = document.getElementById('attachments');
+    const jsonInput = document.getElementById('jsonInput');
+    if (content) content.value = '';
+    if (webhookUrl) webhookUrl.value = '';
+    if (embedsContainer) embedsContainer.innerHTML = '';
+    if (attachments) attachments.innerHTML = '';
+    if (jsonInput) jsonInput.value = '';
+    files = [];
+    embedCount = 0;
+    updatePreview();
+    showNotification('success', 'All fields cleared!');
+    closeClearModal();
 }
 
 function togglePreview() {
@@ -531,7 +547,6 @@ function updatePreview() {
     if (!preview) return;
     let html = '';
 
-    // Attachments at the top
     if (files.length > 0) {
         html += '<div class="space-y-2 mb-4"><p class="text-gray-400">Attachments:</p>';
         files.forEach(file => {
@@ -544,13 +559,11 @@ function updatePreview() {
         html += '</div>';
     }
 
-    // Message content
     const content = document.getElementById('content')?.value;
     if (content) {
         html += `<div class="bg-discord-bg p-4 rounded-lg mb-4 embed-content">${parseDiscordMarkdown(content)}</div>`;
     }
 
-    // Embeds
     const embedItems = document.querySelectorAll('.embed-item');
     embedItems.forEach(item => {
         let embedHtml = '<div class="preview-embed rounded-lg p-4 mb-4">';
@@ -662,7 +675,7 @@ async function sendToDiscord() {
                         showNotification('success', 'Message sent to Discord successfully!');
                     })
                     .catch(error => {
-                        console.error('Fetch error in sendToDiscord:', error.message);
+                        console.error('Fetch error sending to Discord:', error.message);
                         showNotification('error', `Failed to send to Discord: ${error.message}`);
                     });
             })
@@ -683,12 +696,12 @@ async function sendToDiscord() {
                         showNotification('success', 'Message sent to Discord successfully (without files)!');
                     })
                     .catch(error => {
-                        console.error('Fetch error in sendToDiscord (no files):', error.message);
+                        console.error('Fetch error sending to Discord (no files):', error.message);
                         showNotification('error', `Failed to send to Discord: ${error.message}`);
                     });
             });
     } catch (e) {
-        console.error('Error in sendToDiscord:', e.message);
+        console.error('Error sending to Discord:', e.message);
         showNotification('error', `Failed to send to Discord: ${e.message}`);
     }
 }
@@ -707,7 +720,7 @@ function toggleEmojiPicker(pickerId) {
 function setupEmojiPickers() {
     const pickers = document.querySelectorAll('emoji-picker');
     pickers.forEach(picker => {
-        picker.removeEventListener('emoji-click', handleEmojiClick); 
+        picker.removeEventListener('emoji-click', handleEmojiClick);
         picker.addEventListener('emoji-click', handleEmojiClick);
     });
 }
