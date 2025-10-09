@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/dist/index.js" rel="modulepreload">
+    <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/dist/index.js">
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/dist/index.js"></script>
     <script>
         tailwind.config = {
@@ -64,7 +64,7 @@
         .field-inline { display: inline-block; width: 48%; margin-right: 4%; }
         .field-inline:last-child { margin-right: 0; }
         @media (max-width: 768px) { .field-inline { width: 100%; margin-right: 0; margin-bottom: 0.5rem; } }
-        emoji-picker { --emoji-size: 1.5rem; --category-icon-size: 1.2rem; width: 100%; max-height: 300px; }
+        emoji-picker { --emoji-size: 2rem; --category-icon-size: 1.5rem; width: 100%; max-height: 300px; }
         .emoji-picker-container { position: relative; }
         .emoji-picker-container emoji-picker { display: none; position: absolute; z-index: 20; background: #2f3136; border-radius: 8px; padding: 10px; }
         .emoji-picker-container emoji-picker.active { display: block; animation: fadeIn 0.2s ease-out; }
@@ -87,11 +87,14 @@
             background: #4f545c;
         }
         button[onclick="document.getElementById('fileInput').click()"] {
-            background-color: #7e22ce;
+            background-color: #5865f2;
             transition: background-color 0.2s;
         }
         button[onclick="document.getElementById('fileInput').click()"]:hover {
-            background-color: #6b21a8;
+            background-color: #4752c4;
+        }
+        .main-grid {
+            transition: grid-template-columns 0.3s ease;
         }
     </style>
 </head>
@@ -102,7 +105,7 @@
             <p class="text-xl text-gray-300 max-w-2xl mx-auto">Craft stunning Discord embeds with ease. Fully featured, completely free. No limits, no signups.</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div id="mainGrid" class="main-grid grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Builder Panel -->
             <div class="space-y-6">
                 <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
@@ -154,6 +157,9 @@
                 </div>
 
                 <div class="flex space-x-4">
+                    <button onclick="sendToDiscord()" class="flex-1 px-6 py-3 bg-discord-primary rounded-lg hover:bg-discord-primary/80 transition-colors font-semibold">
+                        <i class="fas fa-paper-plane mr-2"></i>Send to Discord
+                    </button>
                     <button onclick="generateJSON()" class="flex-1 px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
                         <i class="fas fa-copy mr-2"></i>Copy JSON
                     </button>
@@ -190,18 +196,18 @@
         <div class="mt-12 bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
             <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-history mr-2 text-purple-400"></i>Live Uses</h2>
             <div id="liveUses" class="space-y-4">
-                <p class="text-gray-400 italic">Loading recent embeds...</p>
+                <p class="text-gray-300 italic">Loading recent embeds...</p>
             </div>
         </div>
 
         <!-- Text Formatting Context Menu -->
         <div id="textContextMenu" class="hidden fixed bg-gray-700 rounded-lg shadow-lg p-2 z-50">
-            <button onclick="formatText('bold')" class="block w-full text-left"><i class="fas fa-bold mr-2"></i>Bold</button>
-            <button onclick="formatText('italic')" class="block w-full text-left"><i class="fas fa-italic mr-2"></i>Italic</button>
-            <button onclick="formatText('underline')" class="block w-full text-left"><i class="fas fa-underline mr-2"></i>Underline</button>
-            <button onclick="formatText('strikethrough')" class="block w-full text-left"><i class="fas fa-strikethrough mr-2"></i>Strikethrough</button>
-            <button onclick="formatText('code')" class="block w-full text-left"><i class="fas fa-code mr-2"></i>Code</button>
-            <button onclick="formatText('spoiler')" class="block w-full text-left"><i class="fas fa-eye-slash mr-2"></i>Spoiler</button>
+            <button onclick="formatText('bold')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-bold mr-2"></i>Bold</button>
+            <button onclick="formatText('italic')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-italic mr-2"></i>Italic</button>
+            <button onclick="formatText('underline')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-underline mr-2"></i>Underline</button>
+            <button onclick="formatText('strikethrough')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-strikethrough mr-2"></i>Strikethrough</button>
+            <button onclick="formatText('code')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-code mr-2"></i>Code</button>
+            <button onclick="formatText('spoiler')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-eye-slash mr-2"></i>Spoiler</button>
         </div>
 
         <!-- JSON Output Modal -->
