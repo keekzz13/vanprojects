@@ -58,9 +58,9 @@ async function fetchLiveUses() {
                 <div class="bg-gray-700 rounded-lg p-4 animate-fadeIn">
                     <p class="text-gray-400 text-sm mb-2">Posted ${new Date(embed.created_at).toLocaleString()}</p>
                     <div class="preview-embed p-4 mb-2">
-                        ${embed.payload.content ? `<p class="text-gray-300 mb-3">${parseDiscordMarkdown(embed.payload.content)}</p>` : ''}
+                        ${embed.payload.content ? `<p class="text-gray-300 mb-3 embed-content">${parseDiscordMarkdown(embed.payload.content)}</p>` : ''}
                         ${embed.payload.embeds?.map((e, i) => `
-                            <div style="border-left: 4px solid ${e.color ? '#' + e.color.toString(16).padStart(6, '0') : '#5865f2'};">
+                            <div class="embed-content" style="border-left: 4px solid ${e.color ? '#' + e.color.toString(16).padStart(6, '0') : '#5865f2'};">
                                 ${e.author?.name ? `
                                     <div class="flex items-center mb-3">
                                         ${e.author.icon_url ? `<img src="${e.author.icon_url}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2" onerror="this.style.display='none'">` : ''}
@@ -120,11 +120,30 @@ async function useTemplate(embedId) {
 
 function formatText(type) {
     const textarea = document.activeElement;
-    if (!textarea || !textarea.selectionStart) return;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    if (start === end) return;
-    const selectedText = textarea.value.substring(start, end);
+    if (!textarea || textarea.tagName !== 'TEXTAREA') return;
+
+    const selection = window.getSelection();
+    let selectedText = '';
+    let start, end;
+
+    if (selection.rangeCount > 0 && selection.toString()) {
+        selectedText = selection.toString();
+        const range = selection.getRangeAt(0);
+        const textareaText = textarea.value;
+        const textareaRange = document.createRange();
+        textareaRange.selectNodeContents(textarea);
+        start = textarea.selectionStart;
+        end = textarea.selectionEnd;
+    } else if (textarea.selectionStart !== textarea.selectionEnd) {
+        start = textarea.selectionStart;
+        end = textarea.selectionEnd;
+        selectedText = textarea.value.substring(start, end);
+    } else {
+        return;
+    }
+
+    if (!selectedText) return;
+
     let formattedText = selectedText;
     switch (type) {
         case 'bold': formattedText = `**${selectedText}**`; break;
@@ -134,7 +153,9 @@ function formatText(type) {
         case 'code': formattedText = `\`${selectedText}\``; break;
         case 'spoiler': formattedText = `||${selectedText}||`; break;
     }
+
     textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+    textarea.setSelectionRange(start, start + formattedText.length);
     updatePreview();
     document.getElementById('textContextMenu').classList.add('hidden');
 }
@@ -147,7 +168,7 @@ function parseDiscordMarkdown(text) {
     text = text.replace(/~~(.*?)~~/g, '<s>$1</s>');
     text = text.replace(/`(.*?)`/g, '<code>$1</code>');
     text = text.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler">$1</span>');
-    text = text.replace(/$$ ([^ $$]+)\]$$ ([^)]+) $$/g, '<a href="$2" target="_blank" class="text-blue-400 hover:underline">$1</a>');
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-400 hover:underline">$1</a>');
     return text;
 }
 
@@ -219,6 +240,7 @@ function addEmbed(embedData = {}) {
     }
     embedCount++;
     updatePreview();
+    setupEmojiPickers();
 }
 
 function removeEmbed(index) {
@@ -449,28 +471,33 @@ function togglePreview() {
     const hideBtn = document.getElementById('hidePreviewBtn');
     const viewBtn = document.getElementById('viewPreviewBtn');
     const mainGrid = document.getElementById('mainGrid');
-    if (!panel || !hideBtn || !viewBtn || !mainGrid) return;
+    const builderPanel = document.querySelector('.builder-panel');
+    if (!panel || !hideBtn || !viewBtn || !mainGrid || !builderPanel) return;
     if (isPreviewVisible) {
-        panel.classList.add('animate-slideOut');
+        panel.classList.add('animate-fadeOut');
         setTimeout(() => {
             panel.classList.add('hidden');
-            panel.classList.remove('animate-slideOut');
+            panel.classList.remove('animate-fadeOut');
             hideBtn.classList.add('hidden');
             viewBtn.classList.remove('hidden');
-            mainGrid.classList.remove('lg:grid-cols-2');
+            mainGrid.classList.remove('lg:grid-cols-4');
             mainGrid.classList.add('lg:grid-cols-1');
-            document.querySelector('.builder-panel').style.width = '100%';
+            builderPanel.classList.remove('lg:col-span-3');
+            builderPanel.classList.add('lg:col-span-1');
+            builderPanel.style.width = '100%';
         }, 300);
     } else {
         panel.classList.remove('hidden');
-        panel.classList.add('animate-slideIn');
+        panel.classList.add('animate-fadeIn');
         setTimeout(() => {
-            panel.classList.remove('animate-slideIn');
+            panel.classList.remove('animate-fadeIn');
             hideBtn.classList.remove('hidden');
             viewBtn.classList.add('hidden');
             mainGrid.classList.remove('lg:grid-cols-1');
-            mainGrid.classList.add('lg:grid-cols-2');
-            document.querySelector('.builder-panel').style.width = '100%';
+            mainGrid.classList.add('lg:grid-cols-4');
+            builderPanel.classList.remove('lg:col-span-1');
+            builderPanel.classList.add('lg:col-span-3');
+            builderPanel.style.width = '100%';
         }, 300);
     }
     isPreviewVisible = !isPreviewVisible;
@@ -520,7 +547,7 @@ function updatePreview() {
     // Message content
     const content = document.getElementById('content')?.value;
     if (content) {
-        html += `<div class="bg-discord-bg p-4 rounded-lg mb-4">${parseDiscordMarkdown(content)}</div>`;
+        html += `<div class="bg-discord-bg p-4 rounded-lg mb-4 embed-content">${parseDiscordMarkdown(content)}</div>`;
     }
 
     // Embeds
@@ -539,12 +566,12 @@ function updatePreview() {
         const colorInput = item.querySelector('input[type="color"]');
 
         if (authorNameInput?.value) {
-            embedHtml += `<div class="flex items-center mb-3">`;
+            embedHtml += `<div class="flex items-center mb-3 embed-content">`;
             if (authorIconInput?.value) embedHtml += `<img src="${authorIconInput.value}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2" onerror="this.style.display='none'">`;
             embedHtml += `<span class="font-semibold">${parseDiscordMarkdown(authorNameInput.value)}</span></div>`;
         }
-        if (titleInput?.value) embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${parseDiscordMarkdown(titleInput.value)}</h3>`;
-        if (descriptionInput?.value) embedHtml += `<p class="text-gray-300 mb-3">${parseDiscordMarkdown(descriptionInput.value)}</p>`;
+        if (titleInput?.value) embedHtml += `<h3 class="font-bold text-lg mb-1 text-white embed-content">${parseDiscordMarkdown(titleInput.value)}</h3>`;
+        if (descriptionInput?.value) embedHtml += `<p class="text-gray-300 mb-3 embed-content">${parseDiscordMarkdown(descriptionInput.value)}</p>`;
         if (thumbnailInput?.value) embedHtml += `<img src="${thumbnailInput.value}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right" onerror="this.style.display='none'">`;
         if (imageInput?.value) embedHtml += `<img src="${imageInput.value}" alt="Image" class="w-full h-auto rounded mb-3" onerror="this.style.display='none'">`;
         const fields = item.querySelectorAll('.field-item');
@@ -553,14 +580,14 @@ function updatePreview() {
             const name = inputs[0]?.value;
             const value = inputs[1]?.value;
             if (name && value) {
-                embedHtml += `<div class="mb-2 ${inputs[2]?.checked ? 'field-inline' : ''}">
+                embedHtml += `<div class="mb-2 ${inputs[2]?.checked ? 'field-inline' : ''} embed-content">
                     <div class="font-semibold text-white mb-1">${parseDiscordMarkdown(name)}</div>
                     <div class="text-gray-300">${parseDiscordMarkdown(value)}</div>
                 </div>`;
             }
         });
         if (footerTextInput?.value || timestampInput?.value) {
-            embedHtml += `<div class="flex items-center mt-3 text-gray-400 text-sm">`;
+            embedHtml += `<div class="flex items-center mt-3 text-gray-400 text-sm embed-content">`;
             if (footerIconInput?.value) embedHtml += `<img src="${footerIconInput.value}" alt="Footer Icon" class="w-5 h-5 mr-2" onerror="this.style.display='none'">`;
             embedHtml += `<span>${footerTextInput?.value ? parseDiscordMarkdown(footerTextInput.value) : ''}${footerTextInput?.value && timestampInput?.value ? ' | ' : ''}${timestampInput?.value ? new Date(timestampInput.value).toLocaleString() : ''}</span></div>`;
         }
@@ -595,7 +622,6 @@ async function sendToDiscord() {
             return;
         }
 
-        // Try to save to Live Uses
         try {
             const saveResponse = await fetch(API_URL, {
                 method: 'POST',
@@ -672,21 +698,30 @@ function toggleEmojiPicker(pickerId) {
     if (!picker) return;
     const isActive = picker.classList.contains('active');
     document.querySelectorAll('emoji-picker').forEach(p => p.classList.remove('active'));
-    if (!isActive) picker.classList.add('active');
+    if (!isActive) {
+        picker.classList.add('active');
+        picker.style.display = 'block';
+    }
 }
 
 function setupEmojiPickers() {
     const pickers = document.querySelectorAll('emoji-picker');
     pickers.forEach(picker => {
-        picker.addEventListener('emoji-click', event => {
-            const textarea = picker.previousElementSibling.previousElementSibling;
-            if (textarea) {
-                textarea.value += event.detail.unicode;
-                updatePreview();
-                picker.classList.remove('active');
-            }
-        });
+        picker.removeEventListener('emoji-click', handleEmojiClick); 
+        picker.addEventListener('emoji-click', handleEmojiClick);
     });
+}
+
+function handleEmojiClick(event) {
+    const picker = event.target.closest('emoji-picker');
+    if (!picker) return;
+    const textarea = picker.previousElementSibling.previousElementSibling;
+    if (textarea && textarea.tagName === 'TEXTAREA') {
+        textarea.value += event.detail.unicode;
+        updatePreview();
+        picker.classList.remove('active');
+        picker.style.display = 'none';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -706,7 +741,8 @@ document.addEventListener('DOMContentLoaded', () => {
         textareas.forEach(textarea => {
             textarea.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
-                if (textarea.selectionStart !== textarea.selectionEnd) {
+                const selection = window.getSelection();
+                if (selection.toString()) {
                     contextMenu.style.top = `${e.clientY}px`;
                     contextMenu.style.left = `${e.clientX}px`;
                     contextMenu.classList.remove('hidden');
