@@ -1,12 +1,15 @@
 {
   "name": "stupid nigger",
   "version": "1.0.0",
-  "description": "bro",
+  "description": "ass",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.74.0"
+  }
 }
