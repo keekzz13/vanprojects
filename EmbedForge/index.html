@@ -86,15 +86,18 @@
         #textContextMenu button:hover {
             background: #4f545c;
         }
-        button[onclick="document.getElementById('fileInput').click()"] {
-            background-color: #5865f2;
+        .attachments-btn {
+            background-color: #5865f2 !important;
             transition: background-color 0.2s;
         }
-        button[onclick="document.getElementById('fileInput').click()"]:hover {
-            background-color: #4752c4;
+        .attachments-btn:hover {
+            background-color: #4752c4 !important;
         }
         .main-grid {
             transition: grid-template-columns 0.3s ease;
+        }
+        .builder-panel {
+            width: 100%;
         }
     </style>
 </head>
@@ -107,7 +110,7 @@
 
         <div id="mainGrid" class="main-grid grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Builder Panel -->
-            <div class="space-y-6">
+            <div class="builder-panel space-y-6">
                 <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
                     <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-link mr-2 text-blue-400"></i>Webhook URL</h2>
                     <input type="url" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required>
@@ -143,7 +146,7 @@
                     <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-file-upload mr-2 text-orange-400"></i>Attachments</h2>
                     <div id="attachments" class="space-y-2"></div>
                     <input type="file" id="fileInput" accept="image/*,video/*,.gif" multiple class="hidden" onchange="handleFiles()">
-                    <button onclick="document.getElementById('fileInput').click()" class="px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center mx-auto">
+                    <button onclick="document.getElementById('fileInput').click()" class="attachments-btn px-4 py-2 rounded-lg transition-colors flex items-center justify-center mx-auto">
                         <i class="fas fa-upload mr-2"></i>Add Attachments
                     </button>
                 </div>
@@ -182,9 +185,7 @@
             <div id="previewPanel" class="fixed right-0 top-20 w-96 max-h-[80vh] bg-gray-800 rounded-l-xl p-6 shadow-xl transition-all duration-300 ease-in-out z-50 overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold flex items-center"><i class="fas fa-eye mr-2 text-indigo-400"></i>Live Preview</h2>
-                    <div class="flex space-x-2">
-                        <button onclick="closePreview()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
-                    </div>
+                    <button onclick="closePreview()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
                 </div>
                 <div id="preview" class="min-h-[200px] bg-discord-bg rounded-lg p-4 space-y-4 overflow-y-auto">
                     <p class="text-gray-400 italic">Build your embed to see a live preview here...</p>
@@ -212,7 +213,7 @@
 
         <!-- JSON Output Modal -->
         <div id="jsonModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-            <div class="bg-gray-800 rounded-xl p-6 w-11/12 max-w-4xl max-h-96 overflow-hidden animate-fadeIn">
+            <div class="bg-gray-800 rounded-xl p-6 w-11/12 max-w-4xl max-h-[80vh] overflow-auto animate-fadeIn">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-semibold">Generated JSON</h3>
                     <button onclick="closeModal()" class="text-gray-400 hover:text-white">&times;</button>
