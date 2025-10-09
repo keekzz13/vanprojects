@@ -46,6 +46,20 @@ const templates = {
     }
 };
 
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+const debouncedUpdatePreview = debounce(updatePreview, 100);
+
 async function fetchLiveUses() {
     try {
         const response = await fetch(API_URL, {
@@ -113,7 +127,7 @@ async function useTemplate(embedId) {
         embedCount = 0;
         embed.payload.embeds?.forEach(e => addEmbed(e));
         showNotification('success', 'Template loaded successfully!');
-        updatePreview();
+        debouncedUpdatePreview();
     } catch (e) {
         console.error('Error loading template:', e.message);
         showNotification('error', `Failed to load template: ${e.message}`);
@@ -154,7 +168,7 @@ function formatText(type) {
 
     textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
     textarea.setSelectionRange(start, start + formattedText.length);
-    updatePreview();
+    debouncedUpdatePreview();
     document.getElementById('textContextMenu').classList.add('hidden');
 }
 
@@ -237,7 +251,7 @@ function addEmbed(embedData = {}) {
         embedData.fields.forEach(field => addField(embedCount, field));
     }
     embedCount++;
-    updatePreview();
+    debouncedUpdatePreview();
     setupEmojiPickers();
 }
 
@@ -246,7 +260,7 @@ function removeEmbed(index) {
     if (embed) {
         embed.remove();
         updateEmbedIndices();
-        updatePreview();
+        debouncedUpdatePreview();
         showNotification('success', 'Embed removed successfully!');
     }
 }
@@ -278,11 +292,11 @@ function addField(embedIndex, fieldData = {}) {
             <label class="flex items-center space-x-1 cursor-pointer">
                 <input type="checkbox" ${fieldData.inline ? 'checked' : ''} class="accent-green-500"> <span class="text-sm">Inline</span>
             </label>
-            <button onclick="this.parentElement.parentElement.remove(); updatePreview()" class="text-red-400 hover:text-red-300 p-1">&times;</button>
+            <button onclick="this.parentElement.parentElement.remove(); debouncedUpdatePreview()" class="text-red-400 hover:text-red-300 p-1">&times;</button>
         </div>
     `;
     fieldsContainer.appendChild(fieldDiv);
-    updatePreview();
+    debouncedUpdatePreview();
 }
 
 function handleFiles() {
@@ -301,7 +315,7 @@ function handleFiles() {
         `;
         attachmentsDiv.appendChild(fileDiv);
     });
-    updatePreview();
+    debouncedUpdatePreview();
     showNotification('success', 'Files added successfully!');
 }
 
@@ -322,7 +336,7 @@ function loadTemplate() {
     embedCount = 0;
     data.embeds.forEach(embed => addEmbed(embed));
     showNotification('success', 'Template loaded successfully!');
-    updatePreview();
+    debouncedUpdatePreview();
 }
 
 function loadFromJSON() {
@@ -338,7 +352,7 @@ function loadFromJSON() {
             data.embeds.forEach(embed => addEmbed(embed));
         }
         showNotification('success', 'JSON loaded successfully!');
-        updatePreview();
+        debouncedUpdatePreview();
     } catch (e) {
         showNotification('error', `Invalid JSON format: ${e.message}`);
     }
@@ -475,7 +489,7 @@ function confirmClear() {
     if (jsonInput) jsonInput.value = '';
     files = [];
     embedCount = 0;
-    updatePreview();
+    debouncedUpdatePreview();
     showNotification('success', 'All fields cleared!');
     closeClearModal();
 }
@@ -737,7 +751,7 @@ function handleEmojiClick(event) {
     const textarea = picker.previousElementSibling.previousElementSibling;
     if (textarea && textarea.tagName === 'TEXTAREA') {
         textarea.value += event.detail.unicode;
-        updatePreview();
+        debouncedUpdatePreview();
         picker.classList.remove('active');
         picker.style.display = 'none';
     }
@@ -746,13 +760,23 @@ function handleEmojiClick(event) {
 document.addEventListener('DOMContentLoaded', () => {
     addEmbed();
     setupEmojiPickers();
-    const inputs = document.querySelectorAll('input, textarea');
-    inputs.forEach(input => {
-        input.addEventListener('input', updatePreview);
-        if (input.type === 'checkbox') {
-            input.addEventListener('change', updatePreview);
-        }
-    });
+    const contentInput = document.getElementById('content');
+    if (contentInput) {
+        contentInput.addEventListener('input', debouncedUpdatePreview);
+    }
+    const embedsContainer = document.getElementById('embedsContainer');
+    if (embedsContainer) {
+        embedsContainer.addEventListener('input', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                debouncedUpdatePreview();
+            }
+        });
+        embedsContainer.addEventListener('change', (e) => {
+            if (e.target.type === 'checkbox') {
+                debouncedUpdatePreview();
+            }
+        });
+    }
 
     const textareas = document.querySelectorAll('textarea');
     const contextMenu = document.getElementById('textContextMenu');
@@ -781,5 +805,5 @@ document.addEventListener('DOMContentLoaded', () => {
     observer.observe(document.getElementById('embedsContainer'), { childList: true, subtree: true });
 
     fetchLiveUses();
-    updatePreview();
+    debouncedUpdatePreview();
 });
