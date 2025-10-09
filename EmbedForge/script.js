@@ -53,7 +53,6 @@ async function fetchLiveUses() {
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
         const embeds = await response.json();
         const liveUsesDiv = document.getElementById('liveUses');
-        if (!liveUsesDiv) throw new Error('Live Uses container not found');
         liveUsesDiv.innerHTML = embeds.length
             ? embeds.map(embed => `
                 <div class="bg-gray-700 rounded-lg p-4 animate-fadeIn">
@@ -91,10 +90,9 @@ async function fetchLiveUses() {
                 </div>
             `).join('')
             : '<p class="text-gray-400 italic">No recent embeds yet...</p>';
-        console.log('Fetched Live Uses:', embeds.length);
     } catch (e) {
         console.error('Error in fetchLiveUses:', e.message);
-        showNotification('error', `Failed to load Live Uses: ${e.message}`);
+        document.getElementById('liveUses').innerHTML = '<p class="text-gray-400 italic">Live Uses not available. Ensure Netlify function is deployed.</p>';
     }
 }
 
@@ -114,7 +112,6 @@ async function useTemplate(embedId) {
         embed.payload.embeds?.forEach(e => addEmbed(e));
         showNotification('success', 'Template loaded successfully!');
         updatePreview();
-        console.log('Loaded template from Live Uses:', embedId);
     } catch (e) {
         console.error('Error in useTemplate:', e.message);
         showNotification('error', `Failed to load template: ${e.message}`);
@@ -122,42 +119,24 @@ async function useTemplate(embedId) {
 }
 
 function formatText(type) {
-    try {
-        const textarea = document.activeElement;
-        if (!textarea || !textarea.selectionStart) return;
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        if (start === end) return;
-        const selectedText = textarea.value.substring(start, end);
-        let formattedText = selectedText;
-        switch (type) {
-            case 'bold':
-                formattedText = `**${selectedText}**`;
-                break;
-            case 'italic':
-                formattedText = `*${selectedText}*`;
-                break;
-            case 'underline':
-                formattedText = `__${selectedText}__`;
-                break;
-            case 'strikethrough':
-                formattedText = `~~${selectedText}~~`;
-                break;
-            case 'code':
-                formattedText = `\`${selectedText}\``;
-                break;
-            case 'spoiler':
-                formattedText = `||${selectedText}||`;
-                break;
-        }
-        textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
-        updatePreview();
-        document.getElementById('textContextMenu').classList.add('hidden');
-        console.log(`Formatted text as ${type}:`, selectedText);
-    } catch (e) {
-        console.error('Error in formatText:', e.message);
-        showNotification('error', `Failed to format text: ${e.message}`);
+    const textarea = document.activeElement;
+    if (!textarea || !textarea.selectionStart) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    if (start === end) return;
+    const selectedText = textarea.value.substring(start, end);
+    let formattedText = selectedText;
+    switch (type) {
+        case 'bold': formattedText = `**${selectedText}**`; break;
+        case 'italic': formattedText = `*${selectedText}*`; break;
+        case 'underline': formattedText = `__${selectedText}__`; break;
+        case 'strikethrough': formattedText = `~~${selectedText}~~`; break;
+        case 'code': formattedText = `\`${selectedText}\``; break;
+        case 'spoiler': formattedText = `||${selectedText}||`; break;
     }
+    textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+    updatePreview();
+    document.getElementById('textContextMenu').classList.add('hidden');
 }
 
 function parseDiscordMarkdown(text) {
@@ -168,7 +147,7 @@ function parseDiscordMarkdown(text) {
     text = text.replace(/~~(.*?)~~/g, '<s>$1</s>');
     text = text.replace(/`(.*?)`/g, '<code>$1</code>');
     text = text.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler">$1</span>');
-    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" class="text-blue-400 hover:underline">$1</a>');
+    text = text.replace(/$$ ([^ $$]+)\]$$ ([^)]+) $$/g, '<a href="$2" target="_blank" class="text-blue-400 hover:underline">$1</a>');
     return text;
 }
 
@@ -346,15 +325,15 @@ function loadFromJSON() {
     }
 }
 
-function generateJSON() {
+function generateJSON(returnPayload = false) {
     try {
-        const webhookUrl = document.getElementById('webhookUrl').value;
+        const webhookUrl = document.getElementById('webhookUrl')?.value;
         if (!webhookUrl) {
             showNotification('error', 'Webhook URL is required!');
-            return;
+            return null;
         }
         const payload = {
-            content: document.getElementById('content').value || '',
+            content: document.getElementById('content')?.value || '',
             embeds: [],
             attachments: []
         };
@@ -367,36 +346,36 @@ function generateJSON() {
             const descriptionInput = item.querySelector('textarea[placeholder="Embed description..."]');
             const colorInput = item.querySelector('input[type="color"]');
             const timestampInput = item.querySelector('input[type="datetime-local"]');
-            const thumbnailInput = item.querySelector('input[placeholder*="Thumbnail"]');
-            const imageInput = item.querySelector('input[placeholder*="Image"]');
+            const thumbnailInput = item.querySelector('input[placeholder*="thumbnail"]');
+            const imageInput = item.querySelector('input[placeholder*="image"]');
             const authorNameInput = item.querySelector('input[placeholder="Author name"]');
             const authorIconInput = item.querySelector('input[placeholder="Author icon URL"]');
             const footerTextInput = item.querySelector('input[placeholder="Footer text"]');
             const footerIconInput = item.querySelector('input[placeholder="Footer icon URL"]');
 
-            if (titleInput && titleInput.value) embed.title = titleInput.value;
-            if (urlInput && urlInput.value) embed.url = urlInput.value;
-            if (descriptionInput && descriptionInput.value) embed.description = descriptionInput.value;
-            if (colorInput && colorInput.value) embed.color = parseInt(colorInput.value.slice(1), 16);
-            if (timestampInput && timestampInput.value) embed.timestamp = new Date(timestampInput.value).toISOString();
-            if (thumbnailInput && thumbnailInput.value) embed.thumbnail = { url: thumbnailInput.value };
-            if (imageInput && imageInput.value) embed.image = { url: imageInput.value };
-            if (authorNameInput && authorNameInput.value) {
+            if (titleInput?.value) embed.title = titleInput.value;
+            if (urlInput?.value) embed.url = urlInput.value;
+            if (descriptionInput?.value) embed.description = descriptionInput.value;
+            if (colorInput?.value) embed.color = parseInt(colorInput.value.slice(1), 16);
+            if (timestampInput?.value) embed.timestamp = new Date(timestampInput.value).toISOString();
+            if (thumbnailInput?.value) embed.thumbnail = { url: thumbnailInput.value };
+            if (imageInput?.value) embed.image = { url: imageInput.value };
+            if (authorNameInput?.value) {
                 embed.author = { name: authorNameInput.value };
-                if (authorIconInput && authorIconInput.value) embed.author.icon_url = authorIconInput.value;
+                if (authorIconInput?.value) embed.author.icon_url = authorIconInput.value;
             }
-            if (footerTextInput && footerTextInput.value) {
+            if (footerTextInput?.value) {
                 embed.footer = { text: footerTextInput.value };
-                if (footerIconInput && footerIconInput.value) embed.footer.icon_url = footerIconInput.value;
+                if (footerIconInput?.value) embed.footer.icon_url = footerIconInput.value;
             }
             const fields = item.querySelectorAll('.field-item');
             if (fields.length > 0) {
                 embed.fields = Array.from(fields).map(field => {
                     const inputs = field.querySelectorAll('input');
                     return {
-                        name: inputs[0].value,
-                        value: inputs[1].value,
-                        inline: inputs[2].checked
+                        name: inputs[0]?.value || '',
+                        value: inputs[1]?.value || '',
+                        inline: inputs[2]?.checked || false
                     };
                 }).filter(field => field.name && field.value);
             }
@@ -407,6 +386,8 @@ function generateJSON() {
             payload.attachments = files.map((file, i) => ({ id: i, filename: file.name, description: '' }));
         }
 
+        if (returnPayload) return payload;
+
         const jsonString = JSON.stringify(payload, null, 2);
         const jsonOutput = document.getElementById('jsonOutput');
         if (jsonOutput) {
@@ -416,8 +397,11 @@ function generateJSON() {
         } else {
             showNotification('error', 'JSON output element not found');
         }
+        return null;
     } catch (e) {
+        console.error('Error in generateJSON:', e.message);
         showNotification('error', `Failed to generate JSON: ${e.message}`);
+        return null;
     }
 }
 
@@ -465,7 +449,8 @@ function togglePreview() {
     const panel = document.getElementById('previewPanel');
     const hideBtn = document.getElementById('hidePreviewBtn');
     const viewBtn = document.getElementById('viewPreviewBtn');
-    if (!panel || !hideBtn || !viewBtn) return;
+    const mainGrid = document.getElementById('mainGrid');
+    if (!panel || !hideBtn || !viewBtn || !mainGrid) return;
     if (isPreviewVisible) {
         panel.classList.add('animate-slideOut');
         setTimeout(() => {
@@ -473,6 +458,8 @@ function togglePreview() {
             panel.classList.remove('animate-slideOut');
             hideBtn.classList.add('hidden');
             viewBtn.classList.remove('hidden');
+            mainGrid.classList.remove('lg:grid-cols-2');
+            mainGrid.classList.add('lg:grid-cols-1');
         }, 300);
     } else {
         panel.classList.remove('hidden');
@@ -481,24 +468,15 @@ function togglePreview() {
             panel.classList.remove('animate-slideIn');
             hideBtn.classList.remove('hidden');
             viewBtn.classList.add('hidden');
+            mainGrid.classList.remove('lg:grid-cols-1');
+            mainGrid.classList.add('lg:grid-cols-2');
         }, 300);
     }
     isPreviewVisible = !isPreviewVisible;
 }
 
 function closePreview() {
-    const panel = document.getElementById('previewPanel');
-    const hideBtn = document.getElementById('hidePreviewBtn');
-    const viewBtn = document.getElementById('viewPreviewBtn');
-    if (!panel || !hideBtn || !viewBtn) return;
-    panel.classList.add('animate-slideOut');
-    setTimeout(() => {
-        panel.classList.add('hidden');
-        panel.classList.remove('animate-slideOut');
-        hideBtn.classList.add('hidden');
-        viewBtn.classList.remove('hidden');
-        isPreviewVisible = false;
-    }, 300);
+    if (isPreviewVisible) togglePreview();
 }
 
 function showNotification(type, message) {
@@ -527,7 +505,7 @@ function updatePreview() {
 
     // Attachments at the top
     if (files.length > 0) {
-        html += '<div class="space-y-2"><p class="text-gray-400">Attachments:</p>';
+        html += '<div class="space-y-2 mb-4"><p class="text-gray-400">Attachments:</p>';
         files.forEach(file => {
             if (file.type.startsWith('image/')) {
                 html += `<img src="${URL.createObjectURL(file)}" alt="${file.name}" class="w-full h-auto rounded mb-3">`;
@@ -550,8 +528,8 @@ function updatePreview() {
         let embedHtml = '<div class="preview-embed rounded-lg p-4 mb-4">';
         const titleInput = item.querySelector('input[placeholder="Embed title..."]');
         const descriptionInput = item.querySelector('textarea[placeholder="Embed description..."]');
-        const thumbnailInput = item.querySelector('input[placeholder*="Thumbnail"]');
-        const imageInput = item.querySelector('input[placeholder*="Image"]');
+        const thumbnailInput = item.querySelector('input[placeholder*="thumbnail"]');
+        const imageInput = item.querySelector('input[placeholder*="image"]');
         const authorNameInput = item.querySelector('input[placeholder="Author name"]');
         const authorIconInput = item.querySelector('input[placeholder="Author icon URL"]');
         const footerTextInput = item.querySelector('input[placeholder="Footer text"]');
@@ -559,33 +537,33 @@ function updatePreview() {
         const timestampInput = item.querySelector('input[type="datetime-local"]');
         const colorInput = item.querySelector('input[type="color"]');
 
-        if (authorNameInput && authorNameInput.value) {
+        if (authorNameInput?.value) {
             embedHtml += `<div class="flex items-center mb-3">`;
-            if (authorIconInput && authorIconInput.value) embedHtml += `<img src="${authorIconInput.value}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2" onerror="this.style.display='none'">`;
+            if (authorIconInput?.value) embedHtml += `<img src="${authorIconInput.value}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2" onerror="this.style.display='none'">`;
             embedHtml += `<span class="font-semibold">${parseDiscordMarkdown(authorNameInput.value)}</span></div>`;
         }
-        if (titleInput && titleInput.value) embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${parseDiscordMarkdown(titleInput.value)}</h3>`;
-        if (descriptionInput && descriptionInput.value) embedHtml += `<p class="text-gray-300 mb-3">${parseDiscordMarkdown(descriptionInput.value)}</p>`;
-        if (thumbnailInput && thumbnailInput.value) embedHtml += `<img src="${thumbnailInput.value}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right" onerror="this.style.display='none'">`;
-        if (imageInput && imageInput.value) embedHtml += `<img src="${imageInput.value}" alt="Image" class="w-full h-auto rounded mb-3" onerror="this.style.display='none'">`;
+        if (titleInput?.value) embedHtml += `<h3 class="font-bold text-lg mb-1 text-white">${parseDiscordMarkdown(titleInput.value)}</h3>`;
+        if (descriptionInput?.value) embedHtml += `<p class="text-gray-300 mb-3">${parseDiscordMarkdown(descriptionInput.value)}</p>`;
+        if (thumbnailInput?.value) embedHtml += `<img src="${thumbnailInput.value}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right" onerror="this.style.display='none'">`;
+        if (imageInput?.value) embedHtml += `<img src="${imageInput.value}" alt="Image" class="w-full h-auto rounded mb-3" onerror="this.style.display='none'">`;
         const fields = item.querySelectorAll('.field-item');
         fields.forEach(field => {
             const inputs = field.querySelectorAll('input');
-            const name = inputs[0].value;
-            const value = inputs[1].value;
+            const name = inputs[0]?.value;
+            const value = inputs[1]?.value;
             if (name && value) {
-                embedHtml += `<div class="mb-2 ${inputs[2].checked ? 'field-inline' : ''}">
+                embedHtml += `<div class="mb-2 ${inputs[2]?.checked ? 'field-inline' : ''}">
                     <div class="font-semibold text-white mb-1">${parseDiscordMarkdown(name)}</div>
                     <div class="text-gray-300">${parseDiscordMarkdown(value)}</div>
                 </div>`;
             }
         });
-        if (footerTextInput && (footerTextInput.value || (timestampInput && timestampInput.value))) {
+        if (footerTextInput?.value || timestampInput?.value) {
             embedHtml += `<div class="flex items-center mt-3 text-gray-400 text-sm">`;
-            if (footerIconInput && footerIconInput.value) embedHtml += `<img src="${footerIconInput.value}" alt="Footer Icon" class="w-5 h-5 mr-2" onerror="this.style.display='none'">`;
-            embedHtml += `<span>${footerTextInput.value ? parseDiscordMarkdown(footerTextInput.value) : ''}${footerTextInput.value && timestampInput.value ? ' | ' : ''}${timestampInput.value ? new Date(timestampInput.value).toLocaleString() : ''}</span></div>`;
+            if (footerIconInput?.value) embedHtml += `<img src="${footerIconInput.value}" alt="Footer Icon" class="w-5 h-5 mr-2" onerror="this.style.display='none'">`;
+            embedHtml += `<span>${footerTextInput?.value ? parseDiscordMarkdown(footerTextInput.value) : ''}${footerTextInput?.value && timestampInput?.value ? ' | ' : ''}${timestampInput?.value ? new Date(timestampInput.value).toLocaleString() : ''}</span></div>`;
         }
-        if (colorInput && colorInput.value) {
+        if (colorInput?.value) {
             embedHtml = embedHtml.replace('preview-embed', `preview-embed border-l-[4px] border-l-[${colorInput.value}]`);
         }
         embedHtml += '</div>';
@@ -593,6 +571,100 @@ function updatePreview() {
     });
 
     preview.innerHTML = html || '<p class="text-gray-400 italic">Build your embed to see a live preview here...</p>';
+}
+
+async function sendToDiscord() {
+    try {
+        const webhookUrl = document.getElementById('webhookUrl')?.value;
+        if (!webhookUrl || !/^https:\/\/(discord\.com|discordapp\.com|ptb\.discord\.com)\/api\/webhooks\/[0-9]+\/[A-Za-z0-9_-]+/.test(webhookUrl)) {
+            showNotification('error', 'Please provide a valid Discord webhook URL!');
+            return;
+        }
+
+        const payload = generateJSON(true);
+        if (!payload) return;
+
+        if (!payload.content && (!payload.embeds || payload.embeds.length === 0) && (!payload.attachments || payload.attachments.length === 0)) {
+            showNotification('error', 'Please add content, embeds, or files before sending!');
+            return;
+        }
+
+        if (files.length > 10) {
+            showNotification('error', 'Maximum 10 files allowed!');
+            return;
+        }
+
+        // Try to save to Live Uses (optional)
+        try {
+            const saveResponse = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ payload }),
+            });
+            if (saveResponse.ok) {
+                await fetchLiveUses(); // Refresh Live Uses
+            }
+        } catch (e) {
+            console.warn('Failed to save to Live Uses:', e.message);
+            // Continue without saving
+        }
+
+        const filePromises = files.map(file => new Promise((resolve, reject) => {
+            if (file.size > 8 * 1024 * 1024) {
+                reject(new Error(`File ${file.name} exceeds 8MB limit`));
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => resolve({ name: file.name, data: reader.result.split(',')[1] });
+            reader.onerror = () => reject(new Error(`Failed to read file ${file.name}`));
+            reader.readAsDataURL(file);
+        }));
+
+        Promise.all(filePromises)
+            .then(fileData => {
+                const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
+                fetch(proxyUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: fileData }),
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(async response => {
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(`Proxy error: ${response.status} - ${errorText}`);
+                        }
+                        showNotification('success', 'Message sent to Discord successfully!');
+                    })
+                    .catch(error => {
+                        console.error('Fetch error in sendToDiscord:', error.message);
+                        showNotification('error', `Failed to send to Discord: ${error.message}`);
+                    });
+            })
+            .catch(error => {
+                console.error('Error reading files:', error.message);
+                showNotification('error', `Failed to process files: ${error.message}. Trying without attachments.`);
+                const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
+                fetch(proxyUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: [] }),
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                    .then(async response => {
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(`Proxy error: ${response.status} - ${errorText}`);
+                        }
+                        showNotification('success', 'Message sent to Discord successfully (without files)!');
+                    })
+                    .catch(error => {
+                        console.error('Fetch error in sendToDiscord (no files):', error.message);
+                        showNotification('error', `Failed to send to Discord: ${error.message}`);
+                    });
+            });
+    } catch (e) {
+        console.error('Error in sendToDiscord:', e.message);
+        showNotification('error', `Failed to send to Discord: ${e.message}`);
+    }
 }
 
 function toggleEmojiPicker(pickerId) {
@@ -617,100 +689,6 @@ function setupEmojiPicker(pickerId) {
     }
 }
 
-async function sendToDiscord() {
-    try {
-        const webhookUrl = document.getElementById('webhookUrl').value;
-        if (!webhookUrl || !/^https:\/\/(discord\.com|discordapp\.com|ptb\.discord\.com)\/api\/webhooks\/[0-9]+\/[A-Za-z0-9_-]+/.test(webhookUrl)) {
-            showNotification('error', 'Please provide a valid Discord webhook URL!');
-            return;
-        }
-
-        const payload = generateJSON(true);
-        if (!payload) return;
-
-        if (!payload.content && (!payload.embeds || payload.embeds.length === 0) && (!files || files.length === 0)) {
-            showNotification('error', 'Please add content, embeds, or files before sending!');
-            return;
-        }
-
-        if (files.length > 10) {
-            showNotification('error', 'Maximum 10 files allowed');
-            return;
-        }
-
-        // Save to Live Uses
-        const saveResponse = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ payload }),
-        });
-        if (!saveResponse.ok) {
-            console.error('Failed to save to Live Uses:', saveResponse.status);
-        } else {
-            fetchLiveUses(); // Refresh Live Uses after saving
-        }
-
-        const filePromises = files.map(file => new Promise((resolve, reject) => {
-            if (file.size > 8 * 1024 * 1024) {
-                reject(new Error(`File ${file.name} exceeds 8MB limit`));
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = () => resolve({ name: file.name, data: reader.result.split(',')[1] });
-            reader.onerror = () => reject(new Error(`Failed to read file ${file.name}`));
-            reader.readAsDataURL(file);
-        }));
-
-        Promise.all(filePromises)
-            .then(fileData => {
-                const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
-                console.log('Sending payload to proxy:', payload, 'Files:', fileData.map(f => f.name));
-                fetch(proxyUrl, {
-                    method: 'POST',
-                    body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: fileData }),
-                    headers: { 'Content-Type': 'application/json' }
-                })
-                    .then(async response => {
-                        if (!response.ok) {
-                            const errorText = await response.text();
-                            throw new Error(`Proxy error: ${response.status} - ${errorText}`);
-                        }
-                        showNotification('success', 'Message sent to Discord successfully!');
-                        console.log('Message sent to Discord via proxy:', webhookUrl);
-                    })
-                    .catch(error => {
-                        console.error('Fetch error in sendToDiscord:', error.message);
-                        showNotification('error', `Failed to send to Discord: ${error.message}`);
-                    });
-            })
-            .catch(error => {
-                console.error('Error reading files:', error.message);
-                showNotification('error', `Failed to process files: ${error.message}. Trying without attachments.`);
-                const proxyUrl = 'https://super-term-24c6.aivanleigh25-684.workers.dev';
-                fetch(proxyUrl, {
-                    method: 'POST',
-                    body: JSON.stringify({ webhookUrl, payload: JSON.stringify(payload), files: [] }),
-                    headers: { 'Content-Type': 'application/json' }
-                })
-                    .then(async response => {
-                        if (!response.ok) {
-                            const errorText = await response.text();
-                            throw new Error(`Proxy error: ${response.status} - ${errorText}`);
-                        }
-                        showNotification('success', 'Message sent to Discord successfully (without files)!');
-                        console.log('Message sent to Discord via proxy (no files):', webhookUrl);
-                    })
-                    .catch(error => {
-                        console.error('Fetch error in sendToDiscord (no files):', error.message);
-                        showNotification('error', `Failed to send to Discord: ${error.message}`);
-                    });
-            });
-    } catch (e) {
-        console.error('Error in sendToDiscord:', e.message);
-        showNotification('error', `Failed to send to Discord: ${e.message}`);
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     addEmbed();
     setupEmojiPicker('contentEmojiPicker');
@@ -722,7 +700,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Text formatting context menu
     const textareas = document.querySelectorAll('textarea');
     const contextMenu = document.getElementById('textContextMenu');
     if (contextMenu) {
@@ -743,6 +720,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    fetchLiveUses(); // Load Live Uses on page load
+    fetchLiveUses();
     updatePreview();
 });
