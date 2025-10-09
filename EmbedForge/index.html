@@ -120,6 +120,9 @@
         }
         .preview-panel {
             width: 100%;
+            position: sticky;
+            top: 0;
+            align-self: start;
         }
         #clearModal {
             transition: opacity 0.3s ease, transform 0.3s ease;
@@ -209,7 +212,7 @@
                 </div>
             </div>
 
-            <div id="previewPanel" class="preview-panel bg-gray-800 rounded-xl p-6 shadow-xl lg:col-span-1 sticky top-20">
+            <div id="previewPanel" class="preview-panel bg-gray-800 rounded-xl p-6 shadow-xl lg:col-span-1 sticky top-4">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold flex items-center"><i class="fas fa-eye mr-2 text-indigo-400"></i>Live Preview</h2>
                     <button onclick="closePreview()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
