@@ -61,15 +61,15 @@ async function fetchLiveUses() {
                         ${embed.payload.content ? `<p class="text-gray-300 mb-3">${parseDiscordMarkdown(embed.payload.content)}</p>` : ''}
                         ${embed.payload.embeds?.map((e, i) => `
                             <div style="border-left: 4px solid ${e.color ? '#' + e.color.toString(16).padStart(6, '0') : '#5865f2'};">
-                                ${e.title ? `<h3 class="font-bold text-lg mb-1 text-white">${parseDiscordMarkdown(e.title)}</h3>` : ''}
-                                ${e.description ? `<p class="text-gray-300 mb-3">${parseDiscordMarkdown(e.description)}</p>` : ''}
-                                ${e.thumbnail?.url ? `<img src="${e.thumbnail.url}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right" onerror="this.style.display='none'">` : ''}
-                                ${e.image?.url ? `<img src="${e.image.url}" alt="Image" class="w-full h-auto rounded mb-3" onerror="this.style.display='none'">` : ''}
                                 ${e.author?.name ? `
                                     <div class="flex items-center mb-3">
                                         ${e.author.icon_url ? `<img src="${e.author.icon_url}" alt="Author Icon" class="w-6 h-6 rounded-full mr-2" onerror="this.style.display='none'">` : ''}
                                         <span class="font-semibold">${parseDiscordMarkdown(e.author.name)}</span>
                                     </div>` : ''}
+                                ${e.title ? `<h3 class="font-bold text-lg mb-1 text-white">${parseDiscordMarkdown(e.title)}</h3>` : ''}
+                                ${e.description ? `<p class="text-gray-300 mb-3">${parseDiscordMarkdown(e.description)}</p>` : ''}
+                                ${e.thumbnail?.url ? `<img src="${e.thumbnail.url}" alt="Thumbnail" class="w-20 h-20 object-cover rounded mb-3 float-right" onerror="this.style.display='none'">` : ''}
+                                ${e.image?.url ? `<img src="${e.image.url}" alt="Image" class="w-full h-auto rounded mb-3" onerror="this.style.display='none'">` : ''}
                                 ${e.fields?.map(f => `
                                     <div class="mb-2 ${f.inline ? 'field-inline' : ''}">
                                         <div class="font-semibold text-white mb-1">${parseDiscordMarkdown(f.name)}</div>
@@ -92,7 +92,7 @@ async function fetchLiveUses() {
             : '<p class="text-gray-400 italic">No recent embeds yet...</p>';
     } catch (e) {
         console.error('Error in fetchLiveUses:', e.message);
-        document.getElementById('liveUses').innerHTML = '<p class="text-gray-400 italic">Live Uses not available. Ensure Netlify function is deployed.</p>';
+        document.getElementById('liveUses').innerHTML = '<p class="text-gray-400 italic">Live Uses not available. Deploying Netlify function...</p>';
     }
 }
 
@@ -217,7 +217,6 @@ function addEmbed(embedData = {}) {
     if (embedData.fields) {
         embedData.fields.forEach(field => addField(embedCount, field));
     }
-    setupEmojiPicker(`embedDescEmojiPicker-${embedCount}`);
     embedCount++;
     updatePreview();
 }
@@ -460,6 +459,7 @@ function togglePreview() {
             viewBtn.classList.remove('hidden');
             mainGrid.classList.remove('lg:grid-cols-2');
             mainGrid.classList.add('lg:grid-cols-1');
+            document.querySelector('.builder-panel').style.width = '100%';
         }, 300);
     } else {
         panel.classList.remove('hidden');
@@ -470,6 +470,7 @@ function togglePreview() {
             viewBtn.classList.add('hidden');
             mainGrid.classList.remove('lg:grid-cols-1');
             mainGrid.classList.add('lg:grid-cols-2');
+            document.querySelector('.builder-panel').style.width = '100%';
         }, 300);
     }
     isPreviewVisible = !isPreviewVisible;
@@ -594,7 +595,7 @@ async function sendToDiscord() {
             return;
         }
 
-        // Try to save to Live Uses (optional)
+        // Try to save to Live Uses
         try {
             const saveResponse = await fetch(API_URL, {
                 method: 'POST',
@@ -602,11 +603,10 @@ async function sendToDiscord() {
                 body: JSON.stringify({ payload }),
             });
             if (saveResponse.ok) {
-                await fetchLiveUses(); // Refresh Live Uses
+                await fetchLiveUses();
             }
         } catch (e) {
             console.warn('Failed to save to Live Uses:', e.message);
-            // Continue without saving
         }
 
         const filePromises = files.map(file => new Promise((resolve, reject) => {
@@ -675,9 +675,9 @@ function toggleEmojiPicker(pickerId) {
     if (!isActive) picker.classList.add('active');
 }
 
-function setupEmojiPicker(pickerId) {
-    const picker = document.getElementById(pickerId);
-    if (picker) {
+function setupEmojiPickers() {
+    const pickers = document.querySelectorAll('emoji-picker');
+    pickers.forEach(picker => {
         picker.addEventListener('emoji-click', event => {
             const textarea = picker.previousElementSibling.previousElementSibling;
             if (textarea) {
@@ -686,12 +686,12 @@ function setupEmojiPicker(pickerId) {
                 picker.classList.remove('active');
             }
         });
-    }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     addEmbed();
-    setupEmojiPicker('contentEmojiPicker');
+    setupEmojiPickers();
     const inputs = document.querySelectorAll('input, textarea');
     inputs.forEach(input => {
         input.addEventListener('input', updatePreview);
@@ -719,6 +719,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const observer = new MutationObserver(() => {
+        setupEmojiPickers();
+    });
+    observer.observe(document.getElementById('embedsContainer'), { childList: true, subtree: true });
 
     fetchLiveUses();
     updatePreview();
