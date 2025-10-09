@@ -1,6 +1,8 @@
 let embedCount = 0;
 let files = [];
 let isPreviewVisible = true;
+let lastSendTime = 0;
+const RATE_LIMIT_MS = 2000;
 const API_URL = 'https://vanprojects.netlify.app/.netlify/functions/embeds';
 
 const templates = {
@@ -128,10 +130,6 @@ function formatText(type) {
 
     if (selection.rangeCount > 0 && selection.toString()) {
         selectedText = selection.toString();
-        const range = selection.getRangeAt(0);
-        const textareaText = textarea.value;
-        const textareaRange = document.createRange();
-        textareaRange.selectNodeContents(textarea);
         start = textarea.selectionStart;
         end = textarea.selectionEnd;
     } else if (textarea.selectionStart !== textarea.selectionEnd) {
@@ -529,7 +527,7 @@ function showNotification(type, message) {
     if (!notification || !content) return;
     content.innerHTML = `
         <i class="fas ${type === 'success' ? 'fa-check-circle text-green-500' : 'fa-exclamation-circle text-red-500'}"></i>
-        <span>${message}</span>
+        <span>${parseDiscordMarkdown(message)}</span>
     `;
     content.className = `p-4 rounded-lg shadow-lg flex items-center space-x-3 ${type === 'success' ? 'bg-green-900' : 'bg-red-900'} animate-fadeIn`;
     notification.classList.remove('hidden');
@@ -615,6 +613,12 @@ function updatePreview() {
 }
 
 async function sendToDiscord() {
+    const currentTime = Date.now();
+    if (currentTime - lastSendTime < RATE_LIMIT_MS) {
+        showNotification('error', '**Uh oh!** *Don\'t spam*');
+        return;
+    }
+
     try {
         const webhookUrl = document.getElementById('webhookUrl')?.value;
         if (!webhookUrl || !/^https:\/\/(discord\.com|discordapp\.com|ptb\.discord\.com)\/api\/webhooks\/[0-9]+\/[A-Za-z0-9_-]+/.test(webhookUrl)) {
@@ -672,6 +676,7 @@ async function sendToDiscord() {
                             const errorText = await response.text();
                             throw new Error(`Proxy error: ${response.status} - ${errorText}`);
                         }
+                        lastSendTime = currentTime;
                         showNotification('success', 'Message sent to Discord successfully!');
                     })
                     .catch(error => {
@@ -693,6 +698,7 @@ async function sendToDiscord() {
                             const errorText = await response.text();
                             throw new Error(`Proxy error: ${response.status} - ${errorText}`);
                         }
+                        lastSendTime = currentTime;
                         showNotification('success', 'Message sent to Discord successfully (without files)!');
                     })
                     .catch(error => {
