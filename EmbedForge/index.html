@@ -60,6 +60,7 @@
         .preview-embed {
             background: linear-gradient(135deg, #36393f 0%, #2f3136 100%);
             border-left: 4px solid #5865f2;
+            padding-left: 8px;
         }
         .embed-content {
             border-left: none !important;
@@ -120,6 +121,13 @@
         .preview-panel {
             width: 100%;
         }
+        #clearModal {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        #clearModal.hidden {
+            opacity: 0;
+            transform: translateY(10px);
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white font-sans min-h-screen">
@@ -130,7 +138,6 @@
         </header>
 
         <div id="mainGrid" class="main-grid grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Builder Panel (3/4 width) -->
             <div class="builder-panel space-y-6 lg:col-span-3">
                 <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
                     <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-link mr-2 text-blue-400"></i>Webhook URL</h2>
@@ -187,7 +194,7 @@
                     <button onclick="generateJSON()" class="flex-1 px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
                         <i class="fas fa-copy mr-2"></i>Copy JSON
                     </button>
-                    <button onclick="clearAll()" class="flex-1 px-6 py-3 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors font-semibold">
+                    <button onclick="showClearModal()" class="flex-1 px-6 py-3 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors font-semibold">
                         <i class="fas fa-trash mr-2"></i>Clear All
                     </button>
                 </div>
@@ -202,8 +209,7 @@
                 </div>
             </div>
 
-            <!-- Preview Panel (1/4 width, non-floating) -->
-            <div id="previewPanel" class="preview-panel bg-gray-800 rounded-xl p-6 shadow-xl lg:col-span-1">
+            <div id="previewPanel" class="preview-panel bg-gray-800 rounded-xl p-6 shadow-xl lg:col-span-1 sticky top-20">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold flex items-center"><i class="fas fa-eye mr-2 text-indigo-400"></i>Live Preview</h2>
                     <button onclick="closePreview()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
@@ -214,7 +220,6 @@
             </div>
         </div>
 
-        <!-- Live Uses Section -->
         <div class="mt-12 bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
             <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-history mr-2 text-purple-400"></i>Live Uses</h2>
             <div id="liveUses" class="space-y-4">
@@ -222,7 +227,6 @@
             </div>
         </div>
 
-        <!-- Text Formatting Context Menu -->
         <div id="textContextMenu" class="hidden fixed bg-gray-700 rounded-lg shadow-lg p-2 z-50">
             <button onclick="formatText('bold')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-bold mr-2"></i>Bold</button>
             <button onclick="formatText('italic')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-italic mr-2"></i>Italic</button>
@@ -232,7 +236,6 @@
             <button onclick="formatText('spoiler')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-eye-slash mr-2"></i>Spoiler</button>
         </div>
 
-        <!-- JSON Output Modal -->
         <div id="jsonModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
             <div class="bg-gray-800 rounded-xl p-6 w-11/12 max-w-4xl max-h-[80vh] overflow-auto animate-fadeIn">
                 <div class="flex justify-between items-center mb-4">
@@ -251,7 +254,24 @@
             </div>
         </div>
 
-        <!-- Success/Error Notifications -->
+        <div id="clearModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-gray-800 rounded-xl p-6 w-11/12 max-w-md animate-fadeIn">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold">Clear All</h3>
+                    <button onclick="closeClearModal()" class="text-gray-400 hover:text-white">&times;</button>
+                </div>
+                <p class="text-gray-300 mb-4">Are you sure you want to clear all fields? This cannot be undone.</p>
+                <div class="flex space-x-4">
+                    <button onclick="confirmClear()" class="flex-1 px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+                        <i class="fas fa-trash mr-2"></i>Confirm
+                    </button>
+                    <button onclick="closeClearModal()" class="flex-1 px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div id="notification" class="fixed top-4 right-4 w-80 hidden">
             <div id="notificationContent" class="p-4 rounded-lg shadow-lg flex items-center space-x-3 animate-fadeIn"></div>
         </div>
