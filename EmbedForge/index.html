@@ -1,190 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Create and send custom Discord embeds with ease using EmbedForge.">
-  <meta name="keywords" content="Discord, embed, webhook, builder, tool, EmbedForge, VanProjects">
-  <meta name="author" content="VanProjects">
-  <title>EmbedForge | Create Custom Discord Embeds</title>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #1a1a1a;
-      color: #e0e0e0;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-    @media (min-width: 1024px) {
-      .main-grid {
-        grid-template-columns: 1fr 2fr;
-      }
-    }
-    .card {
-      background: #2d2d2d;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
-    .preview-embed {
-      background: #36393f;
-      border-left: 4px solid #5865f2;
-      border-radius: 4px;
-      padding: 16px;
-    }
-    textarea, input[type="text"], input[type="url"] {
-      background: #1e1e1e;
-      border: 1px solid #444;
-      color: #e0e0e0;
-      border-radius: 8px;
-      padding: 10px;
-      width: 100%;
-      box-sizing: border-box;
-      resize: vertical;
-    }
-    button {
-      background: #5865f2;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #4752c4;
-    }
-    .notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      color: white;
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .notification.success {
-      background: #43b581;
-    }
-    .notification.error {
-      background: #f04747;
-    }
-    .animate-fadeIn {
-      animation: fadeIn 0.5s ease-in;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .emoji-picker {
-      position: absolute;
-      z-index: 100;
-      background: #2d2d2d;
-      border-radius: 8px;
-      padding: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
-    .emoji-picker button {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      padding: 5px;
-    }
-    .emoji-picker button:hover {
-      background: #444;
-      border-radius: 4px;
-    }
-    #textContextMenu {
-      min-width: 150px;
-    }
-    #textContextMenu button {
-      color: white;
-    }
-    .field-inline {
-      display: inline-block;
-      width: 48%;
-      margin-right: 4%;
-    }
-    .field-inline:last-child {
-      margin-right: 0;
-    }
-    @media (max-width: 768px) {
-      .field-inline {
-        width: 100%;
-        margin-right: 0;
-        margin-bottom: 0.5rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EmbedForge is a free, feature-rich Discord webhook builder. Create stunning embeds with JSON support, emoji picker, GIFs, templates, and live preview. No signups, no limits.">
+    <title>EmbedForge - Free Discord Webhook Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/dist/index.js" rel="modulepreload">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/dist/index.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        discord: {
+                            bg: '#36393f',
+                            primary: '#5865f2',
+                            secondary: '#4f545c',
+                            accent: '#b9bbbe',
+                            success: '#57f287',
+                            error: '#ed4245',
+                        }
+                    },
+                    animation: {
+                        slideIn: 'slideIn 0.3s ease-out',
+                        slideOut: 'slideOut 0.3s ease-in',
+                        fadeIn: 'fadeIn 0.3s ease-out',
+                        fadeOut: 'fadeOut 0.3s ease-in',
+                    },
+                    keyframes: {
+                        slideIn: {
+                            '0%': { transform: 'translateX(100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        slideOut: {
+                            '0%': { transform: 'translateX(0)', opacity: '1' },
+                            '100%': { transform: 'translateX(100%)', opacity: '0' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        fadeOut: {
+                            '0%': { opacity: '1', transform: 'translateY(0)' },
+                            '100%': { opacity: '0', transform: 'translateY(10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .preview-embed {
+            background: linear-gradient(135deg, #36393f 0%, #2f3136 100%);
+            border-left: 4px solid #5865f2;
+        }
+        .field-inline { display: inline-block; width: 48%; margin-right: 4%; }
+        .field-inline:last-child { margin-right: 0; }
+        @media (max-width: 768px) { .field-inline { width: 100%; margin-right: 0; margin-bottom: 0.5rem; } }
+        emoji-picker { --emoji-size: 1.5rem; --category-icon-size: 1.2rem; width: 100%; max-height: 300px; }
+        .emoji-picker-container { position: relative; }
+        .emoji-picker-container emoji-picker { display: none; position: absolute; z-index: 20; background: #2f3136; border-radius: 8px; padding: 10px; }
+        .emoji-picker-container emoji-picker.active { display: block; animation: fadeIn 0.2s ease-out; }
+        #textContextMenu {
+            min-width: 150px;
+            background: #2f3136;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 50;
+        }
+        #textContextMenu button {
+            color: white;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        #textContextMenu button:hover {
+            background: #4f545c;
+        }
+        button[onclick="document.getElementById('fileInput').click()"] {
+            background-color: #7e22ce;
+            transition: background-color 0.2s;
+        }
+        button[onclick="document.getElementById('fileInput').click()"]:hover {
+            background-color: #6b21a8;
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <header class="mb-8">
-      <h1 class="text-4xl font-bold text-center">EmbedForge <i class="fas fa-hammer text-blue-400"></i></h1>
-      <p class="text-center text-gray-400">Create and send custom Discord embeds with ease</p>
-    </header>
-    <div id="mainGrid" class="main-grid grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div class="card">
-        <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-cog mr-2 text-blue-400"></i>Message Content</h2>
-        <div class="relative mb-4">
-          <textarea id="content" rows="4" placeholder="Enter message content..." class="pr-10"></textarea>
-          <button onclick="toggleEmojiPicker('contentEmojiPicker')" class="absolute right-2 top-2 text-gray-400 hover:text-gray-200">
-            <i class="fas fa-smile"></i>
-          </button>
-          <div id="contentEmojiPicker" class="emoji-picker hidden"></div>
+<body class="bg-gray-900 text-white font-sans min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent mb-4 animate-fadeIn">EmbedForge</h1>
+            <p class="text-xl text-gray-300 max-w-2xl mx-auto">Craft stunning Discord embeds with ease. Fully featured, completely free. No limits, no signups.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Builder Panel -->
+            <div class="space-y-6">
+                <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-link mr-2 text-blue-400"></i>Webhook URL</h2>
+                    <input type="url" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none text-white" required>
+                </div>
+
+                <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-align-left mr-2 text-green-400"></i>Message Content</h2>
+                    <div class="emoji-picker-container relative">
+                        <textarea id="content" rows="3" placeholder="Optional plain text message..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-green-500 focus:outline-none text-white resize-none"></textarea>
+                        <button onclick="toggleEmojiPicker('contentEmojiPicker')" class="absolute top-3 right-3 text-gray-400 hover:text-green-500"><i class="fas fa-smile"></i></button>
+                        <emoji-picker id="contentEmojiPicker" class="emoji-picker"></emoji-picker>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-gem mr-2 text-purple-400"></i>Embeds</h2>
+                    <div class="flex space-x-4 mb-4">
+                        <select id="templateSelect" onchange="loadTemplate()" class="w-full p-2 bg-gray-700 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none text-white">
+                            <option value="">Select a Template</option>
+                            <option value="welcome">Welcome Message</option>
+                            <option value="announcement">Announcement</option>
+                            <option value="event">Event Notification</option>
+                        </select>
+                        <button onclick="loadTemplate()" class="px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors">Load</button>
+                    </div>
+                    <div id="embedsContainer"></div>
+                    <button onclick="addEmbed()" class="mt-4 px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center mx-auto">
+                        <i class="fas fa-plus mr-2"></i>Add Embed
+                    </button>
+                </div>
+
+                <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-file-upload mr-2 text-orange-400"></i>Attachments</h2>
+                    <div id="attachments" class="space-y-2"></div>
+                    <input type="file" id="fileInput" accept="image/*,video/*,.gif" multiple class="hidden" onchange="handleFiles()">
+                    <button onclick="document.getElementById('fileInput').click()" class="px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center mx-auto">
+                        <i class="fas fa-upload mr-2"></i>Add Attachments
+                    </button>
+                </div>
+
+                <div class="bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-code mr-2 text-indigo-400"></i>JSON Input</h2>
+                    <textarea id="jsonInput" rows="5" placeholder="Paste your JSON here to load an embed..." class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-indigo-500 focus:outline-none text-white font-mono text-sm resize-none"></textarea>
+                    <button onclick="loadFromJSON()" class="mt-4 px-4 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors w-full">
+                        <i class="fas fa-file-import mr-2"></i>Load JSON
+                    </button>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button onclick="generateJSON()" class="flex-1 px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                        <i class="fas fa-copy mr-2"></i>Copy JSON
+                    </button>
+                    <button onclick="clearAll()" class="flex-1 px-6 py-3 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors font-semibold">
+                        <i class="fas fa-trash mr-2"></i>Clear All
+                    </button>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button id="hidePreviewBtn" onclick="togglePreview()" class="flex-1 px-6 py-3 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors font-semibold">
+                        <i class="fas fa-compress-alt mr-2"></i>Hide Preview
+                    </button>
+                    <button id="viewPreviewBtn" onclick="togglePreview()" class="flex-1 px-6 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors font-semibold hidden">
+                        <i class="fas fa-expand-alt mr-2"></i>View Preview
+                    </button>
+                </div>
+            </div>
+
+            <!-- Floating Preview Panel -->
+            <div id="previewPanel" class="fixed right-0 top-20 w-96 max-h-[80vh] bg-gray-800 rounded-l-xl p-6 shadow-xl transition-all duration-300 ease-in-out z-50 overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold flex items-center"><i class="fas fa-eye mr-2 text-indigo-400"></i>Live Preview</h2>
+                    <div class="flex space-x-2">
+                        <button onclick="closePreview()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div id="preview" class="min-h-[200px] bg-discord-bg rounded-lg p-4 space-y-4 overflow-y-auto">
+                    <p class="text-gray-400 italic">Build your embed to see a live preview here...</p>
+                </div>
+            </div>
         </div>
-        <div class="mb-4">
-          <label for="webhookUrl" class="block text-sm font-medium mb-1">Webhook URL</label>
-          <input type="url" id="webhookUrl" placeholder="Enter Discord webhook URL..." class="w-full">
+
+        <!-- Live Uses Section -->
+        <div class="mt-12 bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
+            <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-history mr-2 text-purple-400"></i>Live Uses</h2>
+            <div id="liveUses" class="space-y-4">
+                <p class="text-gray-400 italic">Loading recent embeds...</p>
+            </div>
         </div>
-        <div class="mb-4">
-          <label for="fileInput" class="block text-sm font-medium mb-1">Attachments</label>
-          <input type="file" id="fileInput" multiple accept="image/*,video/*,audio/*" class="w-full">
-          <div id="fileList" class="mt-2"></div>
+
+        <!-- Text Formatting Context Menu -->
+        <div id="textContextMenu" class="hidden fixed bg-gray-700 rounded-lg shadow-lg p-2 z-50">
+            <button onclick="formatText('bold')" class="block w-full text-left"><i class="fas fa-bold mr-2"></i>Bold</button>
+            <button onclick="formatText('italic')" class="block w-full text-left"><i class="fas fa-italic mr-2"></i>Italic</button>
+            <button onclick="formatText('underline')" class="block w-full text-left"><i class="fas fa-underline mr-2"></i>Underline</button>
+            <button onclick="formatText('strikethrough')" class="block w-full text-left"><i class="fas fa-strikethrough mr-2"></i>Strikethrough</button>
+            <button onclick="formatText('code')" class="block w-full text-left"><i class="fas fa-code mr-2"></i>Code</button>
+            <button onclick="formatText('spoiler')" class="block w-full text-left"><i class="fas fa-eye-slash mr-2"></i>Spoiler</button>
         </div>
-        <button onclick="addEmbed()" class="w-full mb-4"><i class="fas fa-plus mr-2"></i>Add Embed</button>
-        <div id="embedsContainer"></div>
-        <button onclick="sendToDiscord()" class="w-full bg-green-600 hover:bg-green-700"><i class="fas fa-paper-plane mr-2"></i>Send to Discord</button>
-      </div>
-      <div class="card lg:col-span-2">
-        <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-eye mr-2 text-blue-400"></i>Preview</h2>
-        <button onclick="togglePreview()" class="mb-4 bg-gray-600 hover:bg-gray-700"><i class="fas fa-eye-slash mr-2"></i>Toggle Preview</button>
-        <div id="preview" class="preview-embed"></div>
-        <h2 class="text-2xl font-semibold mt-6 mb-4 flex items-center"><i class="fas fa-code mr-2 text-blue-400"></i>JSON Output</h2>
-        <textarea id="jsonInput" rows="10" placeholder="JSON output will appear here..."></textarea>
-      </div>
+
+        <!-- JSON Output Modal -->
+        <div id="jsonModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-gray-800 rounded-xl p-6 w-11/12 max-w-4xl max-h-96 overflow-hidden animate-fadeIn">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold">Generated JSON</h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-white">&times;</button>
+                </div>
+                <textarea id="jsonOutput" rows="20" class="w-full p-3 bg-gray-700 rounded-lg border border-gray-600 focus:outline-none text-white font-mono text-sm resize-none"></textarea>
+                <div class="flex space-x-4 mt-4">
+                    <button onclick="copyJSON()" class="flex-1 px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-copy mr-2"></i>Copy to Clipboard
+                    </button>
+                    <button onclick="closeModal()" class="flex-1 px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-times mr-2"></i>Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Notifications -->
+        <div id="notification" class="fixed top-4 right-4 w-80 hidden">
+            <div id="notificationContent" class="p-4 rounded-lg shadow-lg flex items-center space-x-3 animate-fadeIn"></div>
+        </div>
     </div>
-    <div class="mt-12 bg-gray-800 rounded-xl p-6 shadow-xl animate-fadeIn">
-      <h2 class="text-2xl font-semibold mb-4 flex items-center"><i class="fas fa-history mr-2 text-blue-400"></i>Live Uses</h2>
-      <div id="liveUses" class="space-y-4">
-        <p class="text-gray-400 italic">Loading recent embeds...</p>
-      </div>
-    </div>
-    <div id="textContextMenu" class="hidden fixed bg-gray-700 rounded-lg shadow-lg p-2 z-50">
-      <button onclick="formatText('bold')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-bold mr-2"></i>Bold</button>
-      <button onclick="formatText('italic')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-italic mr-2"></i>Italic</button>
-      <button onclick="formatText('underline')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-underline mr-2"></i>Underline</button>
-      <button onclick="formatText('strikethrough')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-strikethrough mr-2"></i>Strikethrough</button>
-      <button onclick="formatText('code')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-code mr-2"></i>Code</button>
-      <button onclick="formatText('spoiler')" class="block w-full text-left px-3 py-1 hover:bg-gray-600 rounded"><i class="fas fa-eye-slash mr-2"></i>Spoiler (Hide)</button>
-    </div>
-  </div>
-  <script src="./script.js"></script>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
 </body>
 </html>
