@@ -1,15 +1,18 @@
 {
-  "name": "stupid nigger",
+  "name": "embedforge",
   "version": "1.0.0",
-  "description": "ass",
+  "description": "Discord webhook builder",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["discord", "webhook", "embed"],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.74.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
   }
 }
