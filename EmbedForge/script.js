@@ -2,7 +2,7 @@ let embedCount = 0;
 let files = [];
 let isPreviewVisible = true;
 let lastSendTime = 0;
-const RATE_LIMIT_MS = 2000;
+const RATE_LIMIT_MS = 1600;
 const API_URL = 'https://vanprojects.netlify.app/.netlify/functions/embeds';
 
 const templates = {
@@ -783,3 +783,4 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchLiveUses();
     updatePreview();
 });
+
