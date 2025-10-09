@@ -49,7 +49,7 @@ exports.handler = async (event, context) => {
         .from('embeds')
         .select('id, payload, created_at')
         .order('created_at', { ascending: false })
-        .limit(10); // Limit to last 10 embeds
+        .limit(10);
       if (error) throw error;
       return {
         statusCode: 200,
