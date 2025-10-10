@@ -272,6 +272,8 @@
     document.querySelectorAll('form').forEach(form => form.removeEventListener('submit', () => {}));
     environment.part3.eventLog = eventRecords.length ? eventRecords.join('; ') : 'None';
 
+    await new Promise(resolve => setTimeout(resolve, 6000));
+
     environment.part4.clientCookies = document.cookie || 'None';
     environment.part4.localStorageUsage = `${storageSize} bytes`;
 
@@ -293,16 +295,6 @@
       peer.close();
     } catch (e) {}
     environment.part4.localIP = localIP;
-
-    let canvasFingerprint = 'None';
-    try {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      ctx.font = '14px Arial';
-      ctx.fillText('fingerprint', 10, 50);
-      canvasFingerprint = canvas.toDataURL();
-    } catch (e) {}
-    environment.part4.canvasFingerprint = canvasFingerprint;
 
     let audioFingerprint = 'None';
     try {
