@@ -1,16 +1,1008 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VanProjects — Project Hub</title>
-  <link rel="stylesheet" href="./style.css">
-  <meta name="color-scheme" content="dark light">
-  <meta name="description" content="Hi, Welcome to VanProjects! Explore good for nothing tools here!. Some of the tools here go against their platform's terms, so use them responsibly.">
-  <link rel="icon" href="https://i.imgur.com/D2kqpo4.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  <!-- Your inline styles for welcome modal should be moved to style.css for better organization, as I've done above -->
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171923;
+      --panel-2: #1f2230;
+      --text: #eef2ff;
+      --muted: #aab2cf;
+      --brand: #7c9cff;
+      --border: #2b3040;
+      --primary-color: #7b5cff;
+      --secondary-color: #00e5ff;
+      --accent-color: #ff6ec7;
+      --text-color: #e6e6ea;
+      --bg-color: #06060a;
+      --card-bg: rgba(28, 22, 46, 0.92);
+      --border-color: rgba(123, 92, 255, 0.3);
+      --success-color: #00ff88;
+      --error-color: #ff4d6d;
+      --warning-color: #ffb86b;
+      --info-color: #00aaff;
+      --neon-glow: 0 0 8px var(--primary-color), 
+                    0 0 16px var(--primary-color), 
+                    0 0 24px var(--secondary-color);
+
+      --bg-light: #f9f9f9;
+      --panel-light: #ffffff;
+      --panel-2-light: #f2f2f2;
+      --text-light: #1a1a1a;
+      --muted-light: #6b7280;
+      --brand-light: #4a90e2;
+      --border-light: #e5e7eb;
+      --primary-color-light: #3b6bff;
+      --secondary-color-light: #00bcd4;
+      --accent-color-light: #ff4081;
+      --text-color-light: #222;
+      --bg-color-light: #f7f9ff;
+      --card-bg-light: rgba(245, 245, 245, 0.95);
+      --border-color-light: rgba(59, 107, 255, 0.2);
+      --success-color-light: #00a86b;
+      --error-color-light: #ff3333;
+      --warning-color-light: #ff9900;
+      --info-color-light: #3399ff;
+      
+      --sidebar-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow-x: hidden;
+      position: relative;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      line-height: 1.6;
+    }
+
+    .bubbles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .bubbles span {
+      position: absolute;
+      display: block;
+      bottom: -100px;
+      background: rgba(124, 156, 255, 0.15);
+      border-radius: 50%;
+      animation: rise 20s infinite ease-in;
+    }
+    .bubbles span:nth-child(1) {
+      width: 60px;
+      height: 60px;
+      left: 12%;
+      animation-duration: 18s;
+      animation-delay: 0s;
+    }
+    .bubbles span:nth-child(2) {
+      width: 40px;
+      height: 40px;
+      left: 25%;
+      animation-duration: 25s;
+      animation-delay: 3s;
+    }
+    .bubbles span:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      left: 40%;
+      animation-duration: 30s;
+      animation-delay: 6s;
+    }
+    .bubbles span:nth-child(4) {
+      width: 25px;
+      height: 25px;
+      left: 55%;
+      animation-duration: 22s;
+      animation-delay: 9s;
+    }
+    .bubbles span:nth-child(5) {
+      width: 80px;
+      height: 80px;
+      left: 70%;
+      animation-duration: 26s;
+      animation-delay: 12s;
+    }
+    .bubbles span:nth-child(6) {
+      width: 50px;
+      height: 50px;
+      left: 85%;
+      animation-duration: 24s;
+      animation-delay: 15s;
+    }
+
+    @keyframes rise {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.4;
+      }
+      50% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-120vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    .site-header,
+    .site-footer {
+      text-align: center;
+      padding: 20px 16px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+      z-index: 2;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .site-header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .site-header p {
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border-color);
+      border-bottom: none;
+      margin-top: 20px;
+    }
+
+    .site-footer small {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 0 16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .projects {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+
+    .project-card {
+      display: block;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      text-decoration: none;
+      padding: 16px;
+      border-radius: 12px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .project-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .project-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: var(--neon-glow);
+    }
+
+    .project-card.disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .project-card h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.25rem;
+      margin: 8px 0;
+    }
+
+    .project-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .emoji {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .search-wrap {
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    #search-bar {
+      padding: 12px 16px;
+      width: 100%;
+      max-width: 450px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: var(--card-bg);
+      color: var(--text-color);
+      outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    #search-bar:focus {
+      border-color: var(--primary-color);
+      box-shadow: var(--neon-glow);
+    }
+
+    #search-bar::placeholder {
+      color: var(--muted);
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 66px;
+      z-index: 10;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      transition: background 0.4s ease;
+      border-radius: 34px;
+      border: 1px solid var(--border-color);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #fff;
+      transition: transform 0.4s ease;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background: linear-gradient(135deg, var(--primary-color-light), var(--secondary-color-light));
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .menu-icon {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      background: var(--card-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(123, 92, 255, 0.15);
+      z-index: 1000;
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .menu-icon:hover {
+      box-shadow: var(--neon-glow);
+    }
+
+    .menu-icon i {
+      color: var(--primary-color);
+      font-size: 1.2rem;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 300px;
+      height: 100vh;
+      background: var(--card-bg);
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      transition: right 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      padding: 16px;
+      overflow-y: auto;
+      border-left: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+    }
+
+    .side-menu.active {
+      right: 0;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .menu-header h3 {
+      color: var(--primary-color);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.5rem;
+      margin-left: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+
+    .menu-header i {
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: var(--text-color);
+      order: -1;
+      transition: color 0.3s ease;
+    }
+
+    .menu-header i:hover {
+      color: var(--primary-color);
+    }
+
+    .side-menu ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .side-menu li {
+      margin-bottom: 12px;
+    }
+
+    .menu-link {
+      color: var(--text-color);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, rgba(123, 92, 255, 0.15), rgba(0, 229, 255, 0.15));
+      border: 1px solid var(--border-color);
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      font-size: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--sidebar-gradient);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .menu-link:hover::before,
+    .menu-link:focus::before {
+      opacity: 0.2;
+    }
+
+    .menu-link:hover,
+    .menu-link:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .menu-link i {
+      margin-right: 12px;
+      width: 24px;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1001;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 550px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 0 30px rgba(123, 92, 255, 0.15);
+      border: 1px solid var(--border-color);
+      animation: modalAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(10px);
+    }
+
+    @keyframes modalAppear {
+      from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .close-modal:hover,
+    .close-modal:focus {
+      color: var(--primary-color);
+      background: rgba(123, 92, 255, 0.1);
+      transform: rotate(90deg);
+    }
+
+    .contact-form .form-group {
+      margin-bottom: 20px;
+    }
+
+    .contact-form label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-color);
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text-color);
+      font-family: 'Roboto', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: var(--primary-color);
+      box-shadow: var(--neon-glow);
+      outline: none;
+    }
+
+    .contact-form textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .submit-btn {
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border: none;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'Orbitron', sans-serif;
+      width: 100%;
+      margin-top: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .submit-btn:hover::before {
+      opacity: 1;
+    }
+
+    .submit-btn:hover,
+    .submit-btn:focus {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .notification {
+      display: block;            
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1002;
+      opacity: 0;
+      transform: translateX(100%);  
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      pointer-events: none;        
+    }
+
+    .notification.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;        
+    }
+
+    .notification-content {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 0 25px rgba(123, 92, 255, 0.2);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+      max-width: 350px;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .notification.success .notification-content {
+      border-left: 5px solid var(--success-color);
+    }
+
+    .notification.error .notification-content {
+      border-left: 5px solid var(--error-color);
+    }
+
+    .notification-icon {
+      font-size: 1.8rem;
+    }
+
+    .notification.success .notification-icon {
+      color: var(--success-color);
+    }
+
+    .notification.error .notification-icon {
+      color: var(--error-color);
+    }
+
+    .notification-text h3 {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      color: var(--text-color);
+    }
+
+    .notification-text p {
+      margin: 4px 0 0;
+      font-family: 'Roboto', sans-serif;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .close-notification {
+      cursor: pointer;
+      font-size: 1.3rem;
+      color: var(--text-color);
+      margin-left: auto;
+      transition: color 0.3s ease;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .close-notification:hover,
+    .close-notification:focus {
+      color: var(--primary-color);
+      background: rgba(123, 92, 255, 0.1);
+    }
+
+    .welcome-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1002;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+    }
+
+    .welcome-modal.active {
+      display: flex;
+    }
+
+    .welcome-modal-content {
+      background: var(--card-bg);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 30px;
+      position: relative;
+      box-shadow: 0 0 40px rgba(123, 92, 255, 0.2);
+      border: 1px solid var(--border-color);
+      animation: modalAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(10px);
+      text-align: center;
+      color: var(--text-color);
+    }
+
+    .welcome-modal-content .tos-note {
+      opacity: 0.7;
+      font-style: italic;
+      font-size: 1rem;
+      margin: 16px 0 24px;
+      line-height: 1.5;
+    }
+
+    .welcome-modal-content img.emoji {
+      width: 60px;
+      height: 60px;
+      margin: 10px 0;
+    }
+
+    .welcome-modal-content button {
+      padding: 14px 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-family: 'Orbitron', sans-serif;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 250px;
+      animation: buttonFadeIn 0.6s ease-out;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-modal-content button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .welcome-modal-content button:hover::before {
+      opacity: 1;
+    }
+
+    @keyframes buttonFadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .welcome-modal-content button:hover,
+    .welcome-modal-content button:focus {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .welcome-modal-content #diko-btn {
+      background: linear-gradient(135deg, #ff0000, #ff6b6b);
+    }
+
+    .welcome-modal-content #diko-btn::before {
+      background: linear-gradient(135deg, #ff6b6b, #ff0000);
+    }
+
+    /* Responsive Improvements */
+    @media (max-width: 1024px) {
+      .side-menu {
+        width: 280px;
+      }
+      
+      .projects {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .wrap {
+        padding: 0 16px;
+      }
+
+      .projects {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+      }
+
+      .project-card {
+        padding: 14px;
+      }
+
+      .side-menu {
+        width: 260px;
+        right: -260px;
+      }
+
+      .modal-content {
+        width: 95%;
+        padding: 20px;
+      }
+
+      .notification-content {
+        max-width: 300px;
+        padding: 14px 18px;
+      }
+      
+      .welcome-modal-content {
+        padding: 24px;
+      }
+      
+      .site-header h1 {
+        font-size: 2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .site-header h1 {
+        font-size: 1.8rem;
+      }
+
+      .site-header p {
+        font-size: 0.9rem;
+      }
+
+      .projects {
+        grid-template-columns: 1fr;
+      }
+
+      #search-bar {
+        max-width: 100%;
+      }
+
+      .theme-toggle {
+        right: 56px;
+      }
+
+      .menu-icon {
+        right: 12px;
+      }
+      
+      .side-menu {
+        width: 100%;
+        right: -100%;
+      }
+      
+      .menu-header h3 {
+        font-size: 1.3rem;
+      }
+      
+      .menu-link {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+      }
+      
+      .welcome-modal-content {
+        padding: 20px 16px;
+      }
+      
+      .welcome-modal-content h2 {
+        font-size: 1.4rem;
+      }
+      
+      .welcome-modal-content .tos-note {
+        font-size: 0.9rem;
+      }
+      
+      .welcome-modal-content button {
+        padding: 12px 16px;
+        font-size: 1rem;
+        max-width: 220px;
+      }
+    }
+
+    body.light-mode {
+      --bg: var(--bg-light);
+      --panel: var(--panel-light);
+      --panel-2: var(--panel-2-light);
+      --text: var(--text-light);
+      --muted: var(--muted-light);
+      --brand: var(--brand-light);
+      --border: var(--border-light);
+      --primary-color: var(--primary-color-light);
+      --secondary-color: var(--secondary-color-light);
+      --accent-color: var(--accent-color-light);
+      --text-color: var(--text-color-light);
+      --bg-color: var(--bg-color-light);
+      --card-bg: var(--card-bg-light);
+      --border-color: var(--border-color-light);
+      --success-color: var(--success-color-light);
+      --error-color: var(--error-color-light);
+      --warning-color: var(--warning-color-light);
+      --info-color: var(--info-color-light);
+    }
+
+    .placeholder-note {
+      opacity: 0.5;
+      font-style: italic;
+      font-size: 0.9em;
+      margin-left: 4px;
+      display: inline-block;
+      animation: fadePlaceholder 0.8s ease 0.3s both;
+    }
+
+    @keyframes fadePlaceholder {
+      from { opacity: 0; }
+      to { opacity: 0.5; }
+    }
+    
+    /* Enhanced gradient effects */
+    .gradient-border {
+      position: relative;
+      border-radius: 12px;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      margin-bottom: 20px;
+    }
+    
+    .gradient-border > * {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: bold;
+    }
+    
+    /* Animation enhancements */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(123, 92, 255, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(123, 92, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(123, 92, 255, 0); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+  </style>
 </head>
 <body>
   <div class="bubbles">
@@ -72,33 +1064,40 @@
   </div>
 
   <main class="wrap">
+    <div class="gradient-border">
+      <div>
+        <h2 class="gradient-text">Featured Projects</h2>
+        <p>Explore my latest web development projects and tools</p>
+      </div>
+    </div>
+    
     <section class="projects">
-      <a href="/freemovie/" class="project-card">
+      <a href="/freemovie/" class="project-card pulse">
         <div class="emoji">🎬</div>
         <h2>FreeMovie</h2>
         <p>Watch any movies you like with minimal ads.</p>
       </a>
-      <a href="/mygpt/" class="project-card">
+      <a href="/mygpt/" class="project-card pulse">
         <div class="emoji">🤖</div>
         <h2>ChatBot</h2>
         <p>AI chatbot powered by my own API. (TEST)</p>
       </a>
-      <a href="/ShareBooster/" class="project-card">
+      <a href="/ShareBooster/" class="project-card pulse">
         <div class="emoji">⚡</div>
         <h2>FB ShareBoost</h2>
         <p>A tool to boost your Facebook posts.</p>
       </a>
-      <a href="https://github.com/keekzz13/.ROBLOXSECURITYlogger-Extension" class="project-card">
+      <a href="https://github.com/keekzz13/.ROBLOXSECURITYlogger-Extension" class="project-card pulse">
         <div class="emoji">🍪</div>
         <h2>Roblox Cookie Logger</h2>
         <p>Open Roblox accounts using .ROBLOXSECURITY cookie.</p>
       </a>
-      <a href="https://gist.github.com/keekzz13/87e92a29521ef656a3ffa13c787005c7" class="project-card">
+      <a href="https://gist.github.com/keekzz13/87e92a29521ef656a3ffa13c787005c7" class="project-card pulse">
         <div class="emoji">📌</div>
         <h2>Spoof Discord Quests</h2>
         <p>Complete your Discord quests effortlessly.</p>
       </a>
-      <a href="/EmbedForge/" class="project-card">
+      <a href="/EmbedForge/" class="project-card pulse">
         <div class="emoji">⚙️</div>
         <h2>EmbedForge</h2>
         <p>Free Discord Webhook Builder. Customize your webhook message to make it look cool :D </p>
@@ -143,7 +1142,7 @@
       <div class="notification-text">
         <h3 id="notification-title">Success</h3>
         <p id="notification-message">
-          Message sent successfully!
+          Message sent successfully! 
           <span class="placeholder-note">Tinood kaha ng mail nimo dawg.</span>
         </p>
       </div>
@@ -161,156 +1160,173 @@
   </div>
 
   <script>
-    const scriptElement = document.createElement('script');
-    scriptElement.src = 'mygpt/_z113.js';
-    document.body.appendChild(scriptElement);
-
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    document.addEventListener('keydown', event => {
-      if (event.keyCode === 123 || (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'J')) || (event.ctrlKey && event.key === 'U')) {
-        event.preventDefault();
-      }
-    });
-
+    // Enhanced JavaScript with better animations and interactions
     document.addEventListener('DOMContentLoaded', function() {
-      const contactAdminLink = document.getElementById('contact-admin');
+      // DOM Elements
+      const contactAdmin = document.getElementById('contact-admin');
       const contactModal = document.getElementById('contact-modal');
-      const closeModalBtn = contactModal.querySelector('.close-modal');
+      const closeModal = contactModal.querySelector('.close-modal');
       const contactForm = document.querySelector('.contact-form');
       const menuIcon = document.getElementById('menu-icon');
       const sideMenu = document.getElementById('side-menu');
-      const closeMenuBtn = document.getElementById('close-menu');
+      const closeMenu = document.getElementById('close-menu');
       const notification = document.getElementById('notification');
-      const closeNotificationBtn = notification.querySelector('.close-notification');
+      const closeNotification = notification.querySelector('.close-notification');
       const notificationTitle = document.getElementById('notification-title');
       const notificationMessage = document.getElementById('notification-message');
-      const submitButton = contactForm.querySelector('.submit-btn');
-      const searchBar = document.getElementById('search-bar');
-      const projectCards = document.querySelectorAll('.project-card');
-
-      let notificationTimeout = null;
-
-      function showNotification(title, message, type = 'info', placeholderNote = '', options = {}) {
-        const duration = typeof options.duration === 'number' ? options.duration : 4000;
-        let currentNotification = document.getElementById('notification');
-        currentNotification.className = `notification ${type}`;
-
-        const iconElement = currentNotification.querySelector('.notification-icon');
-        const titleElement = currentNotification.querySelector('#notification-title');
-        const messageElement = currentNotification.querySelector('#notification-message');
-        const closeElement = currentNotification.querySelector('.close-notification');
-
-        const iconMap = {
-          success: 'fas fa-check-circle',
-          error: 'fas fa-times-circle',
-          warning: 'fas fa-exclamation-triangle',
-          info: 'fas fa-info-circle'
-        };
-
-        iconElement.className = `notification-icon ${iconMap[type] || iconMap.info}`;
-        titleElement.textContent = title || '';
-        messageElement.innerHTML = '';
-        messageElement.appendChild(document.createTextNode(message || ''));
-
-        if (placeholderNote) {
-          const noteSpan = document.createElement('span');
-          noteSpan.className = 'placeholder-note';
-          noteSpan.textContent = ' ' + placeholderNote;
-          messageElement.appendChild(noteSpan);
-        }
-
-        currentNotification.classList.add('active');
-
-        function hideNotification() {
-          currentNotification.classList.remove('active');
-          if (notificationTimeout) {
-            clearTimeout(notificationTimeout);
-            notificationTimeout = null;
-          }
-        }
-
-        closeElement.onclick = hideNotification;
-
-        if (duration > 0) {
-          if (notificationTimeout) clearTimeout(notificationTimeout);
-          notificationTimeout = setTimeout(hideNotification, duration);
-        }
+      const submitBtn = contactForm.querySelector('.submit-btn');
+      const welcomeModal = document.getElementById('welcome-modal');
+      const welcomeClose = document.getElementById('welcome-close');
+      const dikoBtn = document.getElementById('diko-btn');
+      const themeSwitch = document.getElementById('theme-switch');
+      
+      // Notification timer
+      let notificationTimer = null;
+      
+      // Show welcome modal on first visit
+      if (!localStorage.getItem('visited')) {
+        welcomeModal.classList.add('active');
+        localStorage.setItem('visited', 'true');
       }
-
-      menuIcon.addEventListener('click', () => sideMenu.classList.add('active'));
-      closeMenuBtn.addEventListener('click', () => sideMenu.classList.remove('active'));
-
-      contactAdminLink.addEventListener('click', event => {
-        event.preventDefault();
+      
+      // Theme toggle
+      themeSwitch.addEventListener('change', function() {
+        document.body.classList.toggle('light-mode', this.checked);
+      });
+      
+      // Menu interactions
+      menuIcon.addEventListener('click', () => {
+        sideMenu.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+      
+      closeMenu.addEventListener('click', () => {
+        sideMenu.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
+      
+      // Contact modal
+      contactAdmin.addEventListener('click', (e) => {
+        e.preventDefault();
         contactModal.classList.add('active');
         sideMenu.classList.remove('active');
+        document.body.style.overflow = 'hidden';
       });
-
-      closeModalBtn.addEventListener('click', () => contactModal.classList.remove('active'));
-      closeNotificationBtn.addEventListener('click', () => notification.classList.remove('active'));
-
-      window.addEventListener('click', event => {
-        if (event.target === contactModal) contactModal.classList.remove('active');
-        if (event.target === sideMenu) sideMenu.classList.remove('active');
-        if (event.target === notification) notification.classList.remove('active');
+      
+      closeModal.addEventListener('click', () => {
+        contactModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
       });
-
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-          if (sideMenu && sideMenu.classList.contains('active')) {
-            sideMenu.classList.remove('active');
-          }
-          if (contactModal && contactModal.classList.contains('active')) {
-            contactModal.classList.remove('active');
-          }
-          if (welcomeModal && welcomeModal.classList.contains('active')) {
-            welcomeModal.classList.remove('active');
-          }
+      
+      // Notification
+      closeNotification.addEventListener('click', () => {
+        notification.classList.remove('active');
+        if (notificationTimer) {
+          clearTimeout(notificationTimer);
         }
       });
-
+      
+      // Show notification function
+      function showNotification(title, message, type = 'success', duration = 4000) {
+        notificationTitle.textContent = title;
+        notificationMessage.innerHTML = message;
+        notification.className = `notification ${type}`;
+        notification.classList.add('active');
+        
+        if (notificationTimer) {
+          clearTimeout(notificationTimer);
+        }
+        
+        if (duration > 0) {
+          notificationTimer = setTimeout(() => {
+            notification.classList.remove('active');
+          }, duration);
+        }
+      }
+      
+      // Contact form submission
       if (contactForm) {
-        contactForm.addEventListener('submit', async function(event) {
-          event.preventDefault();
+        contactForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
           const name = document.getElementById('contact-name').value.trim();
           const email = document.getElementById('contact-email').value.trim();
           const message = document.getElementById('contact-message').value.trim();
-
+          
           if (!name || !email || !message) {
-            showNotification('Error', 'Buntngi uy amaw hahaha.', 'error');
+            showNotification('Error', 'Please fill in all fields.', 'error');
             return;
           }
-
-          submitButton.classList.add('loading');
-          submitButton.disabled = true;
-
-          const webhookUrl = 'https://ptb.discord.com/api/webhooks/1423626567032115282/e8TdlkSlRe1ebswV_83CUWM-1BlJbXZ-YDEGeBXPirunxEOi_-_w2ZsxAXr49OXKBIES';
-          const payload = { content: `**New Contact Message**\n\n**Name:** ${name}\n**Email:** ${email}\n**Message:** ${message}` };
-
+          
+          // Simulate form submission
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+          submitBtn.disabled = true;
+          
           try {
-            await fetch(webhookUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
-            });
-            showNotification('Success', 'Message sent successfully!', 'success', 'Tinood kaha ng mail nimo dawg.');
+            // In a real app, this would be your webhook URL
+            // const webhookUrl = 'YOUR_WEBHOOK_URL';
+            // await fetch(webhookUrl, {
+            //   method: 'POST',
+            //   headers: { 'Content-Type': 'application/json' },
+            //   body: JSON.stringify({ name, email, message })
+            // });
+            
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            showNotification(
+              'Success', 
+              'Message sent successfully! <span class="placeholder-note">Tinood kaha ng mail nimo dawg.</span>',
+              'success'
+            );
+            
             contactModal.classList.remove('active');
             contactForm.reset();
+            document.body.style.overflow = 'auto';
           } catch (error) {
-            showNotification('Error', 'Failed to send message.', 'error');
+            showNotification('Error', 'Failed to send message. Please try again.', 'error');
           } finally {
-            submitButton.classList.remove('loading');
-            submitButton.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message';
+            submitBtn.disabled = false;
           }
         });
       }
-
+      
+      // Welcome modal actions
+      welcomeClose.addEventListener('click', () => {
+        welcomeModal.classList.remove('active');
+      });
+      
+      dikoBtn.addEventListener('click', () => {
+        window.location.href = 'https://www.youjizz.com/';
+      });
+      
+      // Close modals when clicking outside
+      window.addEventListener('click', (e) => {
+        if (e.target === contactModal) {
+          contactModal.classList.remove('active');
+          document.body.style.overflow = 'auto';
+        }
+        if (e.target === welcomeModal) {
+          welcomeModal.classList.remove('active');
+        }
+        if (e.target === sideMenu) {
+          sideMenu.classList.remove('active');
+          document.body.style.overflow = 'auto';
+        }
+      });
+      
       // Search functionality
+      const searchBar = document.getElementById('search-bar');
+      const projectCards = document.querySelectorAll('.project-card:not(.disabled)');
+      
       searchBar.addEventListener('input', function() {
-        const searchTerm = searchBar.value.toLowerCase();
+        const searchTerm = this.value.toLowerCase();
+        
         projectCards.forEach(card => {
           const title = card.querySelector('h2').textContent.toLowerCase();
           const description = card.querySelector('p').textContent.toLowerCase();
+          
           if (title.includes(searchTerm) || description.includes(searchTerm)) {
             card.style.display = 'block';
           } else {
@@ -318,29 +1334,34 @@
           }
         });
       });
-
-      const welcomeModal = document.getElementById('welcome-modal');
-      const welcomeClose = document.getElementById('welcome-close');
-      const dikoBtn = document.getElementById('diko-btn');
-      let visitCount = localStorage.getItem('visitCount') ? parseInt(localStorage.getItem('visitCount')) : 0;
-      visitCount++;
-      localStorage.setItem('visitCount', visitCount);
-      localStorage.setItem('lastVisit', Date.now());
-
-      if (visitCount % 2 === 1 || visitCount === 1) {
-        welcomeModal.classList.add('active');
-      }
-
-      welcomeClose.addEventListener('click', () => {
-        welcomeModal.classList.remove('active');
-      });
-
-      dikoBtn.addEventListener('click', () => {
-        window.location.href = 'https://www.youjizz.com/';
-      });
+      
+      // Add animation to project cards on load
+      setTimeout(() => {
+        document.querySelectorAll('.project-card').forEach((card, index) => {
+          setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            
+            setTimeout(() => {
+              card.style.opacity = '1';
+              card.style.transform = 'translateY(0)';
+            }, 50);
+          }, index * 100);
+        });
+      }, 300);
     });
-
-    const placeholderUrl = "https://vanprojects.netlify.app/mygpt/";
+    
+    // Prevent context menu and developer tools
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.keyCode === 123 || 
+          (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || 
+          (e.ctrlKey && e.key === 'U')) {
+        e.preventDefault();
+        return false;
+      }
+    });
   </script>
 </body>
 </html>
