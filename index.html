@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VanProjects — Project Hub</title>
   <meta name="color-scheme" content="dark light">
@@ -9,12 +9,12 @@
   <link rel="icon" href="https://i.imgur.com/D2kqpo4.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-ij3lS2kNv1koRApZJwKQWE8YBZBav+0x+lqPnS6YsJhBKt3vnDnN/SfXlBx/6CkXbkqVKgf/mBlC9ZwTe9MkXw==" crossorigin="anonymous" referrerpolicy="no-referrer">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body data-page="vanprojects">
-  <div class="preloader" id="preloader" aria-hidden="true">
+  <div class="preloader" id="preloader">
     <div class="preloader__inner">
       <div class="preloader__orb">
         <span class="preloader__glow"></span>
@@ -40,15 +40,15 @@
       </div>
     </div>
   </div>
-  <div class="noise-layer" aria-hidden="true"></div>
-  <div class="gradient-cloud gradient-cloud--one" aria-hidden="true"></div>
-  <div class="gradient-cloud gradient-cloud--two" aria-hidden="true"></div>
-  <div class="gradient-cloud gradient-cloud--three" aria-hidden="true"></div>
+  <div class="noise-layer"></div>
+  <div class="gradient-cloud gradient-cloud--one"></div>
+  <div class="gradient-cloud gradient-cloud--two"></div>
+  <div class="gradient-cloud gradient-cloud--three"></div>
   <div class="site-shell">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar__inner">
         <div class="sidebar__brand">
-          <span class="sidebar__badge" aria-hidden="true"></span>
+          <span class="sidebar__badge"></span>
           <div class="sidebar__logo">
             <img src="https://i.imgur.com/D2kqpo4.png" alt="VanProjects logo">
           </div>
@@ -96,7 +96,7 @@
               </a>
             </li>
           </ul>
-          <div class="sidebar__division" role="presentation"></div>
+          <div class="sidebar__division"></div>
           <ul class="sidebar__section sidebar__section--secondary">
             <li class="sidebar__item">
               <a class="sidebar__link" href="https://www.youtube.com/@2BkaizenRBLXX" target="_blank" rel="noopener">
@@ -127,8 +127,8 @@
             <input type="checkbox" id="theme-toggle" class="toggle-input" aria-label="Toggle dark mode">
             <label for="theme-toggle" class="toggle-track">
               <span class="toggle-thumb"></span>
-              <span class="toggle-label toggle-label--left" aria-hidden="true"><i class="fas fa-moon"></i></span>
-              <span class="toggle-label toggle-label--right" aria-hidden="true"><i class="fas fa-sun"></i></span>
+              <span class="toggle-label toggle-label--left"><i class="fas fa-moon"></i></span>
+              <span class="toggle-label toggle-label--right"><i class="fas fa-sun"></i></span>
             </label>
           </div>
         </div>
@@ -148,19 +148,19 @@
     </button>
     <main class="main">
       <section class="hero" id="hero">
-        <div class="hero__planet" aria-hidden="true">
+        <div class="hero__planet">
           <span class="hero__planet-core"></span>
           <span class="hero__planet-ring hero__planet-ring--one"></span>
           <span class="hero__planet-ring hero__planet-ring--two"></span>
         </div>
         <div class="hero__inner">
           <div class="hero__content">
-            <span class="hero__eyebrow">🚀 Welcome aboard</span>
+            <span class="hero__eyebrow">Welcome aboard</span>
             <h1 class="hero__title">
               Launching playful experiments that bend the rules with a neon grin.
             </h1>
             <p class="hero__subtitle">
-              Some tools here are lowky dumbfounded.
+              Every project is a sandbox—equal parts curiosity, mischief, and polish. Explore the galaxy of tools I tinker with, from slick utilities to bold prototypes.
             </p>
             <div class="hero__cta">
               <a class="button button--primary" href="#projects" data-scroll-to>
@@ -195,7 +195,7 @@
                   <span class="hero-card__badge-label">Featured</span>
                 </div>
                 <h2 class="hero-card__title">FreeMovie</h2>
-                <p class="hero-card__desc">Watch any movie you like (ill update to adfree soon) </p>
+                <p class="hero-card__desc">Immersive streaming with minimal clutter and a customizable watchlist.</p>
                 <div class="hero-card__tags">
                   <span class="tag">UI Revamp</span>
                   <span class="tag">Live Sessions</span>
@@ -223,8 +223,8 @@
                   </div>
                 </div>
               </article>
-              <div class="hero__floating hero__floating--one" aria-hidden="true"></div>
-              <div class="hero__floating hero__floating--two" aria-hidden="true"></div>
+              <div class="hero__floating hero__floating--one"></div>
+              <div class="hero__floating hero__floating--two"></div>
             </div>
           </div>
         </div>
@@ -271,7 +271,7 @@
         <div class="projects-grid" id="projects-grid">
           <article class="project-card" data-tags="media automation" data-title="FreeMovie" data-observe>
             <div class="project-card__inner">
-              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__halo"></div>
               <div class="project-card__header">
                 <span class="project-card__icon">🎬</span>
                 <span class="project-card__badge project-card__badge--live">Live</span>
@@ -302,7 +302,7 @@
           </article>
           <article class="project-card" data-tags="ai automation" data-title="ChatBot" data-observe>
             <div class="project-card__inner">
-              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__halo"></div>
               <div class="project-card__header">
                 <span class="project-card__icon">🤖</span>
                 <span class="project-card__badge">Beta</span>
@@ -332,7 +332,7 @@
           </article>
           <article class="project-card" data-tags="automation social" data-title="FB ShareBoost" data-observe>
             <div class="project-card__inner">
-              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__halo"></div>
               <div class="project-card__header">
                 <span class="project-card__icon">⚡</span>
                 <span class="project-card__badge project-card__badge--experimental">Lab</span>
@@ -362,7 +362,7 @@
           </article>
           <article class="project-card" data-tags="security automation" data-title="Roblox Cookie Logger" data-observe>
             <div class="project-card__inner">
-              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__halo"></div>
               <div class="project-card__header">
                 <span class="project-card__icon">🍪</span>
                 <span class="project-card__badge project-card__badge--warning">Handle with care</span>
@@ -392,7 +392,7 @@
           </article>
           <article class="project-card" data-tags="automation social" data-title="Spoof Discord Quests" data-observe>
             <div class="project-card__inner">
-              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__halo"></div>
               <div class="project-card__header">
                 <span class="project-card__icon">📌</span>
                 <span class="project-card__badge">Script</span>
@@ -422,7 +422,7 @@
           </article>
           <article class="project-card" data-tags="automation social" data-title="EmbedForge" data-observe>
             <div class="project-card__inner">
-              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__halo"></div>
               <div class="project-card__header">
                 <span class="project-card__icon">⚙️</span>
                 <span class="project-card__badge project-card__badge--featured">Loved</span>
@@ -452,7 +452,7 @@
           </article>
           <article class="project-card project-card--coming-soon" data-tags="future" data-title="Coming Soon" data-observe>
             <div class="project-card__inner">
-              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__halo"></div>
               <div class="project-card__header">
                 <span class="project-card__icon">✨</span>
                 <span class="project-card__badge project-card__badge--soon">Soon</span>
@@ -565,7 +565,7 @@
           </p>
         </header>
         <div class="timeline">
-          <div class="timeline__line" aria-hidden="true"></div>
+          <div class="timeline__line"></div>
           <article class="timeline__event" data-observe>
             <div class="timeline__node"></div>
             <div class="timeline__card">
@@ -711,7 +711,7 @@
               <div class="cta-panel__footnote" id="cta-footnote">Discord: aivanabanto</div>
             </div>
             <div class="cta-panel__visual" data-parallax>
-              <div class="cta-panel__orb" aria-hidden="true">
+              <div class="cta-panel__orb">
                 <span class="cta-panel__beam"></span>
                 <span class="cta-panel__beam cta-panel__beam--lag"></span>
               </div>
@@ -873,11 +873,11 @@
       <span class="welcome-card__footnote">Visit count: <span id="visit-count">1</span></span>
     </div>
   </div>
-  <div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor" id="cursor">
     <span class="cursor__core"></span>
     <span class="cursor__ring"></span>
   </div>
-  <div class="particles" id="particles" aria-hidden="true"></div>
+  <div class="particles" id="particles"></div>
   <script>
     const body = document.body;
     const preloader = document.getElementById("preloader");
@@ -975,8 +975,7 @@
         toggleSidebar(false);
       }
     }
-    
-   function preloadSequence() {
+    function preloadSequence() {
       let progress = 0;
       const updateProgress = () => {
         progress = clamp(progress + Math.random() * 12, 0, 100);
@@ -989,17 +988,19 @@
         });
         if (progress >= 99) {
           clearInterval(interval);
-          setTimeout(() => {
-            preloader.classList.add("preloader--complete");
-            setTimeout(() => {
-              preloader.remove();
-              hasLoaded = true;
-            }, 700);
-          }, 350);
+          completePreloader();
         }
       };
       const interval = setInterval(updateProgress, 120);
-    
+      const completePreloader = () => {
+        preloader.classList.add("preloader--complete");
+        setTimeout(() => {
+          preloader.style.display = "none";
+          hasLoaded = true;
+        }, 700);
+      };
+      setTimeout(completePreloader, 3000);
+    }
     function loadTheme() {
       const stored = localStorage.getItem("vanprojects:theme");
       if (stored === "light") {
@@ -1408,8 +1409,7 @@
               `**Name:** ${name}`,
               `**Email:** ${email}`,
               `**Message:** ${message}`
-            ].join("
-")
+            ].join("\n")
           };
           try {
             await fetch(webhook, {
@@ -1442,8 +1442,7 @@
               "",
               `**Title:** ${title}`,
               `**Details:** ${details}`
-            ].join("
-")
+            ].join("\n")
           };
           try {
             await fetch(webhook, {
@@ -1554,7 +1553,6 @@
     }
     function init() {
       createParticles();
-      preloadSequence();
       loadTheme();
       initThemeToggle();
       initSidebarToggle();
@@ -1582,6 +1580,12 @@
         } else {
           floatingToggle.classList.remove("floating-toggle--shadow");
         }
+      });
+      preloadSequence();
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          preloader.style.display = "none";
+        }, 1000);
       });
     }
     document.addEventListener("DOMContentLoaded", init);
