@@ -1381,11 +1381,11 @@
     function initCopyHandle() {
       copyHandleBtn.addEventListener("click", async () => {
         try {
-          await navigator.clipboard.writeText("aivanabanto");
+          await navigator.clipboard.writeText("aurox.x");
           ctaFootnote.textContent = "Copied. Ping me anytime.";
           enqueueNotification({ title: "Copied", message: "Discord handle copied to clipboard.", status: "success" });
         } catch (error) {
-          ctaFootnote.textContent = "Copy failed. Manual handle: aivanabanto";
+          ctaFootnote.textContent = "Copy failed. Manual handle: aurox.x";
           enqueueNotification({ title: "Copy failed", message: "Your browser blocked clipboard access.", status: "error" });
         }
       });
