@@ -975,30 +975,59 @@
         toggleSidebar(false);
       }
     }
-    function preloadSequence() {
-      let progress = 0;
-      const updateProgress = () => {
-        progress = clamp(progress + Math.random() * 12, 0, 100);
-        preloaderBar.style.setProperty("--progress", progress + "%");
-        preloaderLetters.forEach((letter, index) => {
-          const delay = index * 45;
-          setTimeout(() => {
-            letter.classList.add("preloader__letter--active");
-          }, delay);
-        });
-        if (progress >= 99) {
-          clearInterval(interval);
-          setTimeout(() => {
-            preloader.classList.add("preloader--complete");
-            setTimeout(() => {
-              preloader.remove();
-              hasLoaded = true;
-            }, 700);
-          }, 350);
-        }
-      };
-      const interval = setInterval(updateProgress, 120);
+   function preloadSequence() {
+  let progress = 0;
+  const preloaderBar = document.getElementById("preloader-bar");
+  const preloader = document.getElementById("preloader");
+  const preloaderLetters = document.querySelectorAll(".preloader__letter");
+
+  // Fallback in case of errors
+  const completePreloader = () => {
+    preloader.classList.add("preloader--complete");
+    setTimeout(() => {
+      preloader.style.display = "none"; // Force remove
+      hasLoaded = true;
+      document.dispatchEvent(new Event("preloaderComplete")); // Trigger custom event
+    }, 700);
+  };
+
+  const updateProgress = () => {
+    try {
+      progress = Math.min(progress + Math.random() * 12, 100);
+      preloaderBar.style.setProperty("--progress", `${progress}%`);
+      preloaderLetters.forEach((letter, index) => {
+        setTimeout(() => {
+          letter.classList.add("preloader__letter--active");
+        }, index * 45);
+      });
+      if (progress >= 99) {
+        clearInterval(interval);
+        completePreloader();
+      }
+    } catch (error) {
+      console.error("Preloader error:", error);
+      completePreloader(); // Fallback to complete preloader
     }
+  };
+
+  const interval = setInterval(updateProgress, 120);
+
+  // Fallback timeout to prevent infinite loading
+  setTimeout(completePreloader, 5000);
+}
+
+// Ensure DOM is ready and handle potential CSP issues
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    init();
+  } catch (error) {
+    console.error("Initialization error:", error);
+    // Fallback: hide preloader if init fails
+    document.getElementById("preloader").style.display = "none";
+    hasLoaded = true;
+  }
+});
+    
     function loadTheme() {
       const stored = localStorage.getItem("vanprojects:theme");
       if (stored === "light") {
