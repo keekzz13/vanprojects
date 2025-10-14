@@ -1,1367 +1,1589 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VanProjects — Project Hub</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0f1115;
-      --panel: #171923;
-      --panel-2: #1f2230;
-      --text: #eef2ff;
-      --muted: #aab2cf;
-      --brand: #7c9cff;
-      --border: #2b3040;
-      --primary-color: #7b5cff;
-      --secondary-color: #00e5ff;
-      --accent-color: #ff6ec7;
-      --text-color: #e6e6ea;
-      --bg-color: #06060a;
-      --card-bg: rgba(28, 22, 46, 0.92);
-      --border-color: rgba(123, 92, 255, 0.3);
-      --success-color: #00ff88;
-      --error-color: #ff4d6d;
-      --warning-color: #ffb86b;
-      --info-color: #00aaff;
-      --neon-glow: 0 0 8px var(--primary-color), 
-                    0 0 16px var(--primary-color), 
-                    0 0 24px var(--secondary-color);
-
-      --bg-light: #f9f9f9;
-      --panel-light: #ffffff;
-      --panel-2-light: #f2f2f2;
-      --text-light: #1a1a1a;
-      --muted-light: #6b7280;
-      --brand-light: #4a90e2;
-      --border-light: #e5e7eb;
-      --primary-color-light: #3b6bff;
-      --secondary-color-light: #00bcd4;
-      --accent-color-light: #ff4081;
-      --text-color-light: #222;
-      --bg-color-light: #f7f9ff;
-      --card-bg-light: rgba(245, 245, 245, 0.95);
-      --border-color-light: rgba(59, 107, 255, 0.2);
-      --success-color-light: #00a86b;
-      --error-color-light: #ff3333;
-      --warning-color-light: #ff9900;
-      --info-color-light: #3399ff;
-      
-      --sidebar-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
-
-    body {
-      font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      overflow-x: hidden;
-      position: relative;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      line-height: 1.6;
-    }
-
-    .bubbles {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 0;
-    }
-
-    .bubbles span {
-      position: absolute;
-      display: block;
-      bottom: -100px;
-      background: rgba(124, 156, 255, 0.15);
-      border-radius: 50%;
-      animation: rise 20s infinite ease-in;
-    }
-    .bubbles span:nth-child(1) {
-      width: 60px;
-      height: 60px;
-      left: 12%;
-      animation-duration: 18s;
-      animation-delay: 0s;
-    }
-    .bubbles span:nth-child(2) {
-      width: 40px;
-      height: 40px;
-      left: 25%;
-      animation-duration: 25s;
-      animation-delay: 3s;
-    }
-    .bubbles span:nth-child(3) {
-      width: 100px;
-      height: 100px;
-      left: 40%;
-      animation-duration: 30s;
-      animation-delay: 6s;
-    }
-    .bubbles span:nth-child(4) {
-      width: 25px;
-      height: 25px;
-      left: 55%;
-      animation-duration: 22s;
-      animation-delay: 9s;
-    }
-    .bubbles span:nth-child(5) {
-      width: 80px;
-      height: 80px;
-      left: 70%;
-      animation-duration: 26s;
-      animation-delay: 12s;
-    }
-    .bubbles span:nth-child(6) {
-      width: 50px;
-      height: 50px;
-      left: 85%;
-      animation-duration: 24s;
-      animation-delay: 15s;
-    }
-
-    @keyframes rise {
-      0% {
-        transform: translateY(0) scale(1);
-        opacity: 0;
-      }
-      10% {
-        opacity: 0.4;
-      }
-      50% {
-        opacity: 0.6;
-      }
-      100% {
-        transform: translateY(-120vh) scale(1.5);
-        opacity: 0;
-      }
-    }
-
-    .site-header,
-    .site-footer {
-      text-align: center;
-      padding: 20px 16px;
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
-      position: relative;
-      z-index: 2;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      backdrop-filter: blur(10px);
-    }
-
-    .site-header h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.2rem;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .site-header p {
-      font-size: 1rem;
-      color: var(--muted);
-    }
-
-    .site-footer {
-      border-top: 1px solid var(--border-color);
-      border-bottom: none;
-      margin-top: 20px;
-    }
-
-    .site-footer small {
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-
-    .wrap {
-      max-width: 1100px;
-      margin: 20px auto;
-      padding: 0 16px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .projects {
-      display: grid;
-      gap: 20px;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    }
-
-    .project-card {
-      display: block;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-      text-decoration: none;
-      padding: 16px;
-      border-radius: 12px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-      z-index: 2;
-      backdrop-filter: blur(10px);
-      overflow: hidden;
-    }
-
-    .project-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.3s ease;
-    }
-
-    .project-card:hover::before {
-      transform: scaleX(1);
-    }
-
-    .project-card:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: var(--neon-glow);
-    }
-
-    .project-card.disabled {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    .project-card h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.25rem;
-      margin: 8px 0;
-    }
-
-    .project-card p {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .emoji {
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-
-    .search-wrap {
-      margin: 20px auto;
-      text-align: center;
-    }
-
-    #search-bar {
-      padding: 12px 16px;
-      width: 100%;
-      max-width: 450px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 1rem;
-      background: var(--card-bg);
-      color: var(--text-color);
-      outline: none;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-      backdrop-filter: blur(10px);
-    }
-
-    #search-bar:focus {
-      border-color: var(--primary-color);
-      box-shadow: var(--neon-glow);
-    }
-
-    #search-bar::placeholder {
-      color: var(--muted);
-    }
-
-    .theme-toggle {
-      position: fixed;
-      top: 16px;
-      right: 66px;
-      z-index: 10;
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 24px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      transition: background 0.4s ease;
-      border-radius: 34px;
-      border: 1px solid var(--border-color);
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 2px;
-      bottom: 2px;
-      background-color: #fff;
-      transition: transform 0.4s ease;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
-      background: linear-gradient(135deg, var(--primary-color-light), var(--secondary-color-light));
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(26px);
-    }
-
-    .menu-icon {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      width: 40px;
-      height: 40px;
-      background: var(--card-bg);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(123, 92, 255, 0.15);
-      z-index: 1000;
-      border: 1px solid var(--border-color);
-      backdrop-filter: blur(10px);
-      transition: box-shadow 0.3s ease;
-    }
-
-    .menu-icon:hover {
-      box-shadow: var(--neon-glow);
-    }
-
-    .menu-icon i {
-      color: var(--primary-color);
-      font-size: 1.2rem;
-    }
-
-    .side-menu {
-      position: fixed;
-      top: 0;
-      right: -300px;
-      width: 300px;
-      height: 100vh;
-      background: var(--card-bg);
-      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-      z-index: 999;
-      transition: right 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-      padding: 16px;
-      overflow-y: auto;
-      border-left: 1px solid var(--border-color);
-      backdrop-filter: blur(10px);
-    }
-
-    .side-menu.active {
-      right: 0;
-    }
-
-    .menu-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .menu-header h3 {
-      color: var(--primary-color);
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.5rem;
-      margin-left: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-    }
-
-    .menu-header i {
-      cursor: pointer;
-      font-size: 1.5rem;
-      color: var(--text-color);
-      order: -1;
-      transition: color 0.3s ease;
-    }
-
-    .menu-header i:hover {
-      color: var(--primary-color);
-    }
-
-    .side-menu ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .side-menu li {
-      margin-bottom: 12px;
-    }
-
-    .menu-link {
-      color: var(--text-color);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      padding: 14px 16px;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-      background: linear-gradient(135deg, rgba(123, 92, 255, 0.15), rgba(0, 229, 255, 0.15));
-      border: 1px solid var(--border-color);
-      font-family: 'Roboto', sans-serif;
-      font-weight: 500;
-      font-size: 1rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .menu-link::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--sidebar-gradient);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: -1;
-    }
-
-    .menu-link:hover::before,
-    .menu-link:focus::before {
-      opacity: 0.2;
-    }
-
-    .menu-link:hover,
-    .menu-link:focus {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .menu-link i {
-      margin-right: 12px;
-      width: 24px;
-      text-align: center;
-      font-size: 1.1rem;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1001;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(6px);
-    }
-
-    .modal.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--card-bg);
-      border-radius: 12px;
-      width: 90%;
-      max-width: 550px;
-      max-height: 85vh;
-      overflow-y: auto;
-      padding: 24px;
-      position: relative;
-      box-shadow: 0 0 30px rgba(123, 92, 255, 0.15);
-      border: 1px solid var(--border-color);
-      animation: modalAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      backdrop-filter: blur(10px);
-    }
-
-    @keyframes modalAppear {
-      from { opacity: 0; transform: translateY(-20px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .close-modal {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      font-size: 1.8rem;
-      cursor: pointer;
-      color: var(--text-color);
-      transition: all 0.3s ease;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-    }
-
-    .close-modal:hover,
-    .close-modal:focus {
-      color: var(--primary-color);
-      background: rgba(123, 92, 255, 0.1);
-      transform: rotate(90deg);
-    }
-
-    .contact-form .form-group {
-      margin-bottom: 20px;
-    }
-
-    .contact-form label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--text-color);
-      font-family: 'Roboto', sans-serif;
-      font-weight: 500;
-    }
-
-    .contact-form input,
-    .contact-form textarea {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      background: rgba(0, 0, 0, 0.3);
-      color: var(--text-color);
-      font-family: 'Roboto', sans-serif;
-      font-size: 1rem;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .contact-form input:focus,
-    .contact-form textarea:focus {
-      border-color: var(--primary-color);
-      box-shadow: var(--neon-glow);
-      outline: none;
-    }
-
-    .contact-form textarea {
-      min-height: 140px;
-      resize: vertical;
-    }
-
-    .submit-btn {
-      cursor: pointer;
-      color: #fff;
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      border: none;
-      padding: 14px 20px;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      font-family: 'Orbitron', sans-serif;
-      width: 100%;
-      margin-top: 12px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .submit-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: -1;
-    }
-
-    .submit-btn:hover::before {
-      opacity: 1;
-    }
-
-    .submit-btn:hover,
-    .submit-btn:focus {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    }
-
-    .notification {
-      display: block;            
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1002;
-      opacity: 0;
-      transform: translateX(100%);  
-      transition: opacity 0.4s ease, transform 0.4s ease;
-      pointer-events: none;        
-    }
-
-    .notification.active {
-      opacity: 1;
-      transform: translateX(0);
-      pointer-events: auto;        
-    }
-
-    .notification-content {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      box-shadow: 0 0 25px rgba(123, 92, 255, 0.2);
-      border: 1px solid var(--border-color);
-      backdrop-filter: blur(10px);
-      max-width: 350px;
-      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes popIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .notification.success .notification-content {
-      border-left: 5px solid var(--success-color);
-    }
-
-    .notification.error .notification-content {
-      border-left: 5px solid var(--error-color);
-    }
-
-    .notification-icon {
-      font-size: 1.8rem;
-    }
-
-    .notification.success .notification-icon {
-      color: var(--success-color);
-    }
-
-    .notification.error .notification-icon {
-      color: var(--error-color);
-    }
-
-    .notification-text h3 {
-      margin: 0;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
-      color: var(--text-color);
-    }
-
-    .notification-text p {
-      margin: 4px 0 0;
-      font-family: 'Roboto', sans-serif;
-      font-size: 0.95rem;
-      color: var(--muted);
-    }
-
-    .close-notification {
-      cursor: pointer;
-      font-size: 1.3rem;
-      color: var(--text-color);
-      margin-left: auto;
-      transition: color 0.3s ease;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-    }
-
-    .close-notification:hover,
-    .close-notification:focus {
-      color: var(--primary-color);
-      background: rgba(123, 92, 255, 0.1);
-    }
-
-    .welcome-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1002;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(6px);
-    }
-
-    .welcome-modal.active {
-      display: flex;
-    }
-
-    .welcome-modal-content {
-      background: var(--card-bg);
-      border-radius: 16px;
-      width: 90%;
-      max-width: 600px;
-      max-height: 85vh;
-      overflow-y: auto;
-      padding: 30px;
-      position: relative;
-      box-shadow: 0 0 40px rgba(123, 92, 255, 0.2);
-      border: 1px solid var(--border-color);
-      animation: modalAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      backdrop-filter: blur(10px);
-      text-align: center;
-      color: var(--text-color);
-    }
-
-    .welcome-modal-content .tos-note {
-      opacity: 0.7;
-      font-style: italic;
-      font-size: 1rem;
-      margin: 16px 0 24px;
-      line-height: 1.5;
-    }
-
-    .welcome-modal-content img.emoji {
-      width: 60px;
-      height: 60px;
-      margin: 10px 0;
-    }
-
-    .welcome-modal-content button {
-      padding: 14px 20px;
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      font-family: 'Orbitron', sans-serif;
-      margin: 10px 0;
-      width: 100%;
-      max-width: 250px;
-      animation: buttonFadeIn 0.6s ease-out;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .welcome-modal-content button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: -1;
-    }
-
-    .welcome-modal-content button:hover::before {
-      opacity: 1;
-    }
-
-    @keyframes buttonFadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .welcome-modal-content button:hover,
-    .welcome-modal-content button:focus {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-    }
-
-    .welcome-modal-content #diko-btn {
-      background: linear-gradient(135deg, #ff0000, #ff6b6b);
-    }
-
-    .welcome-modal-content #diko-btn::before {
-      background: linear-gradient(135deg, #ff6b6b, #ff0000);
-    }
-
-    /* Responsive Improvements */
-    @media (max-width: 1024px) {
-      .side-menu {
-        width: 280px;
-      }
-      
-      .projects {
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      }
-    }
-
-    @media (max-width: 768px) {
-      .wrap {
-        padding: 0 16px;
-      }
-
-      .projects {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 16px;
-      }
-
-      .project-card {
-        padding: 14px;
-      }
-
-      .side-menu {
-        width: 260px;
-        right: -260px;
-      }
-
-      .modal-content {
-        width: 95%;
-        padding: 20px;
-      }
-
-      .notification-content {
-        max-width: 300px;
-        padding: 14px 18px;
-      }
-      
-      .welcome-modal-content {
-        padding: 24px;
-      }
-      
-      .site-header h1 {
-        font-size: 2rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .site-header h1 {
-        font-size: 1.8rem;
-      }
-
-      .site-header p {
-        font-size: 0.9rem;
-      }
-
-      .projects {
-        grid-template-columns: 1fr;
-      }
-
-      #search-bar {
-        max-width: 100%;
-      }
-
-      .theme-toggle {
-        right: 56px;
-      }
-
-      .menu-icon {
-        right: 12px;
-      }
-      
-      .side-menu {
-        width: 100%;
-        right: -100%;
-      }
-      
-      .menu-header h3 {
-        font-size: 1.3rem;
-      }
-      
-      .menu-link {
-        padding: 12px 14px;
-        font-size: 0.95rem;
-      }
-      
-      .welcome-modal-content {
-        padding: 20px 16px;
-      }
-      
-      .welcome-modal-content h2 {
-        font-size: 1.4rem;
-      }
-      
-      .welcome-modal-content .tos-note {
-        font-size: 0.9rem;
-      }
-      
-      .welcome-modal-content button {
-        padding: 12px 16px;
-        font-size: 1rem;
-        max-width: 220px;
-      }
-    }
-
-    body.light-mode {
-      --bg: var(--bg-light);
-      --panel: var(--panel-light);
-      --panel-2: var(--panel-2-light);
-      --text: var(--text-light);
-      --muted: var(--muted-light);
-      --brand: var(--brand-light);
-      --border: var(--border-light);
-      --primary-color: var(--primary-color-light);
-      --secondary-color: var(--secondary-color-light);
-      --accent-color: var(--accent-color-light);
-      --text-color: var(--text-color-light);
-      --bg-color: var(--bg-color-light);
-      --card-bg: var(--card-bg-light);
-      --border-color: var(--border-color-light);
-      --success-color: var(--success-color-light);
-      --error-color: var(--error-color-light);
-      --warning-color: var(--warning-color-light);
-      --info-color: var(--info-color-light);
-    }
-
-    .placeholder-note {
-      opacity: 0.5;
-      font-style: italic;
-      font-size: 0.9em;
-      margin-left: 4px;
-      display: inline-block;
-      animation: fadePlaceholder 0.8s ease 0.3s both;
-    }
-
-    @keyframes fadePlaceholder {
-      from { opacity: 0; }
-      to { opacity: 0.5; }
-    }
-    
-    /* Enhanced gradient effects */
-    .gradient-border {
-      position: relative;
-      border-radius: 12px;
-      padding: 2px;
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      margin-bottom: 20px;
-    }
-    
-    .gradient-border > * {
-      background: var(--card-bg);
-      border-radius: 10px;
-      padding: 20px;
-    }
-    
-    .gradient-text {
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      font-weight: bold;
-    }
-    
-    /* Animation enhancements */
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(123, 92, 255, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(123, 92, 255, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(123, 92, 255, 0); }
-    }
-    
-    .pulse {
-      animation: pulse 2s infinite;
-    }
-  </style>
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Explore VanProjects, a futuristic showcase of creative web experiments, tools, and prototypes.">
+  <link rel="icon" href="https://i.imgur.com/D2kqpo4.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-ij3lS2kNv1koRApZJwKQWE8YBZBav+0x+lqPnS6YsJhBKt3vnDnN/SfXlBx/6CkXbkqVKgf/mBlC9ZwTe9MkXw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="./style.css">
 </head>
-<body>
-  <div class="bubbles">
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-
-  <div class="theme-toggle">
-    <label class="switch" for="theme-switch">
-      <input type="checkbox" id="theme-switch" aria-label="Toggle dark and light mode">
-      <span class="slider"></span>
-    </label>
-  </div>
-
-  <div class="menu-icon" id="menu-icon">
-    <i class="fas fa-bars" aria-hidden="true"></i>
-  </div>
-
-  <div class="side-menu" id="side-menu">
-    <div class="menu-header">
-      <i class="fas fa-times" id="close-menu" aria-label="Close menu"></i>
-      <h3>VanProjects Menu</h3>
-    </div>
-    <ul>
-      <li>
-        <a href="#" id="contact-admin" class="menu-link">
-          <i class="fas fa-headset" aria-hidden="true"></i> Contact Admin
-        </a>
-      </li>
-      <li>
-        <a href="https://www.youtube.com/@2BkaizenRBLXX" target="_blank" class="menu-link">
-          <i class="fab fa-youtube" aria-hidden="true"></i> YouTube
-        </a>
-      </li>
-      <li>
-        <a href="https://www.facebook.com/aivan.abanto1" target="_blank" class="menu-link">
-          <i class="fab fa-facebook" aria-hidden="true"></i> Facebook
-        </a>
-      </li>
-      <li>
-        <a href="https://discord.gg/7zhG8UMhK6" target="_blank" class="menu-link">
-          <i class="fab fa-discord" aria-hidden="true"></i> Discord Server
-        </a>
-      </li>
-    </ul>
-  </div>
-
-  <header class="site-header">
-    <h1>🚀 VanProjects</h1>
-    <p>All my web projects in one place.</p>
-  </header>
-
-  <div class="search-wrap">
-    <input type="text" id="search-bar" placeholder="Search projects..." aria-label="Search projects">
-  </div>
-
-  <main class="wrap">
-    <div class="gradient-border">
-      <div>
-        <h2 class="gradient-text">Featured Projects</h2>
-        <p>Explore my latest web development projects and tools</p>
+<body data-page="vanprojects">
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="preloader__inner">
+      <div class="preloader__orb">
+        <span class="preloader__glow"></span>
+        <span class="preloader__pulse"></span>
+        <span class="preloader__ring"></span>
+        <span class="preloader__ring preloader__ring--lag"></span>
+      </div>
+      <div class="preloader__text">
+        <span class="preloader__letter" data-letter="V">V</span>
+        <span class="preloader__letter" data-letter="A">A</span>
+        <span class="preloader__letter" data-letter="N">N</span>
+        <span class="preloader__letter" data-letter="P">P</span>
+        <span class="preloader__letter" data-letter="R">R</span>
+        <span class="preloader__letter" data-letter="O">O</span>
+        <span class="preloader__letter" data-letter="J">J</span>
+        <span class="preloader__letter" data-letter="E">E</span>
+        <span class="preloader__letter" data-letter="C">C</span>
+        <span class="preloader__letter" data-letter="T">T</span>
+        <span class="preloader__letter" data-letter="S">S</span>
+      </div>
+      <div class="preloader__progress">
+        <div class="preloader__bar" id="preloader-bar"></div>
       </div>
     </div>
-    
-    <section class="projects">
-      <a href="/freemovie/" class="project-card pulse">
-        <div class="emoji">🎬</div>
-        <h2>FreeMovie</h2>
-        <p>Watch any movies you like with minimal ads.</p>
-      </a>
-      <a href="/mygpt/" class="project-card pulse">
-        <div class="emoji">🤖</div>
-        <h2>ChatBot</h2>
-        <p>AI chatbot powered by my own API. (TEST)</p>
-      </a>
-      <a href="/ShareBooster/" class="project-card pulse">
-        <div class="emoji">⚡</div>
-        <h2>FB ShareBoost</h2>
-        <p>A tool to boost your Facebook posts.</p>
-      </a>
-      <a href="https://github.com/keekzz13/.ROBLOXSECURITYlogger-Extension" class="project-card pulse">
-        <div class="emoji">🍪</div>
-        <h2>Roblox Cookie Logger</h2>
-        <p>Open Roblox accounts using .ROBLOXSECURITY cookie.</p>
-      </a>
-      <a href="https://gist.github.com/keekzz13/87e92a29521ef656a3ffa13c787005c7" class="project-card pulse">
-        <div class="emoji">📌</div>
-        <h2>Spoof Discord Quests</h2>
-        <p>Complete your Discord quests effortlessly.</p>
-      </a>
-      <a href="/EmbedForge/" class="project-card pulse">
-        <div class="emoji">⚙️</div>
-        <h2>EmbedForge</h2>
-        <p>Free Discord Webhook Builder. Customize your webhook message to make it look cool :D </p>
-      </a>
-      <div class="project-card disabled">
-        <div class="emoji">✨</div>
-        <h2>Coming Soon</h2>
-        <p>Suggest new project.</p>
+  </div>
+  <div class="noise-layer" aria-hidden="true"></div>
+  <div class="gradient-cloud gradient-cloud--one" aria-hidden="true"></div>
+  <div class="gradient-cloud gradient-cloud--two" aria-hidden="true"></div>
+  <div class="gradient-cloud gradient-cloud--three" aria-hidden="true"></div>
+  <div class="site-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__inner">
+        <div class="sidebar__brand">
+          <span class="sidebar__badge" aria-hidden="true"></span>
+          <div class="sidebar__logo">
+            <img src="https://i.imgur.com/D2kqpo4.png" alt="VanProjects logo">
+          </div>
+          <div class="sidebar__title">
+            <span class="sidebar__title-text">VanProjects</span>
+            <span class="sidebar__title-sub">Creative Lab</span>
+          </div>
+        </div>
+        <nav class="sidebar__nav" aria-label="Primary navigation">
+          <ul class="sidebar__section">
+            <li class="sidebar__item">
+              <a class="sidebar__link active" href="#hero" data-scroll-to>
+                <span class="sidebar__icon"><i class="fas fa-rocket"></i></span>
+                <span class="sidebar__label">Hero</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="#projects" data-scroll-to>
+                <span class="sidebar__icon"><i class="fas fa-layer-group"></i></span>
+                <span class="sidebar__label">Projects</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="#skills" data-scroll-to>
+                <span class="sidebar__icon"><i class="fas fa-sparkles"></i></span>
+                <span class="sidebar__label">Skillset</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="#timeline" data-scroll-to>
+                <span class="sidebar__icon"><i class="fas fa-timeline"></i></span>
+                <span class="sidebar__label">Timeline</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="#testimonials" data-scroll-to>
+                <span class="sidebar__icon"><i class="fas fa-comment-dots"></i></span>
+                <span class="sidebar__label">Voices</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="#contact" data-scroll-to>
+                <span class="sidebar__icon"><i class="fas fa-paper-plane"></i></span>
+                <span class="sidebar__label">Contact</span>
+              </a>
+            </li>
+          </ul>
+          <div class="sidebar__division" role="presentation"></div>
+          <ul class="sidebar__section sidebar__section--secondary">
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="https://www.youtube.com/@2BkaizenRBLXX" target="_blank" rel="noopener">
+                <span class="sidebar__icon"><i class="fab fa-youtube"></i></span>
+                <span class="sidebar__label">YouTube</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="https://www.facebook.com/aivan.abanto1" target="_blank" rel="noopener">
+                <span class="sidebar__icon"><i class="fab fa-facebook"></i></span>
+                <span class="sidebar__label">Facebook</span>
+              </a>
+            </li>
+            <li class="sidebar__item">
+              <a class="sidebar__link" href="https://discord.gg/7zhG8UMhK6" target="_blank" rel="noopener">
+                <span class="sidebar__icon"><i class="fab fa-discord"></i></span>
+                <span class="sidebar__label">Discord</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar__actions">
+          <button class="sidebar__cta" id="open-modal" type="button">
+            <span class="sidebar__cta-icon"><i class="fas fa-headset"></i></span>
+            <span class="sidebar__cta-label">Contact Admin</span>
+          </button>
+          <div class="sidebar__toggle">
+            <input type="checkbox" id="theme-toggle" class="toggle-input" aria-label="Toggle dark mode">
+            <label for="theme-toggle" class="toggle-track">
+              <span class="toggle-thumb"></span>
+              <span class="toggle-label toggle-label--left" aria-hidden="true"><i class="fas fa-moon"></i></span>
+              <span class="toggle-label toggle-label--right" aria-hidden="true"><i class="fas fa-sun"></i></span>
+            </label>
+          </div>
+        </div>
+        <footer class="sidebar__footer">
+          <span class="sidebar__footnote">© 2025 VanProjects</span>
+          <span class="sidebar__version" data-tooltip="Build 5G · Last synced Oct 2025">v5.0 Orbit</span>
+        </footer>
       </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <small>© 2025 VanProjects</small>
-  </footer>
-
-  <div class="modal" id="contact-modal">
-    <div class="modal-content">
-      <span class="close-modal" aria-label="Close modal">&times;</span>
-      <h2><i class="fas fa-headset" aria-hidden="true"></i> Contact Admin</h2>
-      <form class="contact-form">
-        <div class="form-group">
-          <label for="contact-name">Your Name:</label>
-          <input type="text" id="contact-name" placeholder="Enter your name" aria-required="true" required>
+    </aside>
+    <button class="floating-toggle" id="floating-toggle" type="button" aria-controls="sidebar" aria-expanded="false">
+      <span class="floating-toggle__box">
+        <span class="floating-toggle__line floating-toggle__line--top"></span>
+        <span class="floating-toggle__line floating-toggle__line--middle"></span>
+        <span class="floating-toggle__line floating-toggle__line--bottom"></span>
+      </span>
+      <span class="floating-toggle__glimmer"></span>
+    </button>
+    <main class="main">
+      <section class="hero" id="hero">
+        <div class="hero__planet" aria-hidden="true">
+          <span class="hero__planet-core"></span>
+          <span class="hero__planet-ring hero__planet-ring--one"></span>
+          <span class="hero__planet-ring hero__planet-ring--two"></span>
         </div>
-        <div class="form-group">
-          <label for="contact-email">Your Email:</label>
-          <input type="email" id="contact-email" placeholder="Enter your email" aria-required="true" required>
+        <div class="hero__inner">
+          <div class="hero__content">
+            <span class="hero__eyebrow">🚀 Welcome aboard</span>
+            <h1 class="hero__title">
+              Launching playful experiments that bend the rules with a neon grin.
+            </h1>
+            <p class="hero__subtitle">
+              Every project is a sandbox—equal parts curiosity, mischief, and polish. Explore the galaxy of tools I tinker with, from slick utilities to bold prototypes.
+            </p>
+            <div class="hero__cta">
+              <a class="button button--primary" href="#projects" data-scroll-to>
+                <span class="button__icon"><i class="fas fa-compass"></i></span>
+                <span class="button__label">Browse Projects</span>
+              </a>
+              <button class="button button--ghost" type="button" id="open-welcome">
+                <span class="button__icon"><i class="fas fa-bolt"></i></span>
+                <span class="button__label">Play the Intro</span>
+              </button>
+            </div>
+            <div class="hero__metrics">
+              <div class="metric-card" data-tilt>
+                <span class="metric-card__value" data-counter data-target="17">0</span>
+                <span class="metric-card__label">Active experiments</span>
+              </div>
+              <div class="metric-card" data-tilt>
+                <span class="metric-card__value" data-counter data-target="8120">0</span>
+                <span class="metric-card__label">Friends reached</span>
+              </div>
+              <div class="metric-card" data-tilt>
+                <span class="metric-card__value" data-counter data-target="36">0</span>
+                <span class="metric-card__label">Weekly commits</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero__visual" data-parallax>
+            <div class="hero__cards">
+              <article class="hero-card hero-card--primary">
+                <div class="hero-card__badge">
+                  <span class="hero-card__badge-icon"><i class="fas fa-fire"></i></span>
+                  <span class="hero-card__badge-label">Featured</span>
+                </div>
+                <h2 class="hero-card__title">FreeMovie</h2>
+                <p class="hero-card__desc">Immersive streaming with minimal clutter and a customizable watchlist.</p>
+                <div class="hero-card__tags">
+                  <span class="tag">UI Revamp</span>
+                  <span class="tag">Live Sessions</span>
+                </div>
+                <a class="hero-card__cta" href="/freemovie/">
+                  <span class="hero-card__cta-label">Dive In</span>
+                  <span class="hero-card__cta-icon"><i class="fas fa-arrow-right"></i></span>
+                </a>
+              </article>
+              <article class="hero-card hero-card--secondary">
+                <div class="hero-card__badge hero-card__badge--alt">
+                  <span class="hero-card__badge-icon"><i class="fas fa-flask"></i></span>
+                  <span class="hero-card__badge-label">Labs</span>
+                </div>
+                <h2 class="hero-card__title">ChatBot Prototype</h2>
+                <p class="hero-card__desc">An experimental AI assistant that riffs on your vibe.</p>
+                <div class="hero-card__stats">
+                  <div class="hero-card__stat">
+                    <span class="hero-card__stat-value">98%</span>
+                    <span class="hero-card__stat-label">Fun factor</span>
+                  </div>
+                  <div class="hero-card__stat">
+                    <span class="hero-card__stat-value">V5</span>
+                    <span class="hero-card__stat-label">Build</span>
+                  </div>
+                </div>
+              </article>
+              <div class="hero__floating hero__floating--one" aria-hidden="true"></div>
+              <div class="hero__floating hero__floating--two" aria-hidden="true"></div>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="contact-message">Message:</label>
-          <textarea id="contact-message" placeholder="How can we help?" aria-required="true" required></textarea>
+      </section>
+      <section class="search-panel panel panel--frost" data-observe>
+        <div class="panel__inner">
+          <div class="panel__label">
+            <span class="panel__icon"><i class="fas fa-search"></i></span>
+            <span class="panel__title">Find a project</span>
+          </div>
+          <div class="panel__controls">
+            <div class="search-field" role="search">
+              <input id="search-input" class="search-field__input" type="search" autocomplete="off" placeholder="Try social, AI, streaming, automation..." aria-label="Search projects">
+              <span class="search-field__hint">Press ⏎ to jump to the first match</span>
+            </div>
+            <div class="filter-group" role="group" aria-label="Filter projects">
+              <button class="filter-chip active" data-filter="all" type="button">All</button>
+              <button class="filter-chip" data-filter="automation" type="button">Automation</button>
+              <button class="filter-chip" data-filter="social" type="button">Social</button>
+              <button class="filter-chip" data-filter="media" type="button">Media</button>
+              <button class="filter-chip" data-filter="security" type="button">Security</button>
+            </div>
+          </div>
         </div>
-        <button type="submit" class="submit-btn"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message</button>
+        <div class="search-panel__meta" aria-live="polite">
+          <span class="search-panel__result-count" id="search-count">Showing 7 results</span>
+          <button class="search-panel__reset" id="reset-filters" type="button">
+            <span class="search-panel__reset-icon"><i class="fas fa-rotate"></i></span>
+            <span class="search-panel__reset-label">Reset filters</span>
+          </button>
+        </div>
+      </section>
+      <section class="projects-section" id="projects">
+        <header class="section-header" data-observe>
+          <div class="section-header__badge">
+            <span class="section-header__icon"><i class="fas fa-layer-group"></i></span>
+            <span class="section-header__label">Projects</span>
+          </div>
+          <h2 class="section-header__title">Curated chaos bundled with polish</h2>
+          <p class="section-header__subtitle">
+            Each card is a rabbit hole. Hover, tap, and explore the delightful details baked into every experiment.
+          </p>
+        </header>
+        <div class="projects-grid" id="projects-grid">
+          <article class="project-card" data-tags="media automation" data-title="FreeMovie" data-observe>
+            <div class="project-card__inner">
+              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__header">
+                <span class="project-card__icon">🎬</span>
+                <span class="project-card__badge project-card__badge--live">Live</span>
+              </div>
+              <h3 class="project-card__title">FreeMovie</h3>
+              <p class="project-card__excerpt">
+                Stream cinema-grade content with custom watch parties, curated picks, and adaptive mood lighting.
+              </p>
+              <ul class="project-card__meta">
+                <li><i class="fas fa-clock"></i> Active updates</li>
+                <li><i class="fas fa-users"></i> 3200+ viewers</li>
+              </ul>
+              <div class="project-card__tags">
+                <span class="tag">Streaming</span>
+                <span class="tag">Synced Rooms</span>
+                <span class="tag">Personalization</span>
+              </div>
+              <div class="project-card__actions">
+                <a class="button button--pill" href="/freemovie/">
+                  <span class="button__label">Launch</span>
+                  <span class="button__icon"><i class="fas fa-arrow-up-right-from-square"></i></span>
+                </a>
+                <button class="button button--ghost button--pill" type="button" data-info="freemovie">
+                  <span class="button__label">Details</span>
+                </button>
+              </div>
+            </div>
+          </article>
+          <article class="project-card" data-tags="ai automation" data-title="ChatBot" data-observe>
+            <div class="project-card__inner">
+              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__header">
+                <span class="project-card__icon">🤖</span>
+                <span class="project-card__badge">Beta</span>
+              </div>
+              <h3 class="project-card__title">ChatBot</h3>
+              <p class="project-card__excerpt">
+                A conversational agent that leans into your tone, offering witty guidance powered by a playful API stack.
+              </p>
+              <ul class="project-card__meta">
+                <li><i class="fas fa-code"></i> Custom endpoint</li>
+                <li><i class="fas fa-signal"></i> Latency tuned</li>
+              </ul>
+              <div class="project-card__tags">
+                <span class="tag">AI</span>
+                <span class="tag">Conversational UI</span>
+              </div>
+              <div class="project-card__actions">
+                <a class="button button--pill" href="/mygpt/">
+                  <span class="button__label">Open</span>
+                  <span class="button__icon"><i class="fas fa-rocket"></i></span>
+                </a>
+                <button class="button button--ghost button--pill" type="button" data-info="chatbot">
+                  <span class="button__label">Details</span>
+                </button>
+              </div>
+            </div>
+          </article>
+          <article class="project-card" data-tags="automation social" data-title="FB ShareBoost" data-observe>
+            <div class="project-card__inner">
+              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__header">
+                <span class="project-card__icon">⚡</span>
+                <span class="project-card__badge project-card__badge--experimental">Lab</span>
+              </div>
+              <h3 class="project-card__title">FB ShareBoost</h3>
+              <p class="project-card__excerpt">
+                Amplify your social impact with choreographed share pulses and smart timing suggestions.
+              </p>
+              <ul class="project-card__meta">
+                <li><i class="fas fa-wave-square"></i> Burst mode</li>
+                <li><i class="fas fa-chart-line"></i> Trend radar</li>
+              </ul>
+              <div class="project-card__tags">
+                <span class="tag">Growth</span>
+                <span class="tag">Automation</span>
+              </div>
+              <div class="project-card__actions">
+                <a class="button button--pill" href="/ShareBooster/">
+                  <span class="button__label">Boost</span>
+                  <span class="button__icon"><i class="fas fa-bolt"></i></span>
+                </a>
+                <button class="button button--ghost button--pill" type="button" data-info="fbshareboost">
+                  <span class="button__label">Details</span>
+                </button>
+              </div>
+            </div>
+          </article>
+          <article class="project-card" data-tags="security automation" data-title="Roblox Cookie Logger" data-observe>
+            <div class="project-card__inner">
+              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__header">
+                <span class="project-card__icon">🍪</span>
+                <span class="project-card__badge project-card__badge--warning">Handle with care</span>
+              </div>
+              <h3 class="project-card__title">Roblox Cookie Logger</h3>
+              <p class="project-card__excerpt">
+                Diagnostics and security auditing toolkit for Roblox accounts using cookie sessions.
+              </p>
+              <ul class="project-card__meta">
+                <li><i class="fas fa-shield"></i> Security insights</li>
+                <li><i class="fas fa-lock"></i> Protected vault</li>
+              </ul>
+              <div class="project-card__tags">
+                <span class="tag">Security</span>
+                <span class="tag">Extension</span>
+              </div>
+              <div class="project-card__actions">
+                <a class="button button--pill" href="https://github.com/keekzz13/.ROBLOXSECURITYlogger-Extension" target="_blank" rel="noopener">
+                  <span class="button__label">View Repo</span>
+                  <span class="button__icon"><i class="fas fa-arrow-up-right-from-square"></i></span>
+                </a>
+                <button class="button button--ghost button--pill" type="button" data-info="roblox">
+                  <span class="button__label">Details</span>
+                </button>
+              </div>
+            </div>
+          </article>
+          <article class="project-card" data-tags="automation social" data-title="Spoof Discord Quests" data-observe>
+            <div class="project-card__inner">
+              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__header">
+                <span class="project-card__icon">📌</span>
+                <span class="project-card__badge">Script</span>
+              </div>
+              <h3 class="project-card__title">Spoof Discord Quests</h3>
+              <p class="project-card__excerpt">
+                Automate quest completions and experiment with reward triggers for Discord seasons.
+              </p>
+              <ul class="project-card__meta">
+                <li><i class="fas fa-robot"></i> Auto quest engine</li>
+                <li><i class="fas fa-sparkles"></i> Reward cues</li>
+              </ul>
+              <div class="project-card__tags">
+                <span class="tag">Scripting</span>
+                <span class="tag">Automation</span>
+              </div>
+              <div class="project-card__actions">
+                <a class="button button--pill" href="https://gist.github.com/keekzz13/87e92a29521ef656a3ffa13c787005c7" target="_blank" rel="noopener">
+                  <span class="button__label">Open Gist</span>
+                  <span class="button__icon"><i class="fas fa-arrow-up-right-from-square"></i></span>
+                </a>
+                <button class="button button--ghost button--pill" type="button" data-info="discordquests">
+                  <span class="button__label">Details</span>
+                </button>
+              </div>
+            </div>
+          </article>
+          <article class="project-card" data-tags="automation social" data-title="EmbedForge" data-observe>
+            <div class="project-card__inner">
+              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__header">
+                <span class="project-card__icon">⚙️</span>
+                <span class="project-card__badge project-card__badge--featured">Loved</span>
+              </div>
+              <h3 class="project-card__title">EmbedForge</h3>
+              <p class="project-card__excerpt">
+                Design expressive Discord webhooks with real-time previews, gradient palettes, and schedule queues.
+              </p>
+              <ul class="project-card__meta">
+                <li><i class="fas fa-eye"></i> Live preview</li>
+                <li><i class="fas fa-clock-rotate-left"></i> Schedule ready</li>
+              </ul>
+              <div class="project-card__tags">
+                <span class="tag">Discord</span>
+                <span class="tag">Design</span>
+              </div>
+              <div class="project-card__actions">
+                <a class="button button--pill" href="/EmbedForge/">
+                  <span class="button__label">Forge</span>
+                  <span class="button__icon"><i class="fas fa-wand-magic-sparkles"></i></span>
+                </a>
+                <button class="button button--ghost button--pill" type="button" data-info="embedforge">
+                  <span class="button__label">Details</span>
+                </button>
+              </div>
+            </div>
+          </article>
+          <article class="project-card project-card--coming-soon" data-tags="future" data-title="Coming Soon" data-observe>
+            <div class="project-card__inner">
+              <div class="project-card__halo" aria-hidden="true"></div>
+              <div class="project-card__header">
+                <span class="project-card__icon">✨</span>
+                <span class="project-card__badge project-card__badge--soon">Soon</span>
+              </div>
+              <h3 class="project-card__title">Coming Soon</h3>
+              <p class="project-card__excerpt">
+                Have an idea you want to see happen? Drop a pitch and maybe it becomes the next drop.
+              </p>
+              <div class="project-card__actions">
+                <button class="button button--pill" type="button" id="suggest-btn">
+                  <span class="button__label">Suggest</span>
+                  <span class="button__icon"><i class="fas fa-plus"></i></span>
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="skills-section" id="skills">
+        <header class="section-header section-header--split" data-observe>
+          <div>
+            <div class="section-header__badge">
+              <span class="section-header__icon"><i class="fas fa-sparkles"></i></span>
+              <span class="section-header__label">Skillset</span>
+            </div>
+            <h2 class="section-header__title">Tech stack that fuels the playground</h2>
+          </div>
+          <p class="section-header__subtitle">
+            From front-end finesse to automation wizardry, here’s the toolkit backing each build.
+          </p>
+        </header>
+        <div class="skills-grid">
+          <article class="skill-cluster" data-observe>
+            <h3 class="skill-cluster__title">Interface Craft</h3>
+            <p class="skill-cluster__desc">Layouts that glow, respond, and delight across any screen.</p>
+            <div class="skill-cluster__badges">
+              <span class="badge badge--primary">CSS Houdini</span>
+              <span class="badge">Framer Motion</span>
+              <span class="badge">Svelte</span>
+              <span class="badge">GSAP</span>
+            </div>
+            <div class="skill-meter">
+              <span class="skill-meter__label">Design Systems</span>
+              <div class="skill-meter__bar">
+                <span class="skill-meter__fill" style="--fill: 92%"></span>
+              </div>
+            </div>
+            <div class="skill-meter">
+              <span class="skill-meter__label">Responsive Dynamics</span>
+              <div class="skill-meter__bar">
+                <span class="skill-meter__fill" style="--fill: 96%"></span>
+              </div>
+            </div>
+          </article>
+          <article class="skill-cluster" data-observe>
+            <h3 class="skill-cluster__title">Automation Ops</h3>
+            <p class="skill-cluster__desc">Scripts and bots that keep the chaos organized and humming.</p>
+            <div class="skill-cluster__badges">
+              <span class="badge badge--primary">Node</span>
+              <span class="badge">Python</span>
+              <span class="badge">Playwright</span>
+              <span class="badge">Cloudflare Workers</span>
+            </div>
+            <div class="skill-meter">
+              <span class="skill-meter__label">Workflow Orchestration</span>
+              <div class="skill-meter__bar">
+                <span class="skill-meter__fill" style="--fill: 88%"></span>
+              </div>
+            </div>
+            <div class="skill-meter">
+              <span class="skill-meter__label">API Design</span>
+              <div class="skill-meter__bar">
+                <span class="skill-meter__fill" style="--fill: 90%"></span>
+              </div>
+            </div>
+          </article>
+          <article class="skill-cluster" data-observe>
+            <h3 class="skill-cluster__title">Community Pulse</h3>
+            <p class="skill-cluster__desc">Spaces, servers, and vibes tuned for playful collaboration.</p>
+            <div class="skill-cluster__badges">
+              <span class="badge badge--primary">Discord Bots</span>
+              <span class="badge">Realtime Dashboards</span>
+              <span class="badge">Social Automation</span>
+              <span class="badge">Analytics</span>
+            </div>
+            <div class="skill-meter">
+              <span class="skill-meter__label">User Onboarding</span>
+              <div class="skill-meter__bar">
+                <span class="skill-meter__fill" style="--fill: 84%"></span>
+              </div>
+            </div>
+            <div class="skill-meter">
+              <span class="skill-meter__label">Engagement Loops</span>
+              <div class="skill-meter__bar">
+                <span class="skill-meter__fill" style="--fill: 91%"></span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="timeline-section" id="timeline">
+        <header class="section-header" data-observe>
+          <div class="section-header__badge">
+            <span class="section-header__icon"><i class="fas fa-timeline"></i></span>
+            <span class="section-header__label">Timeline</span>
+          </div>
+          <h2 class="section-header__title">Highlights that shaped the lab</h2>
+          <p class="section-header__subtitle">
+            A quick look at the sparks, launches, and mischief milestones fueling VanProjects.
+          </p>
+        </header>
+        <div class="timeline">
+          <div class="timeline__line" aria-hidden="true"></div>
+          <article class="timeline__event" data-observe>
+            <div class="timeline__node"></div>
+            <div class="timeline__card">
+              <span class="timeline__date">2022 · Q4</span>
+              <h3 class="timeline__title">The idea ignites</h3>
+              <p class="timeline__content">
+                Started prototyping tools that challenge conventional ToS boundaries—strictly for curiosity and learning.
+              </p>
+            </div>
+          </article>
+          <article class="timeline__event" data-observe>
+            <div class="timeline__node"></div>
+            <div class="timeline__card">
+              <span class="timeline__date">2023 · Q2</span>
+              <h3 class="timeline__title">First spotlight: FreeMovie</h3>
+              <p class="timeline__content">
+                Launched the streaming experiment with synchronized rooms, attracting movie night crowds across servers.
+              </p>
+            </div>
+          </article>
+          <article class="timeline__event" data-observe>
+            <div class="timeline__node"></div>
+            <div class="timeline__card">
+              <span class="timeline__date">2024 · Q1</span>
+              <h3 class="timeline__title">Automation surge</h3>
+              <p class="timeline__content">
+                Introduced ShareBoost and Discord quest scripts—built dashboards, logging, and creative guardrails.
+              </p>
+            </div>
+          </article>
+          <article class="timeline__event" data-observe>
+            <div class="timeline__node"></div>
+            <div class="timeline__card">
+              <span class="timeline__date">2024 · Q4</span>
+              <h3 class="timeline__title">Rebrand to VanProjects</h3>
+              <p class="timeline__content">
+                Unified all experiments under one neon umbrella with a cohesive identity and interactive platform.
+              </p>
+            </div>
+          </article>
+          <article class="timeline__event" data-observe>
+            <div class="timeline__node timeline__node--active"></div>
+            <div class="timeline__card timeline__card--active">
+              <span class="timeline__date">2025 · Now</span>
+              <h3 class="timeline__title">Orbit release</h3>
+              <p class="timeline__content">
+                Introducing the responsive gradient hub, advanced search, and buttery smooth animations you see today.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="testimonials-section" id="testimonials">
+        <header class="section-header" data-observe>
+          <div class="section-header__badge">
+            <span class="section-header__icon"><i class="fas fa-comment-dots"></i></span>
+            <span class="section-header__label">Voices</span>
+          </div>
+          <h2 class="section-header__title">Community reactions</h2>
+          <p class="section-header__subtitle">
+            Notes from friends who have tinkered, stress-tested, and vibed with these experiments.
+          </p>
+        </header>
+        <div class="testimonial-carousel" data-observe>
+          <button class="carousel__nav carousel__nav--prev" type="button" aria-label="Previous testimonial">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="carousel__viewport">
+            <article class="testimonial">
+              <div class="testimonial__quote">
+                <i class="fas fa-quote-left"></i>
+              </div>
+              <p class="testimonial__text">
+                ShareBoost is wild. We used it for a weekend promo and watched our metrics go brr in real time.
+              </p>
+              <div class="testimonial__meta">
+                <img class="testimonial__avatar" src="https://i.imgur.com/YQYi5Fv.png" alt="Avatar">
+                <div>
+                  <span class="testimonial__name">Mikko</span>
+                  <span class="testimonial__role">Community Builder</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial">
+              <div class="testimonial__quote">
+                <i class="fas fa-quote-left"></i>
+              </div>
+              <p class="testimonial__text">
+                EmbedForge feels like Canva but for Discord. The real-time preview sold me instantly.
+              </p>
+              <div class="testimonial__meta">
+                <img class="testimonial__avatar" src="https://i.imgur.com/pQAVQOH.png" alt="Avatar">
+                <div>
+                  <span class="testimonial__name">Ria</span>
+                  <span class="testimonial__role">Server Architect</span>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial">
+              <div class="testimonial__quote">
+                <i class="fas fa-quote-left"></i>
+              </div>
+              <p class="testimonial__text">
+                The UI responsiveness is next level. Everything feels alive without being over the top.
+              </p>
+              <div class="testimonial__meta">
+                <img class="testimonial__avatar" src="https://i.imgur.com/d8MZ4nP.png" alt="Avatar">
+                <div>
+                  <span class="testimonial__name">Ken</span>
+                  <span class="testimonial__role">Front-end Dev</span>
+                </div>
+              </div>
+            </article>
+          </div>
+          <button class="carousel__nav carousel__nav--next" type="button" aria-label="Next testimonial">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <div class="carousel__dots" role="tablist" aria-label="Testimonials dots"></div>
+        </div>
+      </section>
+      <section class="cta-section" id="contact">
+        <div class="cta-panel panel panel--bright" data-observe>
+          <div class="cta-panel__inner">
+            <div class="cta-panel__content">
+              <div class="cta-panel__badge">
+                <span class="cta-panel__icon"><i class="fas fa-paper-plane"></i></span>
+                <span class="cta-panel__label">Drop a line</span>
+              </div>
+              <h2 class="cta-panel__title">Have an idea or want to collaborate?</h2>
+              <p class="cta-panel__text">
+                Ping me with your wildest prompts, feature requests, or dream collabs. The lab door is always open.
+              </p>
+              <div class="cta-panel__actions">
+                <button class="button button--primary" type="button" id="contact-admin-btn">
+                  <span class="button__icon"><i class="fas fa-comments"></i></span>
+                  <span class="button__label">Contact Admin</span>
+                </button>
+                <button class="button button--ghost" type="button" id="copy-handle">
+                  <span class="button__icon"><i class="fas fa-copy"></i></span>
+                  <span class="button__label">Copy Discord handle</span>
+                </button>
+              </div>
+              <div class="cta-panel__footnote" id="cta-footnote">Discord: aivanabanto</div>
+            </div>
+            <div class="cta-panel__visual" data-parallax>
+              <div class="cta-panel__orb" aria-hidden="true">
+                <span class="cta-panel__beam"></span>
+                <span class="cta-panel__beam cta-panel__beam--lag"></span>
+              </div>
+              <div class="cta-panel__cards">
+                <div class="cta-mini">
+                  <span class="cta-mini__icon"><i class="fas fa-sparkles"></i></span>
+                  <span class="cta-mini__label">Rapid prototyping</span>
+                </div>
+                <div class="cta-mini">
+                  <span class="cta-mini__icon"><i class="fas fa-heart"></i></span>
+                  <span class="cta-mini__label">Community-first</span>
+                </div>
+                <div class="cta-mini">
+                  <span class="cta-mini__icon"><i class="fas fa-lock"></i></span>
+                  <span class="cta-mini__label">Responsible play</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <footer class="footer">
+        <div class="footer__inner">
+          <div class="footer__column">
+            <h3 class="footer__title">VanProjects</h3>
+            <p class="footer__tagline">A cozy corner for neon experiments, friends, and a sprinkle of chaos.</p>
+          </div>
+          <div class="footer__column">
+            <h4 class="footer__subtitle">Connect</h4>
+            <ul class="footer__links">
+              <li><a href="https://www.youtube.com/@2BkaizenRBLXX" target="_blank" rel="noopener">YouTube</a></li>
+              <li><a href="https://www.facebook.com/aivan.abanto1" target="_blank" rel="noopener">Facebook</a></li>
+              <li><a href="https://discord.gg/7zhG8UMhK6" target="_blank" rel="noopener">Discord Server</a></li>
+            </ul>
+          </div>
+          <div class="footer__column">
+            <h4 class="footer__subtitle">Quick actions</h4>
+            <ul class="footer__links">
+              <li><button class="footer__link-button" type="button" data-scroll-to="#hero">Back to top</button></li>
+              <li><button class="footer__link-button" type="button" id="footer-contact">Contact</button></li>
+              <li><button class="footer__link-button" type="button" id="footer-suggest">Suggest project</button></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer__meta">
+          <span class="footer__copyright">© 2025 VanProjects. Crafted with cosmic caffeine.</span>
+          <span class="footer__status"><i class="fas fa-satellite"></i> Systems nominal</span>
+        </div>
+      </footer>
+    </main>
+  </div>
+  <div class="modal" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title" aria-hidden="true">
+    <div class="modal__content">
+      <button class="modal__close" type="button" aria-label="Close modal"><i class="fas fa-xmark"></i></button>
+      <div class="modal__header">
+        <div class="modal__icon"><i class="fas fa-headset"></i></div>
+        <div>
+          <h2 class="modal__title" id="contact-modal-title">Contact Admin</h2>
+          <p class="modal__subtitle">Drop me a line. I read every ping.</p>
+        </div>
+      </div>
+      <form class="modal__form" id="contact-form">
+        <div class="form-field">
+          <label for="contact-name" class="form-field__label">Name</label>
+          <input id="contact-name" class="form-field__input" type="text" name="name" required placeholder="Your name">
+        </div>
+        <div class="form-field">
+          <label for="contact-email" class="form-field__label">Email</label>
+          <input id="contact-email" class="form-field__input" type="email" name="email" required placeholder="you@domain.com">
+        </div>
+        <div class="form-field">
+          <label for="contact-message" class="form-field__label">Message</label>
+          <textarea id="contact-message" class="form-field__textarea" name="message" required rows="4" placeholder="Tell me what’s brewing"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="button button--primary button--full" type="submit">
+            <span class="button__icon"><i class="fas fa-paper-plane"></i></span>
+            <span class="button__label">Send</span>
+          </button>
+        </div>
+        <p class="form-footnote">Messages route via a private webhook. Keep it kind and curious.</p>
       </form>
     </div>
   </div>
-
-  <div class="notification success" id="notification">
-    <div class="notification-content">
-      <i class="fas fa-check-circle notification-icon" aria-hidden="true"></i>
-      <div class="notification-text">
-        <h3 id="notification-title">Success</h3>
-        <p id="notification-message">
-          Message sent successfully! 
-          <span class="placeholder-note">Tinood kaha ng mail nimo dawg.</span>
-        </p>
+  <div class="modal modal--narrow" id="suggest-modal" role="dialog" aria-modal="true" aria-labelledby="suggest-modal-title" aria-hidden="true">
+    <div class="modal__content">
+      <button class="modal__close" type="button" aria-label="Close modal"><i class="fas fa-xmark"></i></button>
+      <div class="modal__header">
+        <div class="modal__icon modal__icon--accent"><i class="fas fa-lightbulb"></i></div>
+        <div>
+          <h2 class="modal__title" id="suggest-modal-title">Suggest a project</h2>
+          <p class="modal__subtitle">Pitch an idea and maybe it lands on the roadmap.</p>
+        </div>
       </div>
-      <span class="close-notification" aria-label="Close notification">&times;</span>
+      <form class="modal__form" id="suggest-form">
+        <div class="form-field">
+          <label for="suggest-title" class="form-field__label">Project name</label>
+          <input id="suggest-title" class="form-field__input" type="text" name="title" required placeholder="Dream project title">
+        </div>
+        <div class="form-field">
+          <label for="suggest-details" class="form-field__label">Details</label>
+          <textarea id="suggest-details" class="form-field__textarea" name="details" required rows="5" placeholder="What would it do? Why is it awesome?"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="button button--primary button--full" type="submit">
+            <span class="button__icon"><i class="fas fa-sparkles"></i></span>
+            <span class="button__label">Send idea</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
-
-  <div class="welcome-modal" id="welcome-modal">
-    <div class="welcome-modal-content">
-      <h2>Welcome to VanProjects! Explore our fun tools and projects.</h2>
-      <p class="tos-note">Some tools here may against their ToS so use them with responsibility.</p>
-      <button id="welcome-close">Ge<img src="https://i.imgur.com/VOrIsWz.png" alt="Ge Emoji" class="emoji" style="width: 20px; height: 20px; vertical-align: middle;"></button>
-      <button id="diko-btn">Diko uy<img src="https://i.imgur.com/4NzlysC.png" alt="Diko Emoji" class="emoji" style="width: 20px; height: 20px; vertical-align: middle;"></button>
+  <div class="modal modal--wide" id="project-modal" role="dialog" aria-modal="true" aria-labelledby="project-modal-title" aria-hidden="true">
+    <div class="modal__content">
+      <button class="modal__close" type="button" aria-label="Close modal"><i class="fas fa-xmark"></i></button>
+      <div class="modal__header">
+        <div class="modal__icon modal__icon--project"><i class="fas fa-layer-group"></i></div>
+        <div>
+          <h2 class="modal__title" id="project-modal-title">Project</h2>
+          <p class="modal__subtitle" id="project-modal-subtitle"></p>
+        </div>
+      </div>
+      <div class="modal__body" id="project-modal-body"></div>
+      <div class="modal__footer" id="project-modal-footer"></div>
     </div>
   </div>
-
+  <div class="notification" id="notification" role="status" aria-live="polite">
+    <div class="notification__inner">
+      <span class="notification__icon" id="notification-icon"><i class="fas fa-circle-info"></i></span>
+      <div class="notification__content">
+        <span class="notification__title" id="notification-title">Info</span>
+        <p class="notification__message" id="notification-message">This is a notification.</p>
+      </div>
+      <button class="notification__close" id="notification-close" type="button" aria-label="Dismiss notification">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+  <div class="welcome-overlay" id="welcome-overlay" aria-hidden="true">
+    <div class="welcome-card">
+      <div class="welcome-card__badge">
+        <span class="welcome-card__icon"><i class="fas fa-star-half-alt"></i></span>
+        <span class="welcome-card__label">Welcome back</span>
+      </div>
+      <h2 class="welcome-card__title">Hi! Ready to orbit?</h2>
+      <p class="welcome-card__text">
+        Some tools wiggle around platform guidelines, so explore responsibly and stay curious. Tap continue to launch.
+      </p>
+      <div class="welcome-card__actions">
+        <button class="button button--primary" type="button" id="welcome-continue">
+          <span class="button__icon"><i class="fas fa-circle-check"></i></span>
+          <span class="button__label">Continue</span>
+        </button>
+        <button class="button button--ghost" type="button" id="welcome-redirect">
+          <span class="button__icon"><i class="fas fa-circle-xmark"></i></span>
+          <span class="button__label">Not today</span>
+        </button>
+      </div>
+      <span class="welcome-card__footnote">Visit count: <span id="visit-count">1</span></span>
+    </div>
+  </div>
+  <div class="cursor" id="cursor" aria-hidden="true">
+    <span class="cursor__core"></span>
+    <span class="cursor__ring"></span>
+  </div>
+  <div class="particles" id="particles" aria-hidden="true"></div>
   <script>
-    // Enhanced JavaScript with better animations and interactions
-    document.addEventListener('DOMContentLoaded', function() {
-      // DOM Elements
-      const contactAdmin = document.getElementById('contact-admin');
-      const contactModal = document.getElementById('contact-modal');
-      const closeModal = contactModal.querySelector('.close-modal');
-      const contactForm = document.querySelector('.contact-form');
-      const menuIcon = document.getElementById('menu-icon');
-      const sideMenu = document.getElementById('side-menu');
-      const closeMenu = document.getElementById('close-menu');
-      const notification = document.getElementById('notification');
-      const closeNotification = notification.querySelector('.close-notification');
-      const notificationTitle = document.getElementById('notification-title');
-      const notificationMessage = document.getElementById('notification-message');
-      const submitBtn = contactForm.querySelector('.submit-btn');
-      const welcomeModal = document.getElementById('welcome-modal');
-      const welcomeClose = document.getElementById('welcome-close');
-      const dikoBtn = document.getElementById('diko-btn');
-      const themeSwitch = document.getElementById('theme-switch');
-      
-      // Notification timer
-      let notificationTimer = null;
-      
-      // Show welcome modal on first visit
-      if (!localStorage.getItem('visited')) {
-        welcomeModal.classList.add('active');
-        localStorage.setItem('visited', 'true');
+    const body = document.body;
+    const preloader = document.getElementById("preloader");
+    const preloaderBar = document.getElementById("preloader-bar");
+    const preloaderLetters = document.querySelectorAll(".preloader__letter");
+    const floatingToggle = document.getElementById("floating-toggle");
+    const sidebar = document.getElementById("sidebar");
+    const themeToggle = document.getElementById("theme-toggle");
+    const welcomeOverlay = document.getElementById("welcome-overlay");
+    const welcomeContinue = document.getElementById("welcome-continue");
+    const welcomeRedirect = document.getElementById("welcome-redirect");
+    const visitCountEl = document.getElementById("visit-count");
+    const notification = document.getElementById("notification");
+    const notificationTitle = document.getElementById("notification-title");
+    const notificationMessage = document.getElementById("notification-message");
+    const notificationIcon = document.getElementById("notification-icon");
+    const notificationClose = document.getElementById("notification-close");
+    const contactModal = document.getElementById("contact-modal");
+    const suggestModal = document.getElementById("suggest-modal");
+    const projectModal = document.getElementById("project-modal");
+    const modals = [contactModal, suggestModal, projectModal];
+    const openModalBtn = document.getElementById("open-modal");
+    const contactAdminBtn = document.getElementById("contact-admin-btn");
+    const contactAdminFooter = document.getElementById("footer-contact");
+    const contactAdminQuick = document.getElementById("contact-admin-btn");
+    const contactAdminMenu = document.getElementById("open-modal");
+    const contactFormTrigger = document.getElementById("contact-admin-btn");
+    const contactFormTriggerFooter = document.getElementById("footer-contact");
+    const contactFormTriggerHero = document.getElementById("contact-admin-btn");
+    const contactFormTriggerSidebar = document.getElementById("open-modal");
+    const contactFormTriggerCTA = document.getElementById("contact-admin-btn");
+    const contactAdminButtons = [contactFormTrigger, contactFormTriggerFooter, contactFormTriggerHero, contactFormTriggerSidebar, contactFormTriggerCTA];
+    const contactAdminBtnMain = document.getElementById("contact-admin-btn");
+    const contactAdminBtnSidebar = document.getElementById("open-modal");
+    const contactAdminBtnFooter = document.getElementById("footer-contact");
+    const footerSuggest = document.getElementById("footer-suggest");
+    const suggestBtn = document.getElementById("suggest-btn");
+    const searchInput = document.getElementById("search-input");
+    const filterChips = document.querySelectorAll(".filter-chip");
+    const resetFilters = document.getElementById("reset-filters");
+    const projectsGrid = document.getElementById("projects-grid");
+    const projectCards = document.querySelectorAll(".project-card");
+    const searchCount = document.getElementById("search-count");
+    const metricCounters = document.querySelectorAll("[data-counter]");
+    const observerTargets = document.querySelectorAll("[data-observe]");
+    const scrollLinks = document.querySelectorAll("[data-scroll-to]");
+    const modalCloseButtons = document.querySelectorAll(".modal__close");
+    const cursor = document.getElementById("cursor");
+    const projectInfoButtons = document.querySelectorAll("[data-info]");
+    const particlesContainer = document.getElementById("particles");
+    const copyHandleBtn = document.getElementById("copy-handle");
+    const ctaFootnote = document.getElementById("cta-footnote");
+    const projectModalTitle = document.getElementById("project-modal-title");
+    const projectModalSubtitle = document.getElementById("project-modal-subtitle");
+    const projectModalBody = document.getElementById("project-modal-body");
+    const projectModalFooter = document.getElementById("project-modal-footer");
+    const contactForm = document.getElementById("contact-form");
+    const suggestForm = document.getElementById("suggest-form");
+    const notificationQueue = [];
+    let notificationTimer = null;
+    let activeModal = null;
+    let activeFilter = "all";
+    let hasLoaded = false;
+    function clamp(value, min, max) {
+      if (value < min) {
+        return min;
       }
-      
-      // Theme toggle
-      themeSwitch.addEventListener('change', function() {
-        document.body.classList.toggle('light-mode', this.checked);
-      });
-      
-      // Menu interactions
-      menuIcon.addEventListener('click', () => {
-        sideMenu.classList.add('active');
-        document.body.style.overflow = 'hidden';
-      });
-      
-      closeMenu.addEventListener('click', () => {
-        sideMenu.classList.remove('active');
-        document.body.style.overflow = 'auto';
-      });
-      
-      // Contact modal
-      contactAdmin.addEventListener('click', (e) => {
-        e.preventDefault();
-        contactModal.classList.add('active');
-        sideMenu.classList.remove('active');
-        document.body.style.overflow = 'hidden';
-      });
-      
-      closeModal.addEventListener('click', () => {
-        contactModal.classList.remove('active');
-        document.body.style.overflow = 'auto';
-      });
-      
-      // Notification
-      closeNotification.addEventListener('click', () => {
-        notification.classList.remove('active');
-        if (notificationTimer) {
-          clearTimeout(notificationTimer);
-        }
-      });
-      
-      // Show notification function
-      function showNotification(title, message, type = 'success', duration = 4000) {
-        notificationTitle.textContent = title;
-        notificationMessage.innerHTML = message;
-        notification.className = `notification ${type}`;
-        notification.classList.add('active');
-        
-        if (notificationTimer) {
-          clearTimeout(notificationTimer);
-        }
-        
-        if (duration > 0) {
-          notificationTimer = setTimeout(() => {
-            notification.classList.remove('active');
-          }, duration);
-        }
+      if (value > max) {
+        return max;
       }
-      
-      // Contact form submission
+      return value;
+    }
+    function lerp(start, end, amount) {
+      return start + (end - start) * amount;
+    }
+    function createParticles() {
+      const fragment = document.createDocumentFragment();
+      const count = 56;
+      for (let index = 0; index < count; index += 1) {
+        const particle = document.createElement("span");
+        particle.className = "particle";
+        particle.style.setProperty("--index", index);
+        fragment.appendChild(particle);
+      }
+      particlesContainer.appendChild(fragment);
+    }
+    function toggleSidebar(force) {
+      const expanded = typeof force === "boolean" ? force : !floatingToggle.classList.contains("floating-toggle--active");
+      floatingToggle.classList.toggle("floating-toggle--active", expanded);
+      sidebar.classList.toggle("sidebar--active", expanded);
+      floatingToggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+    }
+    function closeSidebarOnEscape(event) {
+      if (event.key === "Escape" && sidebar.classList.contains("sidebar--active")) {
+        toggleSidebar(false);
+      }
+    }
+    function preloadSequence() {
+      let progress = 0;
+      const updateProgress = () => {
+        progress = clamp(progress + Math.random() * 12, 0, 100);
+        preloaderBar.style.setProperty("--progress", progress + "%");
+        preloaderLetters.forEach((letter, index) => {
+          const delay = index * 45;
+          setTimeout(() => {
+            letter.classList.add("preloader__letter--active");
+          }, delay);
+        });
+        if (progress >= 99) {
+          clearInterval(interval);
+          setTimeout(() => {
+            preloader.classList.add("preloader--complete");
+            setTimeout(() => {
+              preloader.remove();
+              hasLoaded = true;
+            }, 700);
+          }, 350);
+        }
+      };
+      const interval = setInterval(updateProgress, 120);
+    }
+    function loadTheme() {
+      const stored = localStorage.getItem("vanprojects:theme");
+      if (stored === "light") {
+        body.classList.add("theme--light");
+        themeToggle.checked = true;
+      } else {
+        body.classList.remove("theme--light");
+        themeToggle.checked = false;
+      }
+    }
+    function saveTheme() {
+      const mode = body.classList.contains("theme--light") ? "light" : "dark";
+      localStorage.setItem("vanprojects:theme", mode);
+    }
+    function toggleTheme() {
+      body.classList.toggle("theme--light");
+      saveTheme();
+    }
+    function showNotification({ title, message, status }) {
+      const icons = {
+        success: '<i class="fas fa-circle-check"></i>',
+        error: '<i class="fas fa-circle-xmark"></i>',
+        warning: '<i class="fas fa-triangle-exclamation"></i>',
+        info: '<i class="fas fa-circle-info"></i>'
+      };
+      notificationTitle.textContent = title;
+      notificationMessage.textContent = message;
+      notificationIcon.innerHTML = icons[status] || icons.info;
+      notification.className = `notification notification--${status}`;
+      notification.classList.add("notification--visible");
+      if (notificationTimer) {
+        clearTimeout(notificationTimer);
+      }
+      notificationTimer = setTimeout(() => {
+        notification.classList.remove("notification--visible");
+      }, 4200);
+    }
+    function enqueueNotification(payload) {
+      notificationQueue.push(payload);
+      if (notificationQueue.length === 1) {
+        showNotification(payload);
+      }
+    }
+    function filterProjects(query, tag) {
+      let visible = 0;
+      const normalizedQuery = query.trim().toLowerCase();
+      projectCards.forEach(card => {
+        const title = card.dataset.title.toLowerCase();
+        const tags = card.dataset.tags;
+        const matchesQuery = normalizedQuery.length === 0 || title.includes(normalizedQuery) || tags.includes(normalizedQuery);
+        const matchesTag = tag === "all" || tags.includes(tag);
+        const shouldShow = matchesQuery && matchesTag;
+        card.classList.toggle("project-card--hidden", !shouldShow);
+        if (shouldShow) {
+          visible += 1;
+        }
+      });
+      searchCount.textContent = visible === 1 ? "Showing 1 result" : `Showing ${visible} results`;
+      if (visible === 0) {
+        enqueueNotification({ title: "No match", message: "Try a different keyword or reset filters.", status: "warning" });
+      }
+    }
+    function resetSearch() {
+      searchInput.value = "";
+      filterChips.forEach(chip => chip.classList.toggle("active", chip.dataset.filter === "all"));
+      activeFilter = "all";
+      filterProjects("", "all");
+    }
+    function openModal(modal) {
+      if (!modal) {
+        return;
+      }
+      modal.setAttribute("aria-hidden", "false");
+      modal.classList.add("modal--visible");
+      body.classList.add("no-scroll");
+      activeModal = modal;
+    }
+    function closeModal(modal) {
+      if (!modal) {
+        return;
+      }
+      modal.classList.remove("modal--visible");
+      modal.setAttribute("aria-hidden", "true");
+      body.classList.remove("no-scroll");
+      activeModal = null;
+    }
+    function handleGlobalEscape(event) {
+      if (event.key === "Escape" && activeModal) {
+        closeModal(activeModal);
+      }
+    }
+    function initCounters() {
+      metricCounters.forEach(counter => {
+        const target = parseInt(counter.dataset.target, 10);
+        let current = 0;
+        const duration = 1400;
+        const startTime = performance.now();
+        const step = now => {
+          const progress = clamp((now - startTime) / duration, 0, 1);
+          current = Math.floor(progress * target);
+          counter.textContent = current.toLocaleString();
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          } else {
+            counter.textContent = target.toLocaleString();
+          }
+        };
+        requestAnimationFrame(step);
+      });
+    }
+    function initIntersectionObserver() {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+      observerTargets.forEach(target => observer.observe(target));
+    }
+    function smoothScroll(target) {
+      const element = typeof target === "string" ? document.querySelector(target) : target;
+      if (!element) {
+        return;
+      }
+      const headerOffset = window.innerWidth >= 1024 ? 32 : 24;
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementPosition - headerOffset;
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+    }
+    function handleScrollLink(event) {
+      event.preventDefault();
+      const selector = this.getAttribute("href") || this.dataset.scrollTo;
+      smoothScroll(selector);
+      if (window.innerWidth < 1024 && sidebar.classList.contains("sidebar--active")) {
+        toggleSidebar(false);
+      }
+    }
+    function attachScrollListeners() {
+      scrollLinks.forEach(link => {
+        link.addEventListener("click", handleScrollLink);
+      });
+    }
+    function initCursor() {
+      const core = cursor.querySelector(".cursor__core");
+      const ring = cursor.querySelector(".cursor__ring");
+      const state = { x: window.innerWidth / 2, y: window.innerHeight / 2, targetX: window.innerWidth / 2, targetY: window.innerHeight / 2 };
+      const updateCursor = () => {
+        state.x = lerp(state.x, state.targetX, 0.15);
+        state.y = lerp(state.y, state.targetY, 0.15);
+        cursor.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`;
+        requestAnimationFrame(updateCursor);
+      };
+      updateCursor();
+      window.addEventListener("mousemove", event => {
+        state.targetX = event.clientX;
+        state.targetY = event.clientY;
+        cursor.classList.add("cursor--active");
+      });
+      document.querySelectorAll("a, button, .project-card, .filter-chip").forEach(element => {
+        element.addEventListener("mouseenter", () => cursor.classList.add("cursor--link"));
+        element.addEventListener("mouseleave", () => cursor.classList.remove("cursor--link"));
+      });
+      document.addEventListener("mouseleave", () => cursor.classList.remove("cursor--active"));
+    }
+    const projectDetails = {
+      freemovie: {
+        title: "FreeMovie",
+        subtitle: "Immersive watch parties with a custom experience engine.",
+        body: `
+          <p>Bring movie nights to life with synchronized playback, reaction overlays, and curated collections that adapt to your community's vibe.</p>
+          <ul class="modal-list">
+            <li>Realtime chat overlay with sentiment-driven lighting cues.</li>
+            <li>Dynamic ad muting and scene bookmarking for watch-alongs.</li>
+            <li>Personalized recommendations across genres, moods, and playlists.</li>
+          </ul>
+        `,
+        footer: `
+          <a class="button button--primary button--full" href="/freemovie/">
+            <span class="button__icon"><i class="fas fa-arrow-up-right-from-square"></i></span>
+            <span class="button__label">Visit FreeMovie</span>
+          </a>
+        `
+      },
+      chatbot: {
+        title: "ChatBot",
+        subtitle: "An AI buddy that mirrors the way you talk, jokes included.",
+        body: `
+          <p>Built on a playful API sandbox, this chatbot riffs on your tone, remembers your quirks, and keeps the conversation energetic.</p>
+          <ul class="modal-list">
+            <li>Custom persona templating with stylized responses.</li>
+            <li>Rapid context switching for multi-purpose chats.</li>
+            <li>Analytics dashboard tracking sentiment spikes and trends.</li>
+          </ul>
+        `,
+        footer: `
+          <a class="button button--primary button--full" href="/mygpt/">
+            <span class="button__icon"><i class="fas fa-rocket"></i></span>
+            <span class="button__label">Open ChatBot</span>
+          </a>
+        `
+      },
+      fbshareboost: {
+        title: "FB ShareBoost",
+        subtitle: "Amplify your social reach with precision bursts.",
+        body: `
+          <p>Coordinate timed share bursts, track viral loops, and align your crew to storm the feeds with maximum impact.</p>
+          <ul class="modal-list">
+            <li>Algorithm-friendly timing suggestions with timezone sync.</li>
+            <li>Share queue manager with accountability nudges.</li>
+            <li>Heatmap analytics displaying reach and retention.</li>
+          </ul>
+        `,
+        footer: `
+          <a class="button button--primary button--full" href="/ShareBooster/">
+            <span class="button__icon"><i class="fas fa-bolt"></i></span>
+            <span class="button__label">Boost now</span>
+          </a>
+        `
+      },
+      roblox: {
+        title: "Roblox Cookie Logger",
+        subtitle: "Security diagnostics for account session cookies.",
+        body: `
+          <p>Inspect, verify, and safeguard session cookies for Roblox accounts with audit trails and vault-grade storage.</p>
+          <ul class="modal-list">
+            <li>Encrypted vault handling with key rotation.</li>
+            <li>Session anomaly detection and alerting.</li>
+            <li>Dashboard insights for security posture monitoring.</li>
+          </ul>
+        `,
+        footer: `
+          <a class="button button--primary button--full" href="https://github.com/keekzz13/.ROBLOXSECURITYlogger-Extension" target="_blank" rel="noopener">
+            <span class="button__icon"><i class="fas fa-arrow-up-right-from-square"></i></span>
+            <span class="button__label">Open GitHub</span>
+          </a>
+        `
+      },
+      discordquests: {
+        title: "Spoof Discord Quests",
+        subtitle: "Automate quest completions with style.",
+        body: `
+          <p>Experiment with quest flows, trigger sequences, and mock completions to rapidly test Discord seasonal events.</p>
+          <ul class="modal-list">
+            <li>Modular scripts for quest targeting.</li>
+            <li>Visual logger to trace reward triggers.</li>
+            <li>Safety toggles for controlled environments.</li>
+          </ul>
+        `,
+        footer: `
+          <a class="button button--primary button--full" href="https://gist.github.com/keekzz13/87e92a29521ef656a3ffa13c787005c7" target="_blank" rel="noopener">
+            <span class="button__icon"><i class="fas fa-arrow-up-right-from-square"></i></span>
+            <span class="button__label">Open Gist</span>
+          </a>
+        `
+      },
+      embedforge: {
+        title: "EmbedForge",
+        subtitle: "Design vibrant Discord webhooks with live previews.",
+        body: `
+          <p>Mix gradients, emojis, and dynamic footers in a real-time canvas. Schedule Webhooks and reuse templates at will.</p>
+          <ul class="modal-list">
+            <li>Palette composer with contrast validation.</li>
+            <li>Webhook scheduler with timezone detection.</li>
+            <li>Template library with shareable links.</li>
+          </ul>
+        `,
+        footer: `
+          <a class="button button--primary button--full" href="/EmbedForge/">
+            <span class="button__icon"><i class="fas fa-wand-magic-sparkles"></i></span>
+            <span class="button__label">Open EmbedForge</span>
+          </a>
+        `
+      }
+    };
+    function openProjectModal(key) {
+      const data = projectDetails[key];
+      if (!data) {
+        return;
+      }
+      projectModalTitle.textContent = data.title;
+      projectModalSubtitle.textContent = data.subtitle;
+      projectModalBody.innerHTML = data.body;
+      projectModalFooter.innerHTML = data.footer;
+      openModal(projectModal);
+    }
+    function initProjectInfoButtons() {
+      projectInfoButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          const key = button.dataset.info;
+          openProjectModal(key);
+        });
+      });
+    }
+    function initFilterChips() {
+      filterChips.forEach(chip => {
+        chip.addEventListener("click", () => {
+          filterChips.forEach(item => item.classList.remove("active"));
+          chip.classList.add("active");
+          activeFilter = chip.dataset.filter;
+          filterProjects(searchInput.value, activeFilter);
+        });
+      });
+    }
+    function initSearchInput() {
+      searchInput.addEventListener("input", () => {
+        filterProjects(searchInput.value, activeFilter);
+      });
+      searchInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const firstVisible = Array.from(projectCards).find(card => !card.classList.contains("project-card--hidden"));
+          if (firstVisible) {
+            smoothScroll(firstVisible);
+            firstVisible.classList.add("project-card--highlight");
+            setTimeout(() => firstVisible.classList.remove("project-card--highlight"), 1200);
+          }
+        }
+      });
+    }
+    function initResetButton() {
+      resetFilters.addEventListener("click", () => {
+        resetSearch();
+      });
+    }
+    function initThemeToggle() {
+      themeToggle.addEventListener("change", toggleTheme);
+    }
+    function initSidebarToggle() {
+      floatingToggle.addEventListener("click", () => toggleSidebar());
+      document.addEventListener("keydown", closeSidebarOnEscape);
+      window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1024) {
+          toggleSidebar(false);
+        }
+      });
+    }
+    function initModals() {
+      contactAdminButtons.forEach(button => {
+        if (button) {
+          button.addEventListener("click", () => openModal(contactModal));
+        }
+      });
+      if (suggestBtn) {
+        suggestBtn.addEventListener("click", () => openModal(suggestModal));
+      }
+      if (footerSuggest) {
+        footerSuggest.addEventListener("click", () => openModal(suggestModal));
+      }
+      modalCloseButtons.forEach(button => {
+        button.addEventListener("click", () => closeModal(button.closest(".modal")));
+      });
+      modals.forEach(modal => {
+        modal.addEventListener("click", event => {
+          if (event.target === modal) {
+            closeModal(modal);
+          }
+        });
+      });
+      document.addEventListener("keydown", handleGlobalEscape);
+    }
+    function initWelcomeOverlay() {
+      let visits = parseInt(localStorage.getItem("vanprojects:visits") || "0", 10) + 1;
+      localStorage.setItem("vanprojects:visits", visits);
+      visitCountEl.textContent = visits.toString();
+      if (visits % 2 === 1) {
+        welcomeOverlay.classList.add("welcome-overlay--visible");
+      }
+      welcomeContinue.addEventListener("click", () => {
+        welcomeOverlay.classList.remove("welcome-overlay--visible");
+        enqueueNotification({ title: "Welcome aboard", message: "Explore responsibly. Have fun!", status: "success" });
+      });
+      welcomeRedirect.addEventListener("click", () => {
+        window.location.href = "https://www.google.com";
+      });
+    }
+    function initCopyHandle() {
+      copyHandleBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText("aivanabanto");
+          ctaFootnote.textContent = "Copied. Ping me anytime.";
+          enqueueNotification({ title: "Copied", message: "Discord handle copied to clipboard.", status: "success" });
+        } catch (error) {
+          ctaFootnote.textContent = "Copy failed. Manual handle: aivanabanto";
+          enqueueNotification({ title: "Copy failed", message: "Your browser blocked clipboard access.", status: "error" });
+        }
+      });
+    }
+    function initForms() {
+      const webhook = "https://ptb.discord.com/api/webhooks/1423626567032115282/e8TdlkSlRe1ebswV_83CUWM-1BlJbXZ-YDEGeBXPirunxEOi_-_w2ZsxAXr49OXKBIES";
       if (contactForm) {
-        contactForm.addEventListener('submit', async function(e) {
-          e.preventDefault();
-          
-          const name = document.getElementById('contact-name').value.trim();
-          const email = document.getElementById('contact-email').value.trim();
-          const message = document.getElementById('contact-message').value.trim();
-          
+        contactForm.addEventListener("submit", async event => {
+          event.preventDefault();
+          const name = document.getElementById("contact-name").value.trim();
+          const email = document.getElementById("contact-email").value.trim();
+          const message = document.getElementById("contact-message").value.trim();
           if (!name || !email || !message) {
-            showNotification('Error', 'Please fill in all fields.', 'error');
+            enqueueNotification({ title: "Incomplete", message: "Please fill in all contact fields.", status: "warning" });
             return;
           }
-          
-          // Simulate form submission
-          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-          submitBtn.disabled = true;
-          
+          const payload = {
+            content: [
+              "**New Contact Message**",
+              "",
+              `**Name:** ${name}`,
+              `**Email:** ${email}`,
+              `**Message:** ${message}`
+            ].join("
+")
+          };
           try {
-            // In a real app, this would be your webhook URL
-            // const webhookUrl = 'YOUR_WEBHOOK_URL';
-            // await fetch(webhookUrl, {
-            //   method: 'POST',
-            //   headers: { 'Content-Type': 'application/json' },
-            //   body: JSON.stringify({ name, email, message })
-            // });
-            
-            // Simulate network delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            showNotification(
-              'Success', 
-              'Message sent successfully! <span class="placeholder-note">Tinood kaha ng mail nimo dawg.</span>',
-              'success'
-            );
-            
-            contactModal.classList.remove('active');
+            await fetch(webhook, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(payload)
+            });
+            enqueueNotification({ title: "Message sent", message: "Thanks for reaching out!", status: "success" });
             contactForm.reset();
-            document.body.style.overflow = 'auto';
+            closeModal(contactModal);
           } catch (error) {
-            showNotification('Error', 'Failed to send message. Please try again.', 'error');
-          } finally {
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message';
-            submitBtn.disabled = false;
+            enqueueNotification({ title: "Error", message: "Unable to send your message right now.", status: "error" });
           }
         });
       }
-      
-      // Welcome modal actions
-      welcomeClose.addEventListener('click', () => {
-        welcomeModal.classList.remove('active');
-      });
-      
-      dikoBtn.addEventListener('click', () => {
-        window.location.href = 'https://www.youjizz.com/';
-      });
-      
-      // Close modals when clicking outside
-      window.addEventListener('click', (e) => {
-        if (e.target === contactModal) {
-          contactModal.classList.remove('active');
-          document.body.style.overflow = 'auto';
-        }
-        if (e.target === welcomeModal) {
-          welcomeModal.classList.remove('active');
-        }
-        if (e.target === sideMenu) {
-          sideMenu.classList.remove('active');
-          document.body.style.overflow = 'auto';
-        }
-      });
-      
-      // Search functionality
-      const searchBar = document.getElementById('search-bar');
-      const projectCards = document.querySelectorAll('.project-card:not(.disabled)');
-      
-      searchBar.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        
-        projectCards.forEach(card => {
-          const title = card.querySelector('h2').textContent.toLowerCase();
-          const description = card.querySelector('p').textContent.toLowerCase();
-          
-          if (title.includes(searchTerm) || description.includes(searchTerm)) {
-            card.style.display = 'block';
-          } else {
-            card.style.display = 'none';
+      if (suggestForm) {
+        suggestForm.addEventListener("submit", async event => {
+          event.preventDefault();
+          const title = document.getElementById("suggest-title").value.trim();
+          const details = document.getElementById("suggest-details").value.trim();
+          if (!title || !details) {
+            enqueueNotification({ title: "Missing info", message: "Please fill in the project idea details.", status: "warning" });
+            return;
+          }
+          const payload = {
+            content: [
+              "**New Project Suggestion**",
+              "",
+              `**Title:** ${title}`,
+              `**Details:** ${details}`
+            ].join("
+")
+          };
+          try {
+            await fetch(webhook, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(payload)
+            });
+            enqueueNotification({ title: "Idea sent", message: "I will check it out soon.", status: "success" });
+            suggestForm.reset();
+            closeModal(suggestModal);
+          } catch (error) {
+            enqueueNotification({ title: "Error", message: "Unable to submit your suggestion.", status: "error" });
           }
         });
+      }
+    }
+    function initNotificationClose() {
+      notificationClose.addEventListener("click", () => {
+        notification.classList.remove("notification--visible");
       });
-      
-      // Add animation to project cards on load
-      setTimeout(() => {
-        document.querySelectorAll('.project-card').forEach((card, index) => {
+    }
+    function initParallax() {
+      const parallaxElements = document.querySelectorAll("[data-parallax]");
+      window.addEventListener("mousemove", event => {
+        const x = event.clientX / window.innerWidth - 0.5;
+        const y = event.clientY / window.innerHeight - 0.5;
+        parallaxElements.forEach(element => {
+          const depth = parseFloat(element.dataset.depth || "0.1");
+          element.style.transform = `translate3d(${x * depth * 40}px, ${y * depth * 40}px, 0)`;
+        });
+      });
+    }
+    function initTilt() {
+      const tiltElements = document.querySelectorAll("[data-tilt]");
+      tiltElements.forEach(element => {
+        element.addEventListener("mousemove", event => {
+          const rect = element.getBoundingClientRect();
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+          const rotateX = ((y / rect.height) * 14) - 7;
+          const rotateY = ((x / rect.width) * -14) + 7;
+          element.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+        element.addEventListener("mouseleave", () => {
+          element.style.transform = "";
+        });
+      });
+    }
+    function initCarousel() {
+      const carousel = document.querySelector(".testimonial-carousel");
+      if (!carousel) {
+        return;
+      }
+      const viewport = carousel.querySelector(".carousel__viewport");
+      const slides = Array.from(viewport.children);
+      const prevButton = carousel.querySelector(".carousel__nav--prev");
+      const nextButton = carousel.querySelector(".carousel__nav--next");
+      const dotsContainer = carousel.querySelector(".carousel__dots");
+      let currentIndex = 0;
+      slides.forEach((slide, index) => {
+        const dot = document.createElement("button");
+        dot.className = "carousel__dot";
+        dot.type = "button";
+        dot.setAttribute("aria-label", `View testimonial ${index + 1}`);
+        dot.dataset.index = index.toString();
+        dotsContainer.appendChild(dot);
+      });
+      const dots = Array.from(dotsContainer.children);
+      function updateCarousel(index) {
+        currentIndex = (index + slides.length) % slides.length;
+        viewport.style.transform = `translateX(-${currentIndex * 100}%)`;
+        dots.forEach((dot, dotIndex) => {
+          dot.classList.toggle("carousel__dot--active", dotIndex === currentIndex);
+        });
+      }
+      prevButton.addEventListener("click", () => updateCarousel(currentIndex - 1));
+      nextButton.addEventListener("click", () => updateCarousel(currentIndex + 1));
+      dots.forEach(dot => {
+        dot.addEventListener("click", () => {
+          updateCarousel(parseInt(dot.dataset.index, 10));
+        });
+      });
+      updateCarousel(0);
+    }
+    function initWelcomeButtonReplay() {
+      const openWelcomeButton = document.getElementById("open-welcome");
+      if (!openWelcomeButton) {
+        return;
+      }
+      openWelcomeButton.addEventListener("click", () => {
+        welcomeOverlay.classList.add("welcome-overlay--visible");
+      });
+    }
+    function initProjectHighlight() {
+      const hash = window.location.hash.replace("#", "");
+      if (hash) {
+        const targetCard = Array.from(projectCards).find(card => card.dataset.title.toLowerCase() === hash.toLowerCase());
+        if (targetCard) {
           setTimeout(() => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            
-            setTimeout(() => {
-              card.style.opacity = '1';
-              card.style.transform = 'translateY(0)';
-            }, 50);
-          }, index * 100);
-        });
-      }, 300);
-    });
-    
-    // Prevent context menu and developer tools
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if (e.keyCode === 123 || 
-          (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || 
-          (e.ctrlKey && e.key === 'U')) {
-        e.preventDefault();
-        return false;
+            smoothScroll(targetCard);
+            targetCard.classList.add("project-card--highlight");
+            setTimeout(() => targetCard.classList.remove("project-card--highlight"), 1400);
+          }, 800);
+        }
       }
-    });
+    }
+    function init() {
+      createParticles();
+      preloadSequence();
+      loadTheme();
+      initThemeToggle();
+      initSidebarToggle();
+      initIntersectionObserver();
+      initCounters();
+      attachScrollListeners();
+      initCursor();
+      initProjectInfoButtons();
+      initFilterChips();
+      initSearchInput();
+      initResetButton();
+      initModals();
+      initWelcomeOverlay();
+      initCopyHandle();
+      initForms();
+      initNotificationClose();
+      initParallax();
+      initTilt();
+      initCarousel();
+      initWelcomeButtonReplay();
+      initProjectHighlight();
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 100) {
+          floatingToggle.classList.add("floating-toggle--shadow");
+        } else {
+          floatingToggle.classList.remove("floating-toggle--shadow");
+        }
+      });
+    }
+    document.addEventListener("DOMContentLoaded", init);
   </script>
 </body>
 </html>
