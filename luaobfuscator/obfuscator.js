@@ -1,1 +1,110 @@
-(function(w){const R=()=>Math.random(),F=Math.floor,S=String.fromCharCode,C=s=>s.charCodeAt(0);function G(l){let r='';for(let i=0;i<l;i++)r+=S(97+F(R()*26));return r}function H(n,p=''){const s=G(8);let h='';for(let i=0;i<n.length;i++){const c=C(n[i])^C(s[i%s.length]);h+=S(c)}return`(function(...)local ${p||G(6)}="${s}";local ${p||G(6)}="${h.split('').map(c=>'\\'..C(c)).join('')}";local ${p||G(6)}="";for ${p||G(6)}=1,#${p||G(6)} do ${p||G(6)}=${p||G(6)}..string.char(string.byte(${p||G(6)},${p||G(6)})~string.byte(${p||G(6)},(${p||G(6)}-1)%#${p||G(6)}+1))end;return ${p||G(6)} end)()`}function B(n){const l=R()<0.5?'base64':'hex';if(l==='base64'){const b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';let r='',p=0,v=0;for(let i=0;i<n.length;i++){v=(v<<8)|C(n[i]);p+=8;while(p>=6){r+=b[(v>>(p-6))&63];p-=6}}if(p>0)r+=b[(v<<(6-p))&63];while(r.length%4!==0)r+='=';return`(function()local ${G(6)}="${r}";local ${G(6)}="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";local ${G(6)}="";local ${G(6)}=1;while ${G(6)}<=#${G(6)} do local ${G(6)}=${G(6)}:find(${G(6)}:sub(${G(6)},${G(6)}))-1;${G(6)}=${G(6)}+1;if ${G(6)}<=#${G(6)} then local ${G(6)}=${G(6)}:find(${G(6)}:sub(${G(6)},${G(6)}))-1;${G(6)}=${G(6)}+1;if ${G(6)}<=#${G(6)} then local ${G(6)}=${G(6)}:find(${G(6)}:sub(${G(6)},${G(6)}))-1;${G(6)}=${G(6)}+1;if ${G(6)}<=#${G(6)} then local ${G(6)}=${G(6)}:find(${G(6)}:sub(${G(6)},${G(6)}))-1;${G(6)}=${G(6)}+1;${G(6)}=${G(6)}..string.char((${G(6)}*64+${G(6)}*16+${G(6)}*4+${G(6)})/256);${G(6)}=${G(6)}..string.char((${G(6)}*64+${G(6)}*16+${G(6)}*4+${G(6)})%256)else ${G(6)}=${G(6)}..string.char((${G(6)}*64+${G(6)}*16+${G(6)}*4)/256)end else ${G(6)}=${G(6)}..string.char(${G(6)}*4+${G(6)}/16)end end end;return ${G(6)} end)()`}else{let r='';for(let i=0;i<n.length;i++){const h=C(n[i]).toString(16).padStart(2,'0');r+=h}return`(function()local ${G(6)}="${r}";local ${G(6)}="";for ${G(6)}=1,#${G(6)},2 do ${G(6)}=${G(6)}..string.char(tonumber(${G(6)}:sub(${G(6)},${G(6)}+1),16))end;return ${G(6)} end)()`}}function E(n,d=2){let r=n;const m=[H,B,(s)=>{let o='';for(let i=0;i<s.length;i++)o+='\\'..C(s[i]);return'"'..o..'"'}];for(let i=0;i<d;i++){const f=m[F(R()*m.length)];r=f(r)}return r}function T(c){const p=/(['"])(?:(?!\1)[^\\]|\\.)*\1/g;return c.replace(p,(m)=>{const s=m.slice(1,-1);const l=2+F(R()*3);return E(s,l)})}function D(c){const d=[`local ${G(8)}=function()return nil end;${G(8)}()`,`local ${G(8)}=0;for ${G(8)}=1,0 do ${G(8)}=${G(8)}+1 end`,`if false then local ${G(8)}=true end`,`local ${G(8)}={};${G(8)}[1]=nil`,`local function ${G(8)}()end`];let r='';const n=F(R()*3)+2;for(let i=0;i<n;i++)r+=d[F(R()*d.length)]+';';return r+c}function L(c){const l=c.split('\n');const m=[];let s='';let p=0;const k=G(8);for(let i=0;i<l.length;i++){const n=l[i].trim();if(n){m.push({i:p++,c:n})}}let r=`local ${k}=0;while true do `;m.forEach((n,i)=>{r+=`if ${k}==${n.i} then ${n.c};${k}=${i<m.length-1?m[i+1].i:-1} `;if(R()>0.7&&i<m.length-1){const d=F(R()*(m.length-i-1))+i+1;r+=`elseif ${k}==${m[d].i} then ${m[d].c};${k}=${d<m.length-1?m[d+1].i:-1} `}});r+=`else break end end`;return r}function V(c,o){const k=G(8),v=G(8),m=G(8);const h=`local ${k}=getfenv or function()return _ENV end;local ${v}=${k}().string.char;local ${m}=${k}().string.byte;`;const p=/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g;const u=new Set(['local','function','end','if','then','else','elseif','while','do','for','in','repeat','until','return','break','and','or','not','true','false','nil']);const r=new Map();let n=c.replace(p,(e)=>{if(!u.has(e)){if(!r.has(e)){r.set(e,G(F(R()*8)+8))}return r.get(e)}return e});if(o.deadCode){n=D(n)}n=T(n);if(o.controlFlow&&R()>0.3){n=L(n)}const s=`--[[ Obfuscated in https://vanprojects.netlify.app/luaobfuscator ]]--\n${h}(function()local ${G(8)}=[[${G(16)}]];${n} end)()`;const x=G(12);const z=G(16);let f=s;const q=`local ${x}=function(${G(6)})if not ${G(6)}:match("Obfuscated in https://vanprojects.netlify.app/luaobfuscator")then error("${z}",0)end;return true end;`;f=f.replace('--[[ Obfuscated','--[[ Obfuscated')+'';const y=f.split('\n');if(y.length>0){y.splice(1,0,q+`${x}(debug.getinfo(1).source or"");`);f=y.join('\n')}return f}w.ObfuscateLua=function(c,o={}){const d={controlFlow:o.controlFlow!==false,deadCode:o.deadCode!==false};return V(c,d)};})(window);
+// Utility Functions
+const $ = (s, d = document) => d.querySelector(s);
+const $$ = (s, d = document) => d.querySelectorAll(s);
+const C = (t, c = 1) => t.split('').map((_, i) => String.fromCharCode(t.charCodeAt(i) ^ c)).join('');
+const R = (m, n) => Math.floor(Math.random() * (n - m + 1) + m);
+const S = (a) => a.sort(() => 0.5 - Math.random());
+const X = (l = 32) => Array(l).fill().map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[R(0, 61)]).join('');
+const Y = (s, k = X()) => s.split('').map(c => k[c.charCodeAt(0) % k.length] || c).join('');
+const Z = (s, k = X()) => s.split('').map(c => k.indexOf(c) >= 0 ? String.fromCharCode(k.indexOf(c)) : c).join('');
+const _ = (s, l = R(2, 4)) => { for (let i = 0; i < l; i++) s = C(Y(s)); return s; };
+const __ = (s, l = R(2, 4)) => { for (let i = 0; i < l; i++) s = Z(C(s)); return s; };
+
+// Anti-Debugging Tricks
+const antiDebug = () => {
+  const checks = [
+    `if debug.getinfo then return end`,
+    `if _G["debug"] then os.exit() end`,
+    `local mt = getmetatable(_G) if mt then mt.__index = function() error("No debug!") end end`,
+    `local oldprint = print; _G.print = function(...) if select('#', ...) > 0 and tostring(select(1, ...)):find("debug") then return else oldprint(...) end end`
+  ];
+  return checks[R(0, checks.length - 1)];
+};
+
+// Dynamic Key Generation
+const dynamicKey = () => {
+  const key = X(16);
+  return `
+    local function getKey()
+      local key = "${key}"
+      for i=1,#key do
+        key = key:sub(2) .. key:sub(1,1)
+        key = key:gsub(".(.)", function(a,b) return b..a end)
+      end
+      return key
+    end
+  `;
+};
+
+// Junk Code Injection
+const junkCode = () => {
+  const junk = [
+    `local ${X(8)} = function() return ${R(100, 9999)} end`,
+    `for ${X(5)}=1,${R(5, 20)} do local ${X(8)}=math.random() end`,
+    `if ${R(1, 100)} > ${R(1, 100)} then ${X(8)}() end`,
+    `local ${X(8)} = {${Array(R(3, 10)).fill().map(() => R(0, 255)).join(',')}}`,
+    `pcall(function() ${X(8)} = ${R(1, 100)} end)`
+  ];
+  return junk[R(0, junk.length - 1)];
+};
+
+// Number Obfuscation
+const obfuscateNumber = (n) => {
+  if (n < 10) return n;
+  const ops = ['+', '-', '*', '/', '^'];
+  const a = R(1, n - 1);
+  const b = n - a;
+  const op = ops[R(0, ops.length - 1)];
+  return `${a}${op}${b}`;
+};
+
+// Base64 + XOR Obfuscation
+const B64 = (s) => btoa(encodeURIComponent(s).replace(/%([0-9A-F]{2})/g, (_, p) => String.fromCharCode('0x' + p)));
+const XOR_B64 = (s, k) => C(B64(s), k);
+
+// Main Obfuscator Function
+const T = (code, options = {}) => {
+  const {
+    junk = true,
+    antiDebugging = true,
+    dynamicKeys = true,
+    layers = R(3, 8)
+  } = options;
+
+  // Generate random variable names
+  const vars = Array(100).fill().map(() => X(8));
+  const [r, n, e, o, u, a, i, s, l, d, p, h, v, g, y, m, b, w, k, E, S, x, N, C, D, P, L, O, A, I, U, F, R, B, W, K, V, G, Y, M, q, H, j, Q, z] = vars;
+
+  // Obfuscate the input code
+  let obfuscated = _(code);
+
+  // Add layers of obfuscation
+  for (let layer = 0; layer < layers; layer++) {
+    obfuscated = R(0, 1) ? _(obfuscated) : __(obfuscated);
+    if (junk) obfuscated = `${junkCode()}\n${obfuscated}`;
+  }
+
+  // Inject anti-debugging
+  if (antiDebugging) obfuscated = `${antiDebug()}\n${obfuscated}`;
+
+  // Inject dynamic key generation
+  if (dynamicKeys) obfuscated = `${dynamicKey()}\n${obfuscated}`;
+
+  // Wrap in a random function
+  return `
+--[[ Obfuscated in https://vanprojects.netlify.app/luaobfuscator ]]--
+local ${r}=function()
+  ${vars.map(v => `local ${v}=${R(100, 9999)}`).join('\n  ')}
+  ${obfuscated}
+  return ${r}
+end
+${r}()
+  `.trim();
+};
+
+// Export for Node.js / Browser
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { T, _, __, C, Y, Z, X, R };
+} else {
+  window.LuaObfuscator = { T, _, __, C, Y, Z, X, R };
+}
