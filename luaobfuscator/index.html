@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VanProjects - Professional Lua Obfuscator</title>
+    <title>Van Projects - Lua Obfuscator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">VanProjects</div>
+            <div class="nav-logo">Van Projects</div>
             <ul class="nav-menu">
                 <li><a href="#home">Home</a></li>
-                <li><a href="#features">Features</a></li>
                 <li><a href="#obfuscator">Obfuscator</a></li>
+                <li><a href="#features">Features</a></li>
                 <li><a href="#about">About</a></li>
             </ul>
         </div>
@@ -21,88 +21,114 @@
 
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1 class="hero-title">Advanced Lua Obfuscator</h1>
-            <p class="hero-subtitle">Industry-leading protection for your Roblox scripts</p>
-            <a href="#obfuscator" class="cta-button">Start Obfuscating</a>
-        </div>
-    </section>
-
-    <section id="features" class="features">
-        <div class="container">
-            <h2 class="section-title">Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3>Military-Grade Encryption</h3>
-                    <p>Multi-layer encoding with randomized algorithms</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3>Lightning Fast</h3>
-                    <p>Instant obfuscation with optimized performance</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🛡️</div>
-                    <h3>Anti-Tampering</h3>
-                    <p>Built-in integrity checks prevent modification</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎲</div>
-                    <h3>Dynamic Randomization</h3>
-                    <p>Unique output every time you obfuscate</p>
-                </div>
-            </div>
+            <h1 class="hero-title">Professional Lua Obfuscator</h1>
+            <p class="hero-subtitle">Advanced code protection for Roblox developers</p>
+            <a href="#obfuscator" class="hero-button">Start Obfuscating</a>
         </div>
     </section>
 
     <section id="obfuscator" class="obfuscator-section">
         <div class="container">
-            <h2 class="section-title">Lua Obfuscator</h2>
+            <h2 class="section-title">Lua Code Obfuscator</h2>
             <div class="obfuscator-container">
-                <div class="input-section">
-                    <h3>Input Code</h3>
-                    <textarea id="inputCode" placeholder="Paste your Lua code here..."></textarea>
+                <div class="input-panel">
+                    <div class="panel-header">
+                        <h3>Original Code</h3>
+                        <button class="clear-btn" onclick="clearInput()">Clear</button>
+                    </div>
+                    <textarea id="input-code" placeholder="Paste your Lua code here..."></textarea>
                 </div>
-                <div class="controls">
-                    <button id="obfuscateBtn" class="obfuscate-btn">Obfuscate</button>
-                    <button id="clearBtn" class="clear-btn">Clear</button>
+                <div class="control-panel">
+                    <button class="obfuscate-btn" onclick="obfuscateCode()">
+                        <span class="btn-icon">🔒</span>
+                        Obfuscate
+                    </button>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Input Size:</span>
+                            <span id="input-size">0 bytes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Output Size:</span>
+                            <span id="output-size">0 bytes</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="output-section">
-                    <h3>Obfuscated Output</h3>
-                    <textarea id="outputCode" readonly placeholder="Obfuscated code will appear here..."></textarea>
-                    <button id="copyBtn" class="copy-btn">Copy to Clipboard</button>
-                </div>
-            </div>
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="stat-label">Original Size:</span>
-                    <span id="originalSize">0 bytes</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Obfuscated Size:</span>
-                    <span id="obfuscatedSize">0 bytes</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Compression Ratio:</span>
-                    <span id="ratio">0%</span>
+                <div class="output-panel">
+                    <div class="panel-header">
+                        <h3>Obfuscated Code</h3>
+                        <button class="copy-btn" onclick="copyOutput()">Copy</button>
+                    </div>
+                    <textarea id="output-code" readonly placeholder="Obfuscated code will appear here..."></textarea>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="about" class="about">
+    <section id="features" class="features-section">
         <div class="container">
-            <h2 class="section-title">About VanProjects</h2>
-            <p class="about-text">
-                VanProjects delivers enterprise-grade Lua obfuscation technology trusted by thousands of developers worldwide.
-                Our advanced algorithms ensure your intellectual property remains protected against reverse engineering attempts.
-            </p>
+            <h2 class="section-title">Advanced Protection Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Anti-Tampering</h3>
+                    <p>Automatic detection and prevention of code modification attempts</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>String Encryption</h3>
+                    <p>Multi-layer encryption for all string literals in your code</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌀</div>
+                    <h3>Control Flow</h3>
+                    <p>Advanced control flow obfuscation to prevent analysis</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎲</div>
+                    <h3>Randomization</h3>
+                    <p>Unique obfuscation patterns for every build</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Fast Processing</h3>
+                    <p>Client-side obfuscation with instant results</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Zero Dependencies</h3>
+                    <p>No external libraries or server requirements</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title">About Van Projects</h2>
+            <div class="about-content">
+                <p>Van Projects specializes in creating professional development tools for the Roblox community. Our Lua obfuscator provides enterprise-grade code protection with advanced anti-reversing techniques.</p>
+                <div class="about-stats">
+                    <div class="about-stat">
+                        <h3>100%</h3>
+                        <p>Client-Side</p>
+                    </div>
+                    <div class="about-stat">
+                        <h3>0</h3>
+                        <p>Data Collected</p>
+                    </div>
+                    <div class="about-stat">
+                        <h3>∞</h3>
+                        <p>Unique Builds</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 VanProjects. All rights reserved.</p>
+            <p>&copy; 2024 Van Projects. Professional Lua Obfuscation.</p>
         </div>
     </footer>
 
