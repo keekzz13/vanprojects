@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lua Obfuscator</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lua Obfuscator</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="obfuscator.js"></script>
 </head>
 <body>
-  <div class="container">
     <h1>Lua Obfuscator</h1>
-    <div class="editor">
-      <textarea id="input" placeholder="Paste Lua code here..."></textarea>
-      <textarea id="output" placeholder="Obfuscated output..." readonly></textarea>
-    </div>
-    <button id="obfuscate">Obfuscate</button>
-    <button id="copy">Copy</button>
-  </div>
-  <script src="obfuscator.js"></script>
-  <script src="app.js"></script>
+    <textarea id="input" placeholder="Paste your Lua script here..."></textarea>
+    <label for="flatten">Enable control-flow flattening + dead code
+        <input type="checkbox" id="flatten" checked>
+    </label>
+    <button onclick="obf()">Obfuscate Now</button>
+    <textarea id="output" placeholder="Obfuscated Lua will appear here..." readonly></textarea>
+    <script>
+        function obf() {
+            var input = document.getElementById('input').value;
+            var flatten = document.getElementById('flatten').checked;
+            var output = obfuscateLua(input, flatten);
+            document.getElementById('output').value = output;
+        }
+    </script>
 </body>
 </html>
