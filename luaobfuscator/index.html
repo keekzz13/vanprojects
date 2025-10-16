@@ -3,20 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Luau Obfuscator</title>
+  <title>Lua Obfuscator - VanProjects</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
-    <h1>High-Quality Luau Obfuscator for Roblox</h1>
-    <textarea id="input" placeholder="Paste your Luau script here..."></textarea>
-    <label>
-      <input type="checkbox" id="flatten"> Enable control-flow flattening and dead code injection
-    </label>
-    <button id="obfuscate">Obfuscate Script</button>
-    <textarea id="output" placeholder="Obfuscated script will appear here..." readonly></textarea>
+    <header class="header">
+      <div class="logo-section">
+        <h1>LuaVault</h1>
+        <p class="tagline">Enterprise-Grade Lua Code Protection</p>
+      </div>
+      <div class="info-badge">v2.4.1</div>
+    </header>
+
+    <main class="main-content">
+      <div class="editor-wrapper">
+        <div class="editor-panel">
+          <div class="panel-header">
+            <h2>Input</h2>
+            <span class="char-count">0 characters</span>
+          </div>
+          <textarea id="inputCode" class="code-input" placeholder="Paste your Lua code here..." spellcheck="false"></textarea>
+        </div>
+
+        <div class="button-group">
+          <button id="obfuscateBtn" class="btn btn-primary">
+            <span class="btn-icon">⚡</span>
+            Obfuscate
+          </button>
+          <button id="clearBtn" class="btn btn-secondary">Clear</button>
+        </div>
+
+        <div class="editor-panel">
+          <div class="panel-header">
+            <h2>Output</h2>
+            <button id="copyBtn" class="btn-copy">Copy</button>
+          </div>
+          <textarea id="outputCode" class="code-output" readonly placeholder="Obfuscated code will appear here..."></textarea>
+        </div>
+      </div>
+
+      <div class="features-section">
+        <h3>Protection Features</h3>
+        <ul class="features-list">
+          <li>✓ Multi-layer string encryption</li>
+          <li>✓ Variable name randomization</li>
+          <li>✓ Per-build obfuscation variance</li>
+          <li>✓ Non-reversible encoding chains</li>
+          <li>✓ Runtime decoder injection</li>
+          <li>✓ Embedded watermark authentication</li>
+        </ul>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>© 2025 VanProjects. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a></p>
+    </footer>
   </div>
+
+  <div id="notification" class="notification"></div>
+
   <script src="obfuscator.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
-
