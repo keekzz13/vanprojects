@@ -3,170 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VanProjects - Lua Obfuscator</title>
+    <title>Lua Obfuscator - Advanced Code Protection</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <header class="fade-in">
-            <div class="logo">
-                <span class="logo-text">VanProjects</span>
-                <span class="logo-dot"></span>
-            </div>
-            <nav>
-                <a href="#home" class="nav-link">Home</a>
-                <a href="#features" class="nav-link">Features</a>
-                <a href="#obfuscator" class="nav-link">Obfuscator</a>
-            </nav>
+        <header>
+            <h1>Lua Obfuscator</h1>
+            <p>Advanced code protection with multiple security layers</p>
         </header>
 
-        <section class="hero fade-in-up">
-            <div class="hero-content">
-                <h1 class="glitch" data-text="Advanced Lua Obfuscator">Advanced Lua Obfuscator</h1>
-                <p class="hero-subtitle">Protect your Lua scripts with military-grade obfuscation</p>
-                <a href="#obfuscator" class="cta-button">
-                    <span>Start Obfuscating</span>
-                    <div class="button-glow"></div>
-                </a>
+        <div class="main-content">
+            <div class="input-section">
+                <div class="section-header">
+                    <h2>Input Lua Code</h2>
+                    <div class="controls">
+                        <button id="sampleBtn" class="btn-secondary">Load Sample</button>
+                        <button id="clearBtn" class="btn-secondary">Clear</button>
+                    </div>
+                </div>
+                <textarea id="inputCode" placeholder="Paste your Lua code here..."></textarea>
             </div>
-            <div class="hero-background">
-                <div class="floating-code">01001100</div>
-                <div class="floating-code">01010101</div>
-                <div class="floating-code">01000001</div>
-            </div>
-        </section>
 
-        <section class="features" id="features">
-            <h2 class="section-title">Why Choose Us?</h2>
-            <div class="feature-grid">
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
-                    <div class="icon-wrapper">
-                        <div class="icon">🔒</div>
-                    </div>
-                    <h3>Unbreakable Security</h3>
-                    <p>Multi-layer protection that prevents deobfuscation attempts</p>
-                    <div class="card-glow"></div>
+            <div class="options-section">
+                <h2>Obfuscation Options</h2>
+                <div class="options-grid">
+                    <label class="option">
+                        <input type="checkbox" id="stringEncoding" checked>
+                        <span class="checkmark"></span>
+                        String Encoding (2-4 layers)
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" id="controlFlow" checked>
+                        <span class="checkmark"></span>
+                        Control Flow Flattening
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" id="deadCode" checked>
+                        <span class="checkmark"></span>
+                        Add Dead Code
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" id="nameObfuscation" checked>
+                        <span class="checkmark"></span>
+                        Variable Name Obfuscation
+                    </label>
                 </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="icon-wrapper">
-                        <div class="icon">⚡</div>
-                    </div>
-                    <h3>Zero Performance Loss</h3>
-                    <p>Optimized obfuscation maintains script execution speed</p>
-                    <div class="card-glow"></div>
-                </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="icon-wrapper">
-                        <div class="icon">🎯</div>
-                    </div>
-                    <h3>Advanced Algorithms</h3>
-                    <p>Proprietary obfuscation techniques used by professionals</p>
-                    <div class="card-glow"></div>
-                </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="icon-wrapper">
-                        <div class="icon">🛡️</div>
-                    </div>
-                    <h3>Tamper Protection</h3>
-                    <p>Built-in verification prevents header modification</p>
-                    <div class="card-glow"></div>
-                </div>
+                <button id="obfuscateBtn" class="btn-primary">Obfuscate Code</button>
             </div>
-        </section>
 
-        <section class="obfuscator-section" id="obfuscator">
-            <h2 class="section-title">Obfuscate Your Code</h2>
-            <div class="editor-container">
-                <div class="editor-panel">
-                    <div class="panel-header">
-                        <span class="panel-title">
-                            <span class="status-dot"></span>
-                            Input Code
-                        </span>
-                        <button class="clear-btn" onclick="clearInput()">
-                            <span>Clear</span>
-                        </button>
+            <div class="output-section">
+                <div class="section-header">
+                    <h2>Obfuscated Output</h2>
+                    <div class="controls">
+                        <button id="copyBtn" class="btn-secondary">Copy to Clipboard</button>
+                        <button id="downloadBtn" class="btn-secondary">Download</button>
                     </div>
-                    <textarea id="inputCode" placeholder="Paste your Lua code here..."></textarea>
-                    <div class="line-numbers" id="inputLineNumbers"></div>
                 </div>
-                <div class="editor-panel">
-                    <div class="panel-header">
-                        <span class="panel-title">
-                            <span class="status-dot success"></span>
-                            Obfuscated Output
-                        </span>
-                        <button class="copy-btn" onclick="copyOutput()">
-                            <span class="copy-text">Copy</span>
-                            <span class="copied-text">Copied!</span>
-                        </button>
-                    </div>
-                    <textarea id="outputCode" readonly placeholder="Obfuscated code will appear here..."></textarea>
-                    <div class="line-numbers" id="outputLineNumbers"></div>
-                </div>
+                <textarea id="outputCode" readonly placeholder="Obfuscated code will appear here..."></textarea>
             </div>
-            <button class="obfuscate-btn" onclick="obfuscateCode()">
-                <span class="btn-text">Obfuscate Code</span>
-                <span class="btn-loader"></span>
-            </button>
-            <div class="stats-container">
-                <div class="stat-item">
-                    <div class="stat-value" id="inputSize">0</div>
-                    <div class="stat-label">Characters In</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="outputSize">0</div>
-                    <div class="stat-label">Characters Out</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="obfuscationTime">0ms</div>
-                    <div class="stat-label">Processing Time</div>
-                </div>
-            </div>
-        </section>
+        </div>
 
-        <footer class="fade-in">
-            <div class="footer-content">
-                <p>&copy; 2024 VanProjects. All rights reserved.</p>
-                <div class="social-links">
-                    <a href="#" class="social-icon">GitHub</a>
-                    <a href="#" class="social-icon">Discord</a>
-                    <a href="#" class="social-icon">Twitter</a>
-                </div>
-            </div>
+        <footer>
+            <p>Obfuscated with <a href="https://vanprojects.netlify.app/luaobfuscator" target="_blank">Lua Obfuscator</a></p>
         </footer>
     </div>
 
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-container">
-            <div class="loading-spinner">
-                <div class="spinner-ring"></div>
-                <div class="spinner-ring"></div>
-                <div class="spinner-ring"></div>
-            </div>
-            <div class="loading-text">
-                <span class="loading-stage">Obfuscating</span>
-                <span class="loading-dots">
-                    <span>.</span><span>.</span><span>.</span>
-                </span>
-            </div>
-            <div class="loading-progress">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-            <div class="loading-steps">
-                <div class="step active" id="step1">Encrypting variables</div>
-                <div class="step" id="step2">Shuffling code blocks</div>
-                <div class="step" id="step3">Applying transformations</div>
-                <div class="step" id="step4">Finalizing protection</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="notification" id="notification">
-        <div class="notification-icon">✓</div>
-        <div class="notification-text"></div>
-    </div>
-
-    <script src="obfuscator.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
