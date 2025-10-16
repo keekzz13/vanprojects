@@ -1,69 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lua Obfuscator - VanProjects</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanProjects - Professional Lua Obfuscator</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <div class="logo-section">
-        <h1>LuaVault</h1>
-        <p class="tagline">Enterprise-Grade Lua Code Protection</p>
-      </div>
-      <div class="info-badge">v2.4.1</div>
-    </header>
-
-    <main class="main-content">
-      <div class="editor-wrapper">
-        <div class="editor-panel">
-          <div class="panel-header">
-            <h2>Input</h2>
-            <span class="char-count">0 characters</span>
-          </div>
-          <textarea id="inputCode" class="code-input" placeholder="Paste your Lua code here..." spellcheck="false"></textarea>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">VanProjects</div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#obfuscator">Obfuscator</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
         </div>
+    </nav>
 
-        <div class="button-group">
-          <button id="obfuscateBtn" class="btn btn-primary">
-            <span class="btn-icon">⚡</span>
-            Obfuscate
-          </button>
-          <button id="clearBtn" class="btn btn-secondary">Clear</button>
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Advanced Lua Obfuscator</h1>
+            <p class="hero-subtitle">Industry-leading protection for your Roblox scripts</p>
+            <a href="#obfuscator" class="cta-button">Start Obfuscating</a>
         </div>
+    </section>
 
-        <div class="editor-panel">
-          <div class="panel-header">
-            <h2>Output</h2>
-            <button id="copyBtn" class="btn-copy">Copy</button>
-          </div>
-          <textarea id="outputCode" class="code-output" readonly placeholder="Obfuscated code will appear here..."></textarea>
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Military-Grade Encryption</h3>
+                    <p>Multi-layer encoding with randomized algorithms</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Instant obfuscation with optimized performance</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Anti-Tampering</h3>
+                    <p>Built-in integrity checks prevent modification</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎲</div>
+                    <h3>Dynamic Randomization</h3>
+                    <p>Unique output every time you obfuscate</p>
+                </div>
+            </div>
         </div>
-      </div>
+    </section>
 
-      <div class="features-section">
-        <h3>Protection Features</h3>
-        <ul class="features-list">
-          <li>✓ Multi-layer string encryption</li>
-          <li>✓ Variable name randomization</li>
-          <li>✓ Per-build obfuscation variance</li>
-          <li>✓ Non-reversible encoding chains</li>
-          <li>✓ Runtime decoder injection</li>
-          <li>✓ Embedded watermark authentication</li>
-        </ul>
-      </div>
-    </main>
+    <section id="obfuscator" class="obfuscator-section">
+        <div class="container">
+            <h2 class="section-title">Lua Obfuscator</h2>
+            <div class="obfuscator-container">
+                <div class="input-section">
+                    <h3>Input Code</h3>
+                    <textarea id="inputCode" placeholder="Paste your Lua code here..."></textarea>
+                </div>
+                <div class="controls">
+                    <button id="obfuscateBtn" class="obfuscate-btn">Obfuscate</button>
+                    <button id="clearBtn" class="clear-btn">Clear</button>
+                </div>
+                <div class="output-section">
+                    <h3>Obfuscated Output</h3>
+                    <textarea id="outputCode" readonly placeholder="Obfuscated code will appear here..."></textarea>
+                    <button id="copyBtn" class="copy-btn">Copy to Clipboard</button>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Original Size:</span>
+                    <span id="originalSize">0 bytes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Obfuscated Size:</span>
+                    <span id="obfuscatedSize">0 bytes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Compression Ratio:</span>
+                    <span id="ratio">0%</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About VanProjects</h2>
+            <p class="about-text">
+                VanProjects delivers enterprise-grade Lua obfuscation technology trusted by thousands of developers worldwide.
+                Our advanced algorithms ensure your intellectual property remains protected against reverse engineering attempts.
+            </p>
+        </div>
+    </section>
 
     <footer class="footer">
-      <p>© 2025 VanProjects. All rights reserved. | <a href="#">Privacy</a> | <a href="#">Terms</a></p>
+        <div class="container">
+            <p>&copy; 2024 VanProjects. All rights reserved.</p>
+        </div>
     </footer>
-  </div>
 
-  <div id="notification" class="notification"></div>
-
-  <script src="obfuscator.js"></script>
-  <script src="app.js"></script>
+    <script src="obfuscator.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
