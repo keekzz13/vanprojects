@@ -1,28 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lua Obfuscator</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="obfuscator.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luau Obfuscator</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Lua Obfuscator</h1>
-    <textarea id="input" placeholder="Paste your Lua script here..."></textarea>
-    <label for="flatten">Enable control-flow flattening + dead code
-        <input type="checkbox" id="flatten" checked>
+  <div class="container">
+    <h1>High-Quality Luau Obfuscator for Roblox</h1>
+    <textarea id="input" placeholder="Paste your Luau script here..."></textarea>
+    <label>
+      <input type="checkbox" id="flatten"> Enable control-flow flattening and dead code injection
     </label>
-    <button onclick="obf()">Obfuscate Now</button>
-    <textarea id="output" placeholder="Obfuscated Lua will appear here..." readonly></textarea>
-    <script>
-        function obf() {
-            var input = document.getElementById('input').value;
-            var flatten = document.getElementById('flatten').checked;
-            var output = obfuscateLua(input, flatten);
-            document.getElementById('output').value = output;
-        }
-    </script>
+    <button id="obfuscate">Obfuscate Script</button>
+    <textarea id="output" placeholder="Obfuscated script will appear here..." readonly></textarea>
+  </div>
+  <script src="obfuscator.js"></script>
 </body>
 </html>
-
