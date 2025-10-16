@@ -1,55 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lua Obfuscator - VanProjects</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lua Obfuscator</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Lua Obfuscator</h1>
-            <p>Advanced client-side obfuscation engine</p>
-        </header>
-        <div class="editor-wrapper">
-            <div class="panel">
-                <div class="panel-header">
-                    <span>Input Code</span>
-                    <button class="btn-clear" data-target="input">Clear</button>
-                </div>
-                <textarea id="input" placeholder="Paste your Lua code here..."></textarea>
-            </div>
-            <div class="panel">
-                <div class="panel-header">
-                    <span>Obfuscated Output</span>
-                    <div class="header-buttons">
-                        <button class="btn-copy" data-target="output">Copy</button>
-                        <button class="btn-clear" data-target="output">Clear</button>
-                    </div>
-                </div>
-                <textarea id="output" readonly placeholder="Obfuscated code will appear here..."></textarea>
-            </div>
-        </div>
-        <div class="controls">
-            <div class="options">
-                <label class="option">
-                    <input type="checkbox" id="opt-flow" checked>
-                    <span>Control Flow</span>
-                </label>
-                <label class="option">
-                    <input type="checkbox" id="opt-dead" checked>
-                    <span>Dead Code</span>
-                </label>
-            </div>
-            <button id="obfuscate" class="btn-primary">Obfuscate</button>
-        </div>
-        <footer>
-            <p>&copy; 2024 VanProjects. All rights reserved.</p>
-        </footer>
+  <div class="container">
+    <h1>Lua Obfuscator</h1>
+    <div class="editor">
+      <textarea id="input" placeholder="Paste Lua code here..."></textarea>
+      <textarea id="output" placeholder="Obfuscated output..." readonly></textarea>
     </div>
-    <script src="obfuscator.js"></script>
-    <script src="main.js"></script>
+    <button id="obfuscate">Obfuscate</button>
+    <button id="copy">Copy</button>
+  </div>
+  <script src="obfuscator.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
-
