@@ -1,406 +1,340 @@
 const LuaObfuscator = (function() {
-    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
-    const digits = '0123456789';
-    
-    function randomString(length) {
-        let result = charset[Math.floor(Math.random() * charset.length)];
-        for (let i = 1; i < length; i++) {
-            const pool = charset + digits;
-            result += pool[Math.floor(Math.random() * pool.length)];
-        }
-        return result;
-    }
+    const _0xA8F2 = ['_IL', '_ll', '_lI', '_II', '_li', '_iI', '_Ll', '_LL', '_ii', '_Li'];
+    const _0xB3D1 = {};
+    let _0xC5E9 = 0;
     
     function generateVarName() {
-        const prefixes = ['_', '__', '___'];
-        const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-        return prefix + randomString(Math.floor(Math.random() * 8) + 12);
-    }
-    
-    function escapeString(str) {
-        return str.replace(/\\/g, '\\\\')
-                  .replace(/"/g, '\\"')
-                  .replace(/'/g, "\\'")
-                  .replace(/\n/g, '\\n')
-                  .replace(/\r/g, '\\r')
-                  .replace(/\t/g, '\\t');
+        const chars = 'IlL';
+        let name = '_';
+        for(let i = 0; i < 8 + Math.floor(Math.random() * 4); i++) {
+            name += chars[Math.floor(Math.random() * chars.length)];
+        }
+        return name + Math.floor(Math.random() * 9999);
     }
     
     function encodeString(str) {
-        const bytes = [];
-        for (let i = 0; i < str.length; i++) {
-            bytes.push(str.charCodeAt(i));
-        }
-        return bytes;
+        const methods = [
+            (s) => {
+                let result = [];
+                for(let i = 0; i < s.length; i++) {
+                    result.push(s.charCodeAt(i));
+                }
+                return `(function() local t={${result.join(',')}} local s="" for i=1,#t do s=s..string.char(t[i]) end return s end)()`;
+            },
+            (s) => {
+                let result = [];
+                for(let i = 0; i < s.length; i++) {
+                    result.push(s.charCodeAt(i) ^ 42);
+                }
+                return `(function() local t={${result.join(',')}} local s="" for i=1,#t do s=s..string.char(t[i]~42) end return s end)()`;
+            },
+            (s) => {
+                let hex = '';
+                for(let i = 0; i < s.length; i++) {
+                    hex += '\\x' + s.charCodeAt(i).toString(16).padStart(2, '0');
+                }
+                return `"${hex}"`;
+            }
+        ];
+        return methods[Math.floor(Math.random() * methods.length)](str);
     }
     
-    function xorEncrypt(str, key) {
-        let result = [];
-        for (let i = 0; i < str.length; i++) {
-            result.push(str.charCodeAt(i) ^ key);
-        }
-        return result;
+    function obfuscateNumber(num) {
+        const n = parseFloat(num);
+        const methods = [
+            () => {
+                const a = Math.floor(Math.random() * 1000) + 1;
+                const b = n + a;
+                return `(${b}-${a})`;
+            },
+            () => {
+                const a = Math.floor(Math.random() * 100) + 1;
+                const b = n * a;
+                return `(${b}/${a})`;
+            },
+            () => {
+                const a = Math.floor(Math.random() * 1000);
+                return `(${n + a}-${a})`;
+            },
+            () => `(0x${n.toString(16)})`,
+            () => {
+                const a = Math.floor(Math.random() * 50) + 1;
+                const b = Math.floor(Math.random() * 50) + 1;
+                const c = n - (a + b);
+                return `(${a}+${b}+${c})`;
+            }
+        ];
+        return methods[Math.floor(Math.random() * methods.length)]();
     }
     
     function createStringTable(strings) {
         const tableVar = generateVarName();
-        const decryptVar = generateVarName();
-        const key = Math.floor(Math.random() * 200) + 55;
+        const decoderVar = generateVarName();
+        const stringMap = new Map();
+        const encodedStrings = [];
         
-        let code = `local ${tableVar} = {}\n`;
-        const replacements = {};
-        
-        strings.forEach((str, index) => {
-            const encrypted = xorEncrypt(str.content, key);
-            const indexName = generateVarName();
-            code += `${tableVar}["${indexName}"] = {`;
-            encrypted.forEach((byte, i) => {
-                code += byte;
-                if (i < encrypted.length - 1) code += ',';
-            });
-            code += `}\n`;
-            replacements[str.original] = `${decryptVar}(${tableVar}["${indexName}"],${key})`;
+        strings.forEach((str, idx) => {
+            const key = generateVarName();
+            const encoded = [];
+            for(let i = 0; i < str.length; i++) {
+                encoded.push(str.charCodeAt(i) + idx + 77);
+            }
+            encodedStrings.push(`[${idx + 1}]={${encoded.join(',')}}`);
+            stringMap.set(str, `${decoderVar}(${tableVar}[${idx + 1}],${idx + 77})`);
         });
         
-        code += `local ${decryptVar} = function(t,k) local s = "" for i=1,#t do s=s..string.char(t[i]~k) end return s end\n`;
+        const decoder = `local ${tableVar}={${encodedStrings.join(',')}} ` +
+                       `local ${decoderVar}=function(t,k) local s="" for i=1,#t do s=s..string.char(t[i]-k) end return s end `;
         
-        return { code, replacements };
+        return { decoder, stringMap, tableVar };
     }
     
     function extractStrings(code) {
         const strings = [];
-        const regex = /(['"])((?:\\.|(?!\1).)*?)\1/g;
+        const regex = /(["'])(?:(?=(\\?))\2.)*?\1/g;
         let match;
-        
-        while ((match = regex.exec(code)) !== null) {
-            strings.push({
-                original: match[0],
-                content: match[2],
-                index: match.index
-            });
+        while((match = regex.exec(code)) !== null) {
+            const content = match[0].slice(1, -1);
+            if(content.length > 0) {
+                strings.push({
+                    full: match[0],
+                    content: content,
+                    index: match.index
+                });
+            }
         }
-        
         return strings;
     }
     
-    function obfuscateNumbers(code) {
-        return code.replace(/\b(\d+)\b/g, (match, num) => {
-            const n = parseInt(num);
-            if (isNaN(n)) return match;
-            
-            const method = Math.floor(Math.random() * 4);
-            switch(method) {
-                case 0:
-                    const add = Math.floor(Math.random() * 1000) + 100;
-                    return `(${n + add}-${add})`;
-                case 1:
-                    const mul = Math.floor(Math.random() * 9) + 2;
-                    return `(${n * mul}/${mul})`;
-                case 2:
-                    return `(0x${n.toString(16)})`;
-                case 3:
-                    const xor = Math.floor(Math.random() * 255) + 1;
-                    return `(${n ^ xor}~${xor})`;
-                default:
-                    return match;
-            }
-        });
-    }
-    
-    function createVariableMap(code) {
-        const reserved = [
-            'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for',
-            'function', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat',
-            'return', 'then', 'true', 'until', 'while', 'self', 'require',
-            'game', 'workspace', 'script', 'wait', 'spawn', 'delay', 'tick',
-            'print', 'warn', 'error', 'assert', 'type', 'typeof', 'tostring',
-            'tonumber', 'pairs', 'ipairs', 'next', 'select', 'table',
-            'string', 'math', 'coroutine', 'os', 'debug', 'getfenv', 'setfenv',
-            'getmetatable', 'setmetatable', 'rawget', 'rawset', 'pcall', 'xpcall',
-            'loadstring', 'load', '_G', '_VERSION', 'Instance', 'Vector3', 'CFrame',
-            'Color3', 'UDim2', 'TweenInfo', 'Enum', 'Ray', 'Region3'
-        ];
+    function createVarMapping(code) {
+        const keywords = ['local', 'function', 'if', 'then', 'else', 'elseif', 'end', 
+                         'for', 'while', 'do', 'repeat', 'until', 'return', 'break',
+                         'and', 'or', 'not', 'true', 'false', 'nil', 'in', 'pairs',
+                         'ipairs', 'next', 'print', 'type', 'tostring', 'tonumber',
+                         'string', 'table', 'math', 'coroutine', 'io', 'os', 'debug',
+                         'getfenv', 'setfenv', 'getmetatable', 'setmetatable', 'rawget',
+                         'rawset', 'pcall', 'xpcall', 'load', 'loadstring', 'require',
+                         'module', 'select', 'unpack', 'error', 'assert'];
         
-        const variableRegex = /\b([a-zA-Z_][a-zA-Z0-9_]*)\b/g;
-        const found = new Set();
+        const varRegex = /\b([a-zA-Z_][a-zA-Z0-9_]*)\b/g;
+        const vars = new Set();
         let match;
         
-        while ((match = variableRegex.exec(code)) !== null) {
-            const varName = match[1];
-            if (!reserved.includes(varName) && !varName.startsWith('_')) {
-                found.add(varName);
+        while((match = varRegex.exec(code)) !== null) {
+            if(!keywords.includes(match[1]) && !match[1].startsWith('_')) {
+                vars.add(match[1]);
             }
         }
         
-        const mapping = {};
-        found.forEach(varName => {
-            mapping[varName] = generateVarName();
+        const mapping = new Map();
+        vars.forEach(v => {
+            mapping.set(v, generateVarName());
         });
         
         return mapping;
     }
     
-    function replaceVariables(code, mapping) {
-        let result = code;
+    function injectDeadCode() {
+        const deadVars = [];
+        const count = 3 + Math.floor(Math.random() * 5);
         
-        Object.keys(mapping).sort((a, b) => b.length - a.length).forEach(original => {
-            const replacement = mapping[original];
-            const regex = new RegExp(`\\b${original}\\b`, 'g');
-            result = result.replace(regex, replacement);
-        });
+        for(let i = 0; i < count; i++) {
+            const varName = generateVarName();
+            const templates = [
+                `local ${varName}=(function() return ${Math.random()} end)()`,
+                `local ${varName}={[${Math.floor(Math.random() * 100)}]=${Math.floor(Math.random() * 100)}}`,
+                `local ${varName}=coroutine.create(function() while false do end end)`,
+                `local ${varName}=(function() local t={} for i=1,${Math.floor(Math.random() * 10)} do t[i]=i end return t end)()`
+            ];
+            deadVars.push(templates[Math.floor(Math.random() * templates.length)]);
+        }
         
-        return result;
+        return deadVars.join(' ');
     }
     
-    function addJunkCode(code) {
-        const lines = code.split('\n');
-        const result = [];
+    function createControlFlow(code) {
+        const flowVar = generateVarName();
+        const stateVar = generateVarName();
+        const chunks = code.split(/(?<=end|;|\n)/).filter(c => c.trim());
         
-        lines.forEach(line => {
-            result.push(line);
-            if (Math.random() > 0.7 && line.trim() && !line.includes('local')) {
-                const junkVar = generateVarName();
-                const junkType = Math.floor(Math.random() * 3);
-                switch(junkType) {
-                    case 0:
-                        result.push(`local ${junkVar} = ${Math.floor(Math.random() * 9999)}`);
-                        break;
-                    case 1:
-                        result.push(`local ${junkVar} = function() return nil end`);
-                        break;
-                    case 2:
-                        result.push(`local ${junkVar} = {}`);
-                        break;
-                }
-            }
+        if(chunks.length < 2) return code;
+        
+        const states = [];
+        chunks.forEach((chunk, idx) => {
+            states.push({
+                id: idx + 1,
+                code: chunk,
+                next: idx < chunks.length - 1 ? idx + 2 : 0
+            });
         });
         
-        return result.join('\n');
+        states.sort(() => Math.random() - 0.5);
+        
+        let flow = `local ${stateVar}=1 local ${flowVar}={`;
+        states.forEach((state, idx) => {
+            flow += `[${state.id}]=function() ${state.code} ${stateVar}=${state.next} end`;
+            if(idx < states.length - 1) flow += ',';
+        });
+        flow += `} while ${stateVar}>0 do ${flowVar}[${stateVar}]() end`;
+        
+        return flow;
+    }
+    
+    function createAntiTamper() {
+        const checkVar = generateVarName();
+        const sourceVar = generateVarName();
+        const errorVar = generateVarName();
+        
+        return `local ${checkVar}=(function()
+            local ${sourceVar}=debug and debug.getinfo and debug.getinfo(1,'S').source or ""
+            if not ${sourceVar}:match("Obfuscated in https://vanprojects%.netlify%.app/luaobfuscator") then
+                local ${errorVar}=function() while true do end end
+                ${errorVar}()
+            end
+        end)() `;
+    }
+    
+    function createGarbageCollector() {
+        const gcVar = generateVarName();
+        const memVar = generateVarName();
+        
+        return `local ${gcVar}=collectgarbage local ${memVar}=${gcVar}("count") `;
+    }
+    
+    function createProxyTable() {
+        const proxyVar = generateVarName();
+        const mtVar = generateVarName();
+        const dataVar = generateVarName();
+        
+        return `local ${dataVar}={} local ${mtVar}={__index=function(t,k) return ${dataVar}[k] end,__newindex=function(t,k,v) ${dataVar}[k]=v end} local ${proxyVar}=setmetatable({},${mtVar}) `;
     }
     
     function wrapInClosure(code) {
-        const funcName = generateVarName();
-        return `(function() ${code} end)()`;
+        const mainVar = generateVarName();
+        const envVar = generateVarName();
+        const loadVar = generateVarName();
+        
+        return `(function() local ${envVar}=getfenv and getfenv() or _ENV local ${mainVar}=function() ${code} end local ${loadVar}=coroutine.wrap(${mainVar}) ${loadVar}() end)()`;
     }
     
-    function addControlFlow(code) {
-        const checkVar = generateVarName();
-        const stateVar = generateVarName();
-        
-        return `
-local ${stateVar} = true
-local ${checkVar} = function()
-    if not ${stateVar} then
-        while true do end
-    end
-end
-${checkVar}()
-${code}
-${checkVar}()`;
+    function obfuscateBooleans(code) {
+        code = code.replace(/\btrue\b/g, '(not false)');
+        code = code.replace(/\bfalse\b/g, '(not true)');
+        code = code.replace(/\bnil\b/g, '(function() return end)()');
+        return code;
     }
     
-    function encodeBase64(str) {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-        let result = '';
-        let i = 0;
+    function createJunkMethods() {
+        const junk = [];
+        const count = 2 + Math.floor(Math.random() * 3);
         
-        while (i < str.length) {
-            const a = str.charCodeAt(i++);
-            const b = i < str.length ? str.charCodeAt(i++) : 0;
-            const c = i < str.length ? str.charCodeAt(i++) : 0;
-            
-            const bitmap = (a << 16) | (b << 8) | c;
-            
-            result += chars.charAt((bitmap >> 18) & 63);
-            result += chars.charAt((bitmap >> 12) & 63);
-            result += i - 2 < str.length ? chars.charAt((bitmap >> 6) & 63) : '=';
-            result += i - 1 < str.length ? chars.charAt(bitmap & 63) : '=';
+        for(let i = 0; i < count; i++) {
+            const funcVar = generateVarName();
+            const paramVar = generateVarName();
+            junk.push(`local ${funcVar}=function(${paramVar}) return ${paramVar} and ${paramVar} or ${Math.random()} end`);
         }
         
-        return result;
+        return junk.join(' ');
     }
     
-    function createLoader(code) {
-        const chunks = [];
-        const chunkSize = 100;
-        
-        for (let i = 0; i < code.length; i += chunkSize) {
-            chunks.push(code.substr(i, chunkSize));
+    function encodeAsBytes(code) {
+        const bytes = [];
+        for(let i = 0; i < code.length; i++) {
+            bytes.push(code.charCodeAt(i));
         }
         
-        const tableVar = generateVarName();
         const loaderVar = generateVarName();
-        const concatVar = generateVarName();
+        const dataVar = generateVarName();
+        const decodeVar = generateVarName();
         
-        let result = `local ${tableVar} = {}\n`;
+        const chunks = [];
+        for(let i = 0; i < bytes.length; i += 100) {
+            chunks.push(bytes.slice(i, i + 100));
+        }
         
-        chunks.forEach((chunk, i) => {
-            const key = generateVarName();
-            const encrypted = xorEncrypt(chunk, 42);
-            result += `${tableVar}["${key}"] = {`;
-            encrypted.forEach((byte, j) => {
-                result += byte;
-                if (j < encrypted.length - 1) result += ',';
-            });
-            result += `}\n`;
+        let result = `local ${dataVar}={`;
+        chunks.forEach((chunk, idx) => {
+            result += `[${idx + 1}]={${chunk.join(',')}}`;
+            if(idx < chunks.length - 1) result += ',';
         });
-        
-        result += `
-local ${concatVar} = ""
-local ${loaderVar} = function(t)
-    for k,v in pairs(t) do
-        for i=1,#v do
-            ${concatVar} = ${concatVar} .. string.char(v[i]~42)
-        end
-    end
-    return ${concatVar}
-end
-local ${generateVarName()} = ${loaderVar}(${tableVar})
-return (loadstring or load)(${generateVarName()})()`;
+        result += `} local ${decodeVar}=function(t) local s="" for _,c in pairs(t) do for _,b in pairs(c) do s=s..string.char(b) end end return s end `;
+        result += `local ${loaderVar}=load or loadstring ${loaderVar}(${decodeVar}(${dataVar}))()`;
         
         return result;
     }
     
-    function addWatermarkProtection(code) {
-        const watermark = '--[[ Obfuscated in https://vanprojects.netlify.app/luaobfuscator ]]--';
-        const checkVar = generateVarName();
-        const validateVar = generateVarName();
-        const sourceVar = generateVarName();
+    function obfuscate(input) {
+        if(!input || !input.trim()) return '';
         
-        const protection = `
-local ${sourceVar} = [[${watermark}]]
-local ${checkVar} = function()
-    local ${validateVar} = debug and debug.getinfo or function() return {source=""} end
-    if not ${sourceVar}:find("vanprojects") then
-        return (function() while true do end end)()
-    end
-end
-${checkVar}()
-`;
+        let code = input;
+        code = code.replace(/--```math
+```math
+[\s\S]*?``````/g, '');
+        code = code.replace(/--[^\n]*/g, '');
+        code = code.replace(/\n\s*\n/g, '\n');
         
-        return watermark + '\n' + protection + code;
-    }
-    
-    function compressCode(code) {
-        return code.replace(/--```math
-[\s\S]*?``````/g, '')
-                   .replace(/--[^\n]*/g, '')
-                   .replace(/\s+/g, ' ')
-                   .replace(/\s*([=+\-*/%<>~])\s*/g, '$1')
-                   .replace(/\s*([(),{}[```;])\s*/g, '$1')
-                   .replace(/;\s*/g, ';')
-                   .replace(/\n+/g, ' ')
-                   .trim();
-    }
-    
-    function generateRandomConstants() {
-        const count = Math.floor(Math.random() * 5) + 5;
-        const constants = [];
+        const strings = extractStrings(code);
+        const uniqueStrings = [...new Set(strings.map(s => s.content))];
         
-        for (let i = 0; i < count; i++) {
-            const name = generateVarName();
-            const value = Math.floor(Math.random() * 10000);
-            constants.push(`local ${name} = ${value}`);
-        }
-        
-        return constants.join('\n');
-    }
-    
-    function shuffleArray(array) {
-        const result = [...array];
-        for (let i = result.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [result[i], result[j]] = [result[j], result[i]];
-        }
-        return result;
-    }
-    
-    function createComplexLoader(code) {
-        const parts = [];
-        const partSize = 50;
-        
-        for (let i = 0; i < code.length; i += partSize) {
-            parts.push(code.substr(i, partSize));
-        }
-        
-        const shuffled = shuffleArray(parts.map((part, i) => ({ part, index: i })));
-        const tableVar = generateVarName();
-        const orderVar = generateVarName();
-        const assembleVar = generateVarName();
-        
-        let result = `local ${tableVar} = {}\n`;
-        let order = `local ${orderVar} = {`;
-        
-        shuffled.forEach(({ part, index }) => {
-            const key = generateVarName();
-            const xorKey = Math.floor(Math.random() * 127) + 1;
-            const encrypted = xorEncrypt(part, xorKey);
+        if(uniqueStrings.length > 0) {
+            const { decoder, stringMap } = createStringTable(uniqueStrings);
             
-            result += `${tableVar}["${key}"] = {k=${xorKey},d={`;
-            encrypted.forEach((byte, i) => {
-                result += byte;
-                if (i < encrypted.length - 1) result += ',';
+            strings.reverse().forEach(str => {
+                const replacement = stringMap.get(str.content);
+                if(replacement) {
+                    code = code.substring(0, str.index) + replacement + code.substring(str.index + str.full.length);
+                }
             });
-            result += `}}\n`;
             
-            order += `{i=${index},k="${key}"},`;
-        });
+            code = decoder + code;
+        }
         
-        order = order.slice(0, -1) + '}\n';
-        
-        result += order;
-        result += `
-table.sort(${orderVar}, function(a,b) return a.i < b.i end)
-local ${assembleVar} = ""
-for _,v in ipairs(${orderVar}) do
-    local t = ${tableVar}[v.k]
-    for _,b in ipairs(t.d) do
-        ${assembleVar} = ${assembleVar} .. string.char(b ~ t.k)
-    end
-end
-return (loadstring or load)(${assembleVar})()`;
-        
-        return result;
-    }
-    
-    return {
-        obfuscate: function(inputCode) {
-            let code = inputCode;
-            
-            code = compressCode(code);
-            
-            const strings = extractStrings(code);
-            if (strings.length > 0) {
-                const stringTable = createStringTable(strings);
-                strings.reverse().forEach(str => {
-                    code = code.replace(str.original, stringTable.replacements[str.original]);
-                });
-                code = stringTable.code + code;
+        const numbers = code.match(/\b\d+\.?\d*\b/g) || [];
+        numbers.forEach(num => {
+            if(parseFloat(num) > 0) {
+                const regex = new RegExp(`\\b${num}\\b`, 'g');
+                code = code.replace(regex, obfuscateNumber(num));
             }
-            
-            code = obfuscateNumbers(code);
-            
-            const varMap = createVariableMap(code);
-            code = replaceVariables(code, varMap);
-            
-            code = addJunkCode(code);
-            
-            const constants = generateRandomConstants();
-            code = constants + '\n' + code;
-            
-            code = addControlFlow(code);
-            
-            code = wrapInClosure(code);
-            
-            code = createComplexLoader(code);
-            
-            code = addWatermarkProtection(code);
-            
-            return code;
+        });
+        
+        code = obfuscateBooleans(code);
+        
+        const varMapping = createVarMapping(code);
+        varMapping.forEach((newName, oldName) => {
+            const regex = new RegExp(`\\b${oldName}\\b`, 'g');
+            code = code.replace(regex, newName);
+        });
+        
+        const deadCode = injectDeadCode();
+        const junkMethods = createJunkMethods();
+        const proxyTable = createProxyTable();
+        const gcCode = createGarbageCollector();
+        
+        code = deadCode + ' ' + junkMethods + ' ' + proxyTable + ' ' + gcCode + ' ' + code;
+        
+        if(code.length > 200 && Math.random() > 0.3) {
+            code = createControlFlow(code);
         }
-    };
+        
+        code = wrapInClosure(code);
+        
+        const antiTamper = createAntiTamper();
+        code = antiTamper + code;
+        
+        if(code.length > 500 && Math.random() > 0.5) {
+            code = encodeAsBytes(code);
+        }
+        
+        const watermark = "--[[ Obfuscated in https://vanprojects.netlify.app/luaobfuscator ]]--";
+        
+        code = code.replace(/\s+/g, ' ').trim();
+        
+        return watermark + '\n' + code;
+    }
+    
+    return { obfuscate };
 })();
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = LuaObfuscator;
+if(typeof window !== 'undefined') {
+    window.LuaObfuscator = LuaObfuscator;
 }
