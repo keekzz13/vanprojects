@@ -1,110 +1,33 @@
-// Utility Functions
-const $ = (s, d = document) => d.querySelector(s);
-const $$ = (s, d = document) => d.querySelectorAll(s);
-const C = (t, c = 1) => t.split('').map((_, i) => String.fromCharCode(t.charCodeAt(i) ^ c)).join('');
-const R = (m, n) => Math.floor(Math.random() * (n - m + 1) + m);
-const S = (a) => a.sort(() => 0.5 - Math.random());
-const X = (l = 32) => Array(l).fill().map(() => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[R(0, 61)]).join('');
-const Y = (s, k = X()) => s.split('').map(c => k[c.charCodeAt(0) % k.length] || c).join('');
-const Z = (s, k = X()) => s.split('').map(c => k.indexOf(c) >= 0 ? String.fromCharCode(k.indexOf(c)) : c).join('');
-const _ = (s, l = R(2, 4)) => { for (let i = 0; i < l; i++) s = C(Y(s)); return s; };
-const __ = (s, l = R(2, 4)) => { for (let i = 0; i < l; i++) s = Z(C(s)); return s; };
-
-// Anti-Debugging Tricks
-const antiDebug = () => {
-  const checks = [
-    `if debug.getinfo then return end`,
-    `if _G["debug"] then os.exit() end`,
-    `local mt = getmetatable(_G) if mt then mt.__index = function() error("No debug!") end end`,
-    `local oldprint = print; _G.print = function(...) if select('#', ...) > 0 and tostring(select(1, ...)):find("debug") then return else oldprint(...) end end`
-  ];
-  return checks[R(0, checks.length - 1)];
-};
-
-// Dynamic Key Generation
-const dynamicKey = () => {
-  const key = X(16);
-  return `
-    local function getKey()
-      local key = "${key}"
-      for i=1,#key do
-        key = key:sub(2) .. key:sub(1,1)
-        key = key:gsub(".(.)", function(a,b) return b..a end)
-      end
-      return key
-    end
-  `;
-};
-
-// Junk Code Injection
-const junkCode = () => {
-  const junk = [
-    `local ${X(8)} = function() return ${R(100, 9999)} end`,
-    `for ${X(5)}=1,${R(5, 20)} do local ${X(8)}=math.random() end`,
-    `if ${R(1, 100)} > ${R(1, 100)} then ${X(8)}() end`,
-    `local ${X(8)} = {${Array(R(3, 10)).fill().map(() => R(0, 255)).join(',')}}`,
-    `pcall(function() ${X(8)} = ${R(1, 100)} end)`
-  ];
-  return junk[R(0, junk.length - 1)];
-};
-
-// Number Obfuscation
-const obfuscateNumber = (n) => {
-  if (n < 10) return n;
-  const ops = ['+', '-', '*', '/', '^'];
-  const a = R(1, n - 1);
-  const b = n - a;
-  const op = ops[R(0, ops.length - 1)];
-  return `${a}${op}${b}`;
-};
-
-// Base64 + XOR Obfuscation
-const B64 = (s) => btoa(encodeURIComponent(s).replace(/%([0-9A-F]{2})/g, (_, p) => String.fromCharCode('0x' + p)));
-const XOR_B64 = (s, k) => C(B64(s), k);
-
-// Main Obfuscator Function
-const T = (code, options = {}) => {
-  const {
-    junk = true,
-    antiDebugging = true,
-    dynamicKeys = true,
-    layers = R(3, 8)
-  } = options;
-
-  // Generate random variable names
-  const vars = Array(100).fill().map(() => X(8));
-  const [r, n, e, o, u, a, i, s, l, d, p, h, v, g, y, m, b, w, k, E, S, x, N, C, D, P, L, O, A, I, U, F, R, B, W, K, V, G, Y, M, q, H, j, Q, z] = vars;
-
-  // Obfuscate the input code
-  let obfuscated = _(code);
-
-  // Add layers of obfuscation
-  for (let layer = 0; layer < layers; layer++) {
-    obfuscated = R(0, 1) ? _(obfuscated) : __(obfuscated);
-    if (junk) obfuscated = `${junkCode()}\n${obfuscated}`;
+!(function(e,t){var n={};function r(i){if(n[i])return n[i].exports;var o=n[i]={i:i,l:!1,exports:{}};return e[i].call(o.exports,o,o.exports,r),o.l=!0,o.exports}var i=0;r.m=e,r.c=n,r.d=function(e,t,n){r.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:n})},r.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},r.t=function(e,t){if(1&t&&(e=r(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var n=Object.create(null);if(r.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var i in e)r.d(n,i,function(t){return e[t]}.bind(null,i));return n},r.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return r.d(t,"a",t),t},r.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},r.p="",r(r.s=1)}([function(e,t,n){e.exports=n(2)},function(e,t,n){var r=n(0),i=n(3);r.T=function(e,t){t=t||{};var n=r.X(8),o=r.X(8),a=r.X(8),s=r.X(8),l=r.X(8),c=r.X(8),u=r.X(8),d=r.X(8),p=r.X(8),h=r.X(8),f=r.X(8),g=r.X(8),m=r.X(8),v=r.X(8),y=r.X(8),b=r.X(8),w=r.X(8),k=r.X(8),E=r.X(8),S=r.X(8),x=r.X(8),N=r.X(8),C=r.X(8),D=r.X(8),P=r.X(8),L=r.X(8),O=r.X(8),A=r.X(8),I=r.X(8),U=r.X(8),F=r.X(8),R=r.X(8),B=r.X(8),W=r.X(8),K=r.X(8),V=r.X(8),G=r.X(8),Y=r.X(8),M=r.X(8),q=r.X(8),H=r.X(8),j=r.X(8),Q=r.X(8),z=r.X(8),X=r.X(8),T=r.R(100,9999),_=r.R(100,9999),__=r.R(100,9999),___=r.R(100,9999),____=r.R(100,9999),_____=r.R(100,9999),______=r.R(100,9999),_______=r.R(100,9999),________=r.R(100,9999),_________=r.R(100,9999),__________=r.R(100,9999),___________=r.R(100,9999),____________=r.R(100,9999),_____________=r.R(100,9999),______________=r.R(100,9999),_______________=r.R(100,9999),________________=r.R(100,9999),_________________=r.R(100,9999),__________________=r.R(100,9999),___________________=r.R(100,9999),____________________=r.R(100,9999),_____________________=r.R(100,9999),c=r.C(e,r.R(1,255)),u=r.Y(c),d=r.Z(u),p=r._(d),h=r.__(p),f=r.S([n,o,a,s,l,c,u,d,p,h,f,g,m,v,y,b,w,k,E,S,x,N,C,D,P,L,O,A,I,U,F,R,B,W,K,V,G,Y,M,q,H,j,Q,z,X,T,_,__,___,____,_____,______,_______,________,_________,__________,___________,____________,_____________,______________,_______________,________________,_________________,__________________,___________________,____________________,_____________________]).join(""),g=r.X(32),m=r.X(32),v=r.X(32),y=r.X(32),b=r.X(32),w=r.X(32),k=r.X(32),E=r.X(32),S=r.X(32),x=r.X(32),N=r.X(32),C=r.X(32),D=r.X(32),P=r.X(32),L=r.X(32),O=r.X(32),A=r.X(32),I=r.X(32),U=r.X(32),F=r.X(32),R=r.X(32),B=r.X(32),W=r.X(32),K=r.X(32),V=r.X(32),G=r.X(32),Y=r.X(32),M=r.X(32),q=r.X(32),H=r.X(32),j=r.X(32),Q=r.X(32),z=r.X(32),X=r.X(32);return`--[[ Obfuscated in https://vanprojects.netlify.app/luaobfuscator ]]--\nlocal ${n}=function()${t.junk?`
+  local ${f}=${r.R(1e4,9e4)}
+  local ${g}=${r.R(1e4,9e4)}
+  ${i.antiDebug}
+  ${i.dynamicKey}
+  ${Array(r.R(3,8)).fill().map(()=>`local ${r.X(8)}=function()local ${r.X(5)}=${r.R(1,255)}return ${r.X(5)} end`).join("\n  ")}
+  local ${o}={
+    ${Array(r.R(5,15)).fill().map((_,i)=>`[${i+1}]="${r.X(r.R(5,20))}"`).join(",\n    ")}
   }
-
-  // Inject anti-debugging
-  if (antiDebugging) obfuscated = `${antiDebug()}\n${obfuscated}`;
-
-  // Inject dynamic key generation
-  if (dynamicKeys) obfuscated = `${dynamicKey()}\n${obfuscated}`;
-
-  // Wrap in a random function
-  return `
---[[ Obfuscated in https://vanprojects.netlify.app/luaobfuscator ]]--
-local ${r}=function()
-  ${vars.map(v => `local ${v}=${R(100, 9999)}`).join('\n  ')}
-  ${obfuscated}
-  return ${r}
+  local ${a}={
+    ${Array(r.R(3,10)).fill().map(()=>`${r.X(8)}=function(${r.X(5)})return ${r.R(1,255)} end`).join(",\n    ")}
+  }`:""}
+  local function ${s}(a)
+    local b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,a1,b1,c1,d1,e1,f1,g1,h1,i1,j1,k1,l1,m1,n1,o1,p1,q1,r1,s1,t1,u1,v1,w1,x1,y1,z1,A1,B1,C1,D1,E1,F1,G1,H1,I1,J1,K1,L1,M1,N1,O1,P1,Q1,R1,S1,T1,U1,V1,W1,X1,Y1,Z1=string.byte(a,1,#a)
+    for i=1,#b do b[i]=b[i]~${T} end
+    return string.char(table.unpack(b))
+  end
+  local function ${l}(a)
+    local b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,a1,b1,c1,d1,e1,f1,g1,h1,i1,j1,k1,l1,m1,n1,o1,p1,q1,r1,s1,t1,u1,v1,w1,x1,y1,z1,A1,B1,C1,D1,E1,F1,G1,H1,I1,J1,K1,L1,M1,N1,O1,P1,Q1,R1,S1,T1,U1,V1,W1,X1,Y1,Z1=string.byte(a,1,#a)
+    for i=1,#b do b[i]=b[i]~${_} end
+    return string.char(table.unpack(b))
+  end
+  ${Array(r.R(20,50)).fill().map((_,idx)=>`
+  local function ${r.X(8)}(a)
+    local b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,a1,b1,c1,d1,e1,f1,g1,h1,i1,j1,k1,l1,m1,n1,o1,p1,q1,r1,s1,t1,u1,v1,w1,x1,y1,z1,A1,B1,C1,D1,E1,F1,G1,H1,I1,J1,K1,L1,M1,N1,O1,P1,Q1,R1,S1,T1,U1,V1,W1,X1,Y1,Z1=string.byte(a,1,#a)
+    for i=1,#b do b[i]=b[i]~${r.R(100,9999)} end
+    return string.char(table.unpack(b))
+  end`).join("\n  ")}
+  local ${u}=${JSON.stringify(e.split("\n").map(line=>`${d}( "${r._(r.Y(line))}" )`).join("\n  "))}
+  local ${p}=load(${u})
+  return ${p}
 end
-${r}()
-  `.trim();
-};
-
-// Export for Node.js / Browser
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { T, _, __, C, Y, Z, X, R };
-} else {
-  window.LuaObfuscator = { T, _, __, C, Y, Z, X, R };
-}
+${n}()`}},function(e,t){var n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",r=[];for(e=0;e<62;e++)r[e]=n[e];t.exports={X:function(e,t){t=t||32;for(var n="",r=0;r<t;r++)n+=this.X(1);return n},R:function(e,t){return Math.floor(Math.random()*(t-e+1)+e)},C:function(e,t){t=t||1;for(var n="",r=0;r<e.length;r++)n+=String.fromCharCode(e.charCodeAt(r)^t);return n},Y:function(e,t){t=t||this.X(32);for(var n="",r=0;r<e.length;r++)n+=t[e.charCodeAt(r)%t.length]||e[r];return n},Z:function(e,t){t=t||this.X(32);for(var n="",r=0;r<e.length;r++)n+=t.indexOf(e[r])>=0?String.fromCharCode(t.indexOf(e[r])):e[r];return n},_:function(e,t){t=t||this.R(2,4);for(var n=0;n<t;n++)e=this.C(this.Y(e));return e},__:function(e,t){t=t||this.R(2,4);for(var n=0;n<t;n++)e=this.Z(this.C(e));return e},S:function(e){return e.sort(function(){return.5-Math.random()})}},function(e){e.junk=`local ${e.X(8)}=function()local ${e.X(5)}=${e.R(1,255)}return ${e.X(5)} end`,e.antiDebug=[`if debug.getinfo then return end`,`if _G["debug"] then os.exit() end`,`local mt=getmetatable(_G) if mt then mt.__index=function()error("")end end`][e.R(0,2)],e.dynamicKey=`local function getKey()local key="${e.X(16)}"for i=1,#key do key=key:sub(2)..key:sub(1,1)key=key:gsub(".(.)",function(a,b)return b..a end)end return key end`}}],2);
