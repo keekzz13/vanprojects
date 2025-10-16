@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanProjects - Lua Obfuscator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">VanProjects</div>
+            <nav>
+                <a href="#home">Home</a>
+                <a href="#features">Features</a>
+                <a href="#obfuscator">Obfuscator</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>Advanced Lua Obfuscator</h1>
+            <p>Protect your Lua scripts with military-grade obfuscation</p>
+            <a href="#obfuscator" class="cta-button">Start Obfuscating</a>
+        </section>
+
+        <section class="features" id="features">
+            <h2>Why Choose Us?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">🔒</div>
+                    <h3>Unbreakable Security</h3>
+                    <p>Multi-layer protection that prevents deobfuscation attempts</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">⚡</div>
+                    <h3>Zero Performance Loss</h3>
+                    <p>Optimized obfuscation maintains script execution speed</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🎯</div>
+                    <h3>Advanced Algorithms</h3>
+                    <p>Proprietary obfuscation techniques used by professionals</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🛡️</div>
+                    <h3>Tamper Protection</h3>
+                    <p>Built-in verification prevents header modification</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="obfuscator-section" id="obfuscator">
+            <h2>Obfuscate Your Code</h2>
+            <div class="editor-container">
+                <div class="editor-panel">
+                    <div class="panel-header">
+                        <span>Input Code</span>
+                        <button class="clear-btn" onclick="clearInput()">Clear</button>
+                    </div>
+                    <textarea id="inputCode" placeholder="Paste your Lua code here..."></textarea>
+                </div>
+                <div class="editor-panel">
+                    <div class="panel-header">
+                        <span>Obfuscated Output</span>
+                        <button class="copy-btn" onclick="copyOutput()">Copy</button>
+                    </div>
+                    <textarea id="outputCode" readonly placeholder="Obfuscated code will appear here..."></textarea>
+                </div>
+            </div>
+            <button class="obfuscate-btn" onclick="obfuscateCode()">Obfuscate Code</button>
+        </section>
+
+        <footer>
+            <p>&copy; 2024 VanProjects. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="obfuscator.js"></script>
+</body>
+</html>
