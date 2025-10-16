@@ -1,26 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Lua Obfuscator</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Van Projects - Lua Obfuscator</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="x">
-<div class="b">
-<div class="h">Lua Obfuscator</div>
-<div class="p">
-<textarea id="i" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-</div>
-<div class="c">
-<button id="o">Obfuscate</button>
-</div>
-<div class="p">
-<textarea id="u" readonly></textarea>
-</div>
-</div>
-</div>
-<script src="obfuscator.js"></script>
+    <div class="gradient-bg"></div>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">Van<span>Projects</span></div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <section class="hero-section">
+            <h1 class="hero-title">Lua Script Obfuscator</h1>
+            <p class="hero-subtitle">Enterprise-grade protection for your Lua scripts</p>
+        </section>
+
+        <section class="workspace">
+            <div class="editor-grid">
+                <div class="editor-panel">
+                    <div class="panel-header">
+                        <h2>Source Code</h2>
+                        <div class="panel-actions">
+                            <button class="btn-icon" onclick="clearInput()" title="Clear">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M2 4h12M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1M7 7v5M9 7v5M3 4h10l-1 9H4L3 4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="inputCode" class="code-editor" placeholder="Enter your Lua code here...
+
+Example:
+local function greet(name)
+    print('Hello, ' .. name)
+end
+
+greet('World')"></textarea>
+                </div>
+
+                <div class="editor-panel">
+                    <div class="panel-header">
+                        <h2>Obfuscated Output</h2>
+                        <div class="panel-actions">
+                            <button class="btn-icon" onclick="copyToClipboard()" title="Copy">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M4 2h8a2 2 0 012 2v8M4 6H2a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-2"/>
+                                </svg>
+                            </button>
+                            <button class="btn-icon" onclick="downloadCode()" title="Download">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M8 12l-4-4h3V2h2v6h3l-4 4zM2 14h12v2H2v-2z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="outputCode" class="code-editor" placeholder="Obfuscated code will appear here..." readonly></textarea>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <button class="btn-primary" onclick="processObfuscation()">
+                    <span class="btn-text">Obfuscate Code</span>
+                    <svg class="btn-icon-right" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 3l7 7-7 7M3 10h14"/>
+                    </svg>
+                </button>
+                <button class="btn-secondary" onclick="resetAll()">Reset All</button>
+            </div>
+        </section>
+
+        <section class="info-section" id="features">
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="card-icon">🔒</div>
+                    <h3>Advanced Protection</h3>
+                    <p>Multi-layer obfuscation with string encryption and control flow flattening</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-icon">⚡</div>
+                    <h3>Fast Processing</h3>
+                    <p>Instant obfuscation with optimized algorithms for any script size</p>
+                </div>
+                <div class="info-card">
+                    <div class="card-icon">🛡️</div>
+                    <h3>Integrity Protection</h3>
+                    <p>Built-in verification to prevent unauthorized modifications</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Van Projects. All rights reserved.</p>
+    </footer>
+
+    <script src="obfuscator.js"></script>
 </body>
 </html>
