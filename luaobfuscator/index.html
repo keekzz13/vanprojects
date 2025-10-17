@@ -3,143 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Van Projects - Professional Lua Obfuscator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <title>Luau Obfuscator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="#" class="nav-logo">Van Projects</a>
-            <ul class="nav-menu">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#obfuscator">Obfuscator</a></li>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#about">About</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1 class="hero-title">Advanced Lua Obfuscator</h1>
-            <p class="hero-subtitle">Military-grade protection for your Roblox scripts</p>
-            <a href="#obfuscator" class="hero-button">Start Obfuscating</a>
-        </div>
-    </section>
-
-    <section id="obfuscator" class="obfuscator-section">
-        <div class="container">
-            <h2 class="section-title">Code Obfuscator</h2>
-            <div class="obfuscator-container">
-                <div class="input-panel">
-                    <div class="panel-header">
-                        <h3>Input Code</h3>
-                        <button class="clear-btn" onclick="clearInput()">Clear</button>
-                    </div>
-                    <textarea id="input-code" placeholder="-- Paste your Lua code here&#10;local myVariable = 'Hello World'&#10;print(myVariable)" spellcheck="false"></textarea>
-                </div>
-                
-                <div class="control-panel">
-                    <button class="obfuscate-btn" onclick="obfuscateCode()">
-                        <span class="btn-icon">🔒</span>
-                        Obfuscate
-                    </button>
-                    <div class="stats">
-                        <div class="stat-item">
-                            <span>Input Size:</span>
-                            <span id="input-size">0 Bytes</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>Output Size:</span>
-                            <span id="output-size">0 Bytes</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>Size Ratio:</span>
-                            <span id="ratio">0%</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="output-panel">
-                    <div class="panel-header">
-                        <h3>Obfuscated Output</h3>
-                        <button class="copy-btn" onclick="copyOutput()">Copy Code</button>
-                    </div>
-                    <textarea id="output-code" readonly placeholder="-- Obfuscated code will appear here" spellcheck="false"></textarea>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="features" class="features-section">
-        <div class="container">
-            <h2 class="section-title">Protection Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🛡️</div>
-                    <h3>Anti-Tamper Protection</h3>
-                    <p>Script breaks if watermark is removed or modified</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔐</div>
-                    <h3>String Encryption</h3>
-                    <p>All strings are encrypted with custom algorithms</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🌀</div>
-                    <h3>Control Flow Obfuscation</h3>
-                    <p>Complex control flow makes analysis impossible</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎲</div>
-                    <h3>Random Generation</h3>
-                    <p>Each obfuscation produces unique output</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📦</div>
-                    <h3>Bytecode Encoding</h3>
-                    <p>Advanced bytecode protection for large scripts</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Instant Processing</h3>
-                    <p>Fast client-side obfuscation with no delays</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="about" class="about-section">
-        <div class="container">
-            <h2 class="section-title">About</h2>
-            <div class="about-content">
-                <p>Van Projects provides professional-grade Lua obfuscation for Roblox developers. Our obfuscator uses advanced techniques to protect your code from reverse engineering and unauthorized use.</p>
-                <div class="about-stats">
-                    <div class="about-stat">
-                        <h3>100%</h3>
-                        <p>Client-Side</p>
-                    </div>
-                    <div class="about-stat">
-                        <h3>0ms</h3>
-                        <p>Server Delay</p>
-                    </div>
-                    <div class="about-stat">
-                        <h3>∞</h3>
-                        <p>Obfuscations</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Van Projects. Advanced Lua Obfuscation Technology.</p>
-        </div>
-    </footer>
-
+    <div class="container">
+        <h1>Luau Obfuscator</h1>
+        <p>Paste your Luau script below and click to obfuscate. Each build uses random encoding layers for added security.</p>
+        <textarea id="input" placeholder="Enter your Luau code here..."></textarea>
+        <button onclick="obfuscate()">Obfuscate Now</button>
+        <textarea id="output" readonly placeholder="Obfuscated Luau will appear here..."></textarea>
+    </div>
     <script src="obfuscator.js"></script>
-    <script src="app.js"></script>
 </body>
 </html>
