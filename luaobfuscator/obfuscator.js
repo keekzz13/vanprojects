@@ -369,26 +369,3 @@ end
             alert("No symbols were renamed to generate a map.");
         }
     });
-
-    // --- Initial Example Input ---
-
-    INPUT_CODE.value = `-- Example Luau Script demonstrating features
-local function calculateMagic(input)
-    -- This calculates the square of the input plus a constant
-    local constant = "Secret Key 123"
-    local result = input * input
-    print("Calculated:", result, constant)
-    if result > 100 then
-        return true -- High value flag
-    end
-    return false
-end
-
-local data = 15
-local flag = calculateMagic(data)
-
-if flag then
-    game.Workspace.Part:Destroy() -- Global API call, must not be renamed
-end
-`;
-});
