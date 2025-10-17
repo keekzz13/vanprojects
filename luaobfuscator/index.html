@@ -3,17 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luau Obfuscator</title>
+    <title>Client-Side Luau Obfuscator (Gemini AI)</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Luau Obfuscator</h1>
-        <p>Paste your Luau script below and click to obfuscate. Each build uses random encoding layers for added security.</p>
-        <textarea id="input" placeholder="Enter your Luau code here..."></textarea>
-        <button onclick="obfuscate()">Obfuscate Now</button>
-        <textarea id="output" readonly placeholder="Obfuscated Luau will appear here..."></textarea>
+        <h1>Client-Side Luau Obfuscator</h1>
+
+        <div class="warning">
+            WARNING: Use responsibly. Do not obfuscate code you do not own or that violates terms of service.
+        </div>
+
+        <div class="io-sections">
+            <div class="io-section input-section">
+                <h2>Input Luau Code</h2>
+                <textarea id="inputCode" rows="15" placeholder="Paste your Luau code here..."></textarea>
+            </div>
+            <div class="io-section output-section">
+                <h2>Obfuscated Output</h2>
+                <textarea id="outputCode" rows="15" readonly placeholder="Output will appear here..."></textarea>
+                <div id="obfStats" class="stats"></div>
+            </div>
+        </div>
+
+        <div class="config">
+            <h2>Configuration</h2>
+            <div class="config-grid">
+                <label><input type="checkbox" id="checkRename" checked> Safe Identifier Renaming</label>
+                <label><input type="checkbox" id="checkStrings" checked> String Literal Encoding (XOR)</label>
+                <label><input type="checkbox" id="checkMinify" checked> Whitespace Removal / Minification</label>
+                <label><input type="checkbox" id="checkFlatten"> Simplified Control-Flow Flattening (Experimental)</label>
+                <label><input type="checkbox" id="checkSymbolMap"> Generate Symbol Map (JSON)</label>
+                <label><input type="checkbox" id="checkPreserveComments"> Preserve Comments (Excluding Header)</label>
+            </div>
+            <div class="aggressiveness-control">
+                <label for="aggressiveness">Aggressiveness (0-10): <span id="aggValue">5</span></label>
+                <input type="range" id="aggressiveness" min="0" max="10" value="5">
+            </div>
+        </div>
+
+        <div class="actions">
+            <button id="btnObfuscate">Obfuscate</button>
+            <button id="btnCopy" disabled>Copy Obfuscated Code</button>
+            <button id="btnDownloadLua" disabled>Download .lua</button>
+            <button id="btnDownloadMap" disabled>Download Symbol Map (JSON)</button>
+        </div>
+
+        <div class="limitations">
+            <h2>Limitations Note</h2>
+            <p>This client-side tool uses simplified methods (primarily regex/token replacement) rather than a full Luau Abstract Syntax Tree (AST) parser. Obfuscation is not foolproof. It may break code if complex renaming collisions or unconventional global uses occur. Always test obfuscated code thoroughly.</p>
+        </div>
     </div>
+
     <script src="obfuscator.js"></script>
 </body>
 </html>
