@@ -42,13 +42,15 @@ function applyShiftEncode(s, key) {
 }
 
 function buildPartsStr(parts) {
-    return '{' + parts.map(function(p) { return '"' + p + '"'; }).join(';') + '}';
+    return '{' + parts.map(function(p) { return '"' + p + '"'; }).join(',') + '}';
 }
 
-function buildDecodeExpr(decExpr, layers, numLayers, nR, nGS, nC, nB) {
+function buildDecodeExpr(decExpr, layers, numLayers, nR, nGS, nC, nB, nTN) {
+    var paramName = randomName();
+    decExpr = nGS + '(' + decExpr + ', "\\\\\\\\(%d%d?%d?)", function(' + paramName + ') return ' + nC + '(' + nTN + '(' + paramName + ')) end)';
     for (var i = numLayers - 1; i >= 0; i--) {
         var layer = layers[i];
-        var paramName = randomName();
+        paramName = randomName();
         if (layer.type === 1) {
             decExpr = nR + '(' + decExpr + ')';
         } else if (layer.type === 2) {
@@ -99,6 +101,7 @@ function obfuscateLua(code) {
     var nR = randomName();
     var nGS = randomName();
     var nTC = randomName();
+    var nTN = randomName();
     var nE = randomName();
     output += 'local ' + nG + ' = _G;\n';
     output += 'local ' + nS + ' = ' + nG + '["' + escapeStr('string') + '"];\n';
@@ -109,10 +112,11 @@ function obfuscateLua(code) {
     output += 'local ' + nR + ' = ' + nS + '.' + escapeStr('reverse') + ';\n';
     output += 'local ' + nGS + ' = ' + nS + '.' + escapeStr('gsub') + ';\n';
     output += 'local ' + nTC + ' = ' + nT + '.' + escapeStr('concat') + ';\n';
+    output += 'local ' + nTN + ' = ' + nG + '["' + escapeStr('tonumber') + '"];\n';
     var partsStr = buildPartsStr(parts);
     output += 'local ' + nE + ' = ' + nTC + '(' + partsStr + ');\n';
     var decExpr = nE;
-    decExpr = buildDecodeExpr(decExpr, layers, numLayers, nR, nGS, nC, nB);
+    decExpr = buildDecodeExpr(decExpr, layers, numLayers, nR, nGS, nC, nB, nTN);
     output += nL + '(' + decExpr + ')();\n';
     return output;
 }
