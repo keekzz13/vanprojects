@@ -107,11 +107,11 @@ function obfuscateLua(code) {
     output += 'local ' + nS + ' = ' + nG + '["' + escapeStr('string') + '"];\n';
     output += 'local ' + nT + ' = ' + nG + '["' + escapeStr('table') + '"];\n';
     output += 'local ' + nL + ' = ' + nG + '["' + escapeStr('load') + '"];\n';
-    output += 'local ' + nB + ' = ' + nS + '.' + escapeStr('byte') + ';\n';
-    output += 'local ' + nC + ' = ' + nS + '.' + escapeStr('char') + ';\n';
-    output += 'local ' + nR + ' = ' + nS + '.' + escapeStr('reverse') + ';\n';
-    output += 'local ' + nGS + ' = ' + nS + '.' + escapeStr('gsub') + ';\n';
-    output += 'local ' + nTC + ' = ' + nT + '.' + escapeStr('concat') + ';\n';
+    output += 'local ' + nB + ' = ' + nS + '["' + escapeStr('byte') + '"];\n';
+    output += 'local ' + nC + ' = ' + nS + '["' + escapeStr('char') + '"];\n';
+    output += 'local ' + nR + ' = ' + nS + '["' + escapeStr('reverse') + '"];\n';
+    output += 'local ' + nGS + ' = ' + nS + '["' + escapeStr('gsub') + '"];\n';
+    output += 'local ' + nTC + ' = ' + nT + '["' + escapeStr('concat') + '"];\n';
     output += 'local ' + nTN + ' = ' + nG + '["' + escapeStr('tonumber') + '"];\n';
     var partsStr = buildPartsStr(parts);
     output += 'local ' + nE + ' = ' + nTC + '(' + partsStr + ');\n';
